@@ -1,0 +1,15 @@
+enum ProximiioEvents {
+  positionUpdated,
+  floorChanged,
+  enteredGeofence,
+  exitedGeofence,
+  enteredPrivacyZone,
+  exitedPrivacyZone,
+  foundIBeacon,
+  updatedIBeacon,
+  lostIBeacon,
+  foundEddystoneBeacon,
+  updatedEddystoneBeacon,
+  lostEddystoneBeacon,
+  unknown,
+}
