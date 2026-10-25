@@ -222,8 +222,16 @@ map.guidance.listen((RouteGuidance? g) => ...); // after map.setGuidanceRules(Ro
 - **Docs:** `docs/site` (28 pages) in the iOS/Android style, strict exporter preflight clean. Blocked on Partner
   Zone product ids `flutter` / `flutter-map` (asked).
 - Found in the SDKs and asked: `authenticate()` fails offline on both platforms, so an offline cold start cannot
-  reach `start()`; Android `MIGRATION.md` §3.5 claims `start()` checks permissions (it does not).
-- Next: P3 (map v1 with `JourneyNavigator`) in `flutter-proximiio-map`.
+  reach `start()` (Android: current behaviour on both platforms; iOS answer open); Android `MIGRATION.md` §3.5
+  claimed `start()` checks permissions (fixed in the Android SDK docs).
+- **P3 done** (`flutter-proximiio-map`, branch `v6-migration`): native map in a platform view on both platforms,
+  per-map Pigeon channels, `MapOptions`, controller (camera, floors, features, routes, guidance) and
+  `JourneyNavigator`. Dart tests 11/11, example widget test, Android `assembleDebug` green; iOS 26.3 simulator
+  integration test passes against the live API (organisation style, two floors, camera, journey start/end).
+  CocoaPods builds a notice only (the iOS map is SwiftPM-only; asked the iOS map team for a podspec).
+  Docs: 25 pages including the 1.x migration.
+- Open: Pixel rerun with the phone unlocked; CocoaPods path not built (no CocoaPods on this machine); Partner
+  Zone product ids; iOS answers on offline `authenticate` and the map podspec.
 
 ## Status (2026-10-25, branch `v6-migration`)
 
