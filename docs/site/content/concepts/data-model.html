@@ -1,0 +1,61 @@
+<!--
+title: Data model
+description: The venue data the SDK stores on the device and how to read it from Dart.
+-->
+
+<p>
+  After <code>authenticate</code>, the SDK keeps the organisation's venue data on the device and
+  updates it while running. The getters read the stored copy.
+</p>
+
+<table>
+  <thead><tr><th>Getter</th><th>Returns</th><th>Edited in</th></tr></thead>
+  <tbody>
+    <tr><td><code>places()</code></td><td><code>ProximiioPlace</code>: venues</td><td>Proximi.io Portal</td></tr>
+    <tr><td><code>floors()</code></td><td><code>ProximiioFloor</code>: floors of the places</td><td>Proximi.io Portal</td></tr>
+    <tr><td><code>departments()</code></td><td><code>ProximiioDepartment</code></td><td>Proximi.io Portal</td></tr>
+    <tr><td><code>geofences()</code></td><td><code>ProximiioGeofence</code></td><td>Proximi.io Portal</td></tr>
+    <tr><td><code>privacyZones()</code></td><td><code>ProximiioPrivacyZone</code></td><td>Proximi.io Portal</td></tr>
+    <tr><td><code>features()</code></td><td><code>ProximiioFeature</code>: GeoJSON POIs, rooms, paths, level changers, as stored by <code>loadRouteNetwork()</code></td><td>Map Editor</td></tr>
+    <tr><td><code>amenities()</code></td><td><code>ProximiioAmenity</code>: POI kinds and icons</td><td>Map Editor</td></tr>
+    <tr><td><code>journeys()</code>, <code>journey(id)</code></td><td><code>ProximiioJourney</code>: multi-stop tours</td><td>Map Editor</td></tr>
+    <tr><td><code>mapStyle()</code></td><td>The MapLibre style document</td><td>Map Editor</td></tr>
+  </tbody>
+</table>
+
+<p>Single records: <code>place(id)</code>, <code>floor(id)</code>. The current ones: <code>currentFloor()</code>, <code>lastPosition()</code>, <code>enteredGeofenceIds()</code>, <code>isInPrivacyZone()</code>.</p>
+
+<h2>Metadata</h2>
+
+<p>
+  Custom metadata set in the Portal is decoded JSON in <code>metadata</code>: a <code>Map</code>,
+  <code>List</code>, <code>String</code>, <code>num</code> or <code>bool</code>. Feature
+  <code>geometry</code> and <code>properties</code> are decoded GeoJSON maps.
+</p>
+
+<h2>Feature titles</h2>
+
+<pre><code class="language-dart">final pois = (await sdk.features()).where((f) =&gt; f.propertyType == 'poi');
+for (final poi in pois) {
+  print(poi.title('sk')); // Slovak title, else properties.title
+}</code></pre>
+
+<h2>Keeping a screen current</h2>
+
+<p>
+  <code>venueDataChanges</code> reports which kinds changed. Re-read only those. A kind is reported
+  only when its whole collection is stored, so a re-read never sees half an update.
+</p>
+
+<pre><code class="language-dart">sdk.venueDataChanges.listen((change) async {
+  if (change.contains(VenueDataKind.features)) {
+    pois = await sdk.features();
+  }
+});</code></pre>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}api/models.html">Models reference</a></li>
+  <li><a href="{{root}}guides/offline-and-sync.html">Offline and sync</a></li>
+</ul>

@@ -352,6 +352,95 @@ enum class MsgFloorChangeSource(val raw: Int) {
   }
 }
 
+enum class MsgRouteProfile(val raw: Int) {
+  PEDESTRIAN(0),
+  WHEELCHAIR(1),
+  STROLLER(2),
+  STAFF(3);
+
+  companion object {
+    fun ofRaw(raw: Int): MsgRouteProfile? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class MsgRouteAvoidance(val raw: Int) {
+  ELEVATORS(0),
+  ESCALATORS(1),
+  STAIRCASES(2),
+  RAMPS(3),
+  NARROW_PATHS(4),
+  HILLS(5),
+  REVOLVING_DOORS(6),
+  TICKET_GATES(7),
+  BARRIERS(8);
+
+  companion object {
+    fun ofRaw(raw: Int): MsgRouteAvoidance? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class MsgInstructionKind(val raw: Int) {
+  START(0),
+  CONTINUE_STRAIGHT(1),
+  TURN_SLIGHT_LEFT(2),
+  TURN_LEFT(3),
+  TURN_SHARP_LEFT(4),
+  TURN_SLIGHT_RIGHT(5),
+  TURN_RIGHT(6),
+  TURN_SHARP_RIGHT(7),
+  LEVEL_CHANGE(8),
+  ARRIVE(9);
+
+  companion object {
+    fun ofRaw(raw: Int): MsgInstructionKind? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class MsgBeaconKind(val raw: Int) {
+  I_BEACON(0),
+  EDDYSTONE(1),
+  UWB_ACCESSORY(2);
+
+  companion object {
+    fun ofRaw(raw: Int): MsgBeaconKind? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class MsgPackageStateKind(val raw: Int) {
+  MISSING(0),
+  DOWNLOADING(1),
+  READY(2),
+  STALE(3),
+  VERIFYING(4),
+  FAILED(5);
+
+  companion object {
+    fun ofRaw(raw: Int): MsgPackageStateKind? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class MsgSimulationState(val raw: Int) {
+  IDLE(0),
+  RUNNING(1),
+  PAUSED(2);
+
+  companion object {
+    fun ofRaw(raw: Int): MsgSimulationState? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /**
  * Android foreground-service notification. Ignored on iOS.
  *
@@ -1163,6 +1252,1353 @@ data class MsgPrivacyZoneState (
     return result
   }
 }
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgRouteOptions (
+  val profile: MsgRouteProfile,
+  val avoid: List<MsgRouteAvoidance>
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgRouteOptions {
+      val profile = pigeonVar_list[0] as MsgRouteProfile
+      val avoid = pigeonVar_list[1] as List<MsgRouteAvoidance>
+      return MsgRouteOptions(profile, avoid)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      profile,
+      avoid,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgRouteOptions
+    return MessagesPigeonUtils.deepEquals(this.profile, other.profile) && MessagesPigeonUtils.deepEquals(this.avoid, other.avoid)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.profile)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.avoid)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgRoutePoint (
+  val coordinate: MsgCoordinate,
+  val level: Double
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgRoutePoint {
+      val coordinate = pigeonVar_list[0] as MsgCoordinate
+      val level = pigeonVar_list[1] as Double
+      return MsgRoutePoint(coordinate, level)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      coordinate,
+      level,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgRoutePoint
+    return MessagesPigeonUtils.deepEquals(this.coordinate, other.coordinate) && MessagesPigeonUtils.deepEquals(this.level, other.level)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.coordinate)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.level)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgLevelChange (
+  val featureType: String,
+  val fromLevel: Double,
+  val toLevel: Double,
+  val coordinate: MsgCoordinate
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgLevelChange {
+      val featureType = pigeonVar_list[0] as String
+      val fromLevel = pigeonVar_list[1] as Double
+      val toLevel = pigeonVar_list[2] as Double
+      val coordinate = pigeonVar_list[3] as MsgCoordinate
+      return MsgLevelChange(featureType, fromLevel, toLevel, coordinate)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      featureType,
+      fromLevel,
+      toLevel,
+      coordinate,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgLevelChange
+    return MessagesPigeonUtils.deepEquals(this.featureType, other.featureType) && MessagesPigeonUtils.deepEquals(this.fromLevel, other.fromLevel) && MessagesPigeonUtils.deepEquals(this.toLevel, other.toLevel) && MessagesPigeonUtils.deepEquals(this.coordinate, other.coordinate)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.featureType)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.fromLevel)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.toLevel)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.coordinate)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgRouteSegment (
+  val start: MsgCoordinate,
+  val end: MsgCoordinate,
+  val distanceMeters: Double
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgRouteSegment {
+      val start = pigeonVar_list[0] as MsgCoordinate
+      val end = pigeonVar_list[1] as MsgCoordinate
+      val distanceMeters = pigeonVar_list[2] as Double
+      return MsgRouteSegment(start, end, distanceMeters)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      start,
+      end,
+      distanceMeters,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgRouteSegment
+    return MessagesPigeonUtils.deepEquals(this.start, other.start) && MessagesPigeonUtils.deepEquals(this.end, other.end) && MessagesPigeonUtils.deepEquals(this.distanceMeters, other.distanceMeters)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.start)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.end)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.distanceMeters)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgRouteInstruction (
+  val kind: MsgInstructionKind,
+  val coordinate: MsgCoordinate,
+  val distanceMeters: Double,
+  val level: Double,
+  val durationSeconds: Double,
+  /** Set when [kind] is `levelChange`. */
+  val levelChange: MsgLevelChange? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgRouteInstruction {
+      val kind = pigeonVar_list[0] as MsgInstructionKind
+      val coordinate = pigeonVar_list[1] as MsgCoordinate
+      val distanceMeters = pigeonVar_list[2] as Double
+      val level = pigeonVar_list[3] as Double
+      val durationSeconds = pigeonVar_list[4] as Double
+      val levelChange = pigeonVar_list[5] as MsgLevelChange?
+      return MsgRouteInstruction(kind, coordinate, distanceMeters, level, durationSeconds, levelChange)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      kind,
+      coordinate,
+      distanceMeters,
+      level,
+      durationSeconds,
+      levelChange,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgRouteInstruction
+    return MessagesPigeonUtils.deepEquals(this.kind, other.kind) && MessagesPigeonUtils.deepEquals(this.coordinate, other.coordinate) && MessagesPigeonUtils.deepEquals(this.distanceMeters, other.distanceMeters) && MessagesPigeonUtils.deepEquals(this.level, other.level) && MessagesPigeonUtils.deepEquals(this.durationSeconds, other.durationSeconds) && MessagesPigeonUtils.deepEquals(this.levelChange, other.levelChange)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.kind)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.coordinate)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.distanceMeters)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.level)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.durationSeconds)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.levelChange)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgComputedRoute (
+  val coordinates: List<MsgCoordinate>,
+  val distanceMeters: Double,
+  val segments: List<MsgRouteSegment>,
+  val level: Double,
+  val levelChanges: List<MsgLevelChange>,
+  val instructions: List<MsgRouteInstruction>,
+  val durationSeconds: Double
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgComputedRoute {
+      val coordinates = pigeonVar_list[0] as List<MsgCoordinate>
+      val distanceMeters = pigeonVar_list[1] as Double
+      val segments = pigeonVar_list[2] as List<MsgRouteSegment>
+      val level = pigeonVar_list[3] as Double
+      val levelChanges = pigeonVar_list[4] as List<MsgLevelChange>
+      val instructions = pigeonVar_list[5] as List<MsgRouteInstruction>
+      val durationSeconds = pigeonVar_list[6] as Double
+      return MsgComputedRoute(coordinates, distanceMeters, segments, level, levelChanges, instructions, durationSeconds)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      coordinates,
+      distanceMeters,
+      segments,
+      level,
+      levelChanges,
+      instructions,
+      durationSeconds,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgComputedRoute
+    return MessagesPigeonUtils.deepEquals(this.coordinates, other.coordinates) && MessagesPigeonUtils.deepEquals(this.distanceMeters, other.distanceMeters) && MessagesPigeonUtils.deepEquals(this.segments, other.segments) && MessagesPigeonUtils.deepEquals(this.level, other.level) && MessagesPigeonUtils.deepEquals(this.levelChanges, other.levelChanges) && MessagesPigeonUtils.deepEquals(this.instructions, other.instructions) && MessagesPigeonUtils.deepEquals(this.durationSeconds, other.durationSeconds)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.coordinates)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.distanceMeters)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.segments)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.level)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.levelChanges)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.instructions)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.durationSeconds)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgDurationRow (
+  val seconds: List<Double?>
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgDurationRow {
+      val seconds = pigeonVar_list[0] as List<Double?>
+      return MsgDurationRow(seconds)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      seconds,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgDurationRow
+    return MessagesPigeonUtils.deepEquals(this.seconds, other.seconds)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.seconds)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgAmenity (
+  val id: String,
+  val title: String? = null,
+  val category: String? = null,
+  val icon: String? = null,
+  val details: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgAmenity {
+      val id = pigeonVar_list[0] as String
+      val title = pigeonVar_list[1] as String?
+      val category = pigeonVar_list[2] as String?
+      val icon = pigeonVar_list[3] as String?
+      val details = pigeonVar_list[4] as String?
+      return MsgAmenity(id, title, category, icon, details)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      id,
+      title,
+      category,
+      icon,
+      details,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgAmenity
+    return MessagesPigeonUtils.deepEquals(this.id, other.id) && MessagesPigeonUtils.deepEquals(this.title, other.title) && MessagesPigeonUtils.deepEquals(this.category, other.category) && MessagesPigeonUtils.deepEquals(this.icon, other.icon) && MessagesPigeonUtils.deepEquals(this.details, other.details)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.id)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.title)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.category)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.icon)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.details)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgFeature (
+  val id: String,
+  val type: String,
+  /** GeoJSON geometry object, as JSON. */
+  val geometryJson: String? = null,
+  /** GeoJSON properties object, as JSON. */
+  val propertiesJson: String? = null,
+  val level: Double? = null,
+  val featureClass: String? = null,
+  val propertyType: String? = null,
+  val isLevelChanger: Boolean,
+  val titleTranslations: Map<String, String>
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgFeature {
+      val id = pigeonVar_list[0] as String
+      val type = pigeonVar_list[1] as String
+      val geometryJson = pigeonVar_list[2] as String?
+      val propertiesJson = pigeonVar_list[3] as String?
+      val level = pigeonVar_list[4] as Double?
+      val featureClass = pigeonVar_list[5] as String?
+      val propertyType = pigeonVar_list[6] as String?
+      val isLevelChanger = pigeonVar_list[7] as Boolean
+      val titleTranslations = pigeonVar_list[8] as Map<String, String>
+      return MsgFeature(id, type, geometryJson, propertiesJson, level, featureClass, propertyType, isLevelChanger, titleTranslations)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      id,
+      type,
+      geometryJson,
+      propertiesJson,
+      level,
+      featureClass,
+      propertyType,
+      isLevelChanger,
+      titleTranslations,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgFeature
+    return MessagesPigeonUtils.deepEquals(this.id, other.id) && MessagesPigeonUtils.deepEquals(this.type, other.type) && MessagesPigeonUtils.deepEquals(this.geometryJson, other.geometryJson) && MessagesPigeonUtils.deepEquals(this.propertiesJson, other.propertiesJson) && MessagesPigeonUtils.deepEquals(this.level, other.level) && MessagesPigeonUtils.deepEquals(this.featureClass, other.featureClass) && MessagesPigeonUtils.deepEquals(this.propertyType, other.propertyType) && MessagesPigeonUtils.deepEquals(this.isLevelChanger, other.isLevelChanger) && MessagesPigeonUtils.deepEquals(this.titleTranslations, other.titleTranslations)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.id)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.type)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.geometryJson)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.propertiesJson)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.level)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.featureClass)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.propertyType)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.isLevelChanger)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.titleTranslations)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgDepartment (
+  val id: String,
+  val name: String? = null,
+  val placeId: String? = null,
+  val floorId: String? = null,
+  val tags: List<String>? = null,
+  val metadataJson: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgDepartment {
+      val id = pigeonVar_list[0] as String
+      val name = pigeonVar_list[1] as String?
+      val placeId = pigeonVar_list[2] as String?
+      val floorId = pigeonVar_list[3] as String?
+      val tags = pigeonVar_list[4] as List<String>?
+      val metadataJson = pigeonVar_list[5] as String?
+      return MsgDepartment(id, name, placeId, floorId, tags, metadataJson)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      id,
+      name,
+      placeId,
+      floorId,
+      tags,
+      metadataJson,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgDepartment
+    return MessagesPigeonUtils.deepEquals(this.id, other.id) && MessagesPigeonUtils.deepEquals(this.name, other.name) && MessagesPigeonUtils.deepEquals(this.placeId, other.placeId) && MessagesPigeonUtils.deepEquals(this.floorId, other.floorId) && MessagesPigeonUtils.deepEquals(this.tags, other.tags) && MessagesPigeonUtils.deepEquals(this.metadataJson, other.metadataJson)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.id)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.name)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.placeId)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.floorId)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.tags)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.metadataJson)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgJourneyWaypoint (
+  val latitude: Double? = null,
+  val longitude: Double? = null,
+  val level: Double? = null,
+  val floorId: String? = null,
+  val label: String? = null,
+  val dwellSeconds: Double? = null,
+  val speed: Double? = null,
+  val transitionSeconds: Double? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgJourneyWaypoint {
+      val latitude = pigeonVar_list[0] as Double?
+      val longitude = pigeonVar_list[1] as Double?
+      val level = pigeonVar_list[2] as Double?
+      val floorId = pigeonVar_list[3] as String?
+      val label = pigeonVar_list[4] as String?
+      val dwellSeconds = pigeonVar_list[5] as Double?
+      val speed = pigeonVar_list[6] as Double?
+      val transitionSeconds = pigeonVar_list[7] as Double?
+      return MsgJourneyWaypoint(latitude, longitude, level, floorId, label, dwellSeconds, speed, transitionSeconds)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      latitude,
+      longitude,
+      level,
+      floorId,
+      label,
+      dwellSeconds,
+      speed,
+      transitionSeconds,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgJourneyWaypoint
+    return MessagesPigeonUtils.deepEquals(this.latitude, other.latitude) && MessagesPigeonUtils.deepEquals(this.longitude, other.longitude) && MessagesPigeonUtils.deepEquals(this.level, other.level) && MessagesPigeonUtils.deepEquals(this.floorId, other.floorId) && MessagesPigeonUtils.deepEquals(this.label, other.label) && MessagesPigeonUtils.deepEquals(this.dwellSeconds, other.dwellSeconds) && MessagesPigeonUtils.deepEquals(this.speed, other.speed) && MessagesPigeonUtils.deepEquals(this.transitionSeconds, other.transitionSeconds)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.latitude)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.longitude)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.level)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.floorId)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.label)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.dwellSeconds)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.speed)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.transitionSeconds)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgJourney (
+  val id: String? = null,
+  val organizationId: String? = null,
+  val name: String? = null,
+  val placeId: String? = null,
+  val speed: Double? = null,
+  val waypoints: List<MsgJourneyWaypoint>,
+  val displayName: String
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgJourney {
+      val id = pigeonVar_list[0] as String?
+      val organizationId = pigeonVar_list[1] as String?
+      val name = pigeonVar_list[2] as String?
+      val placeId = pigeonVar_list[3] as String?
+      val speed = pigeonVar_list[4] as Double?
+      val waypoints = pigeonVar_list[5] as List<MsgJourneyWaypoint>
+      val displayName = pigeonVar_list[6] as String
+      return MsgJourney(id, organizationId, name, placeId, speed, waypoints, displayName)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      id,
+      organizationId,
+      name,
+      placeId,
+      speed,
+      waypoints,
+      displayName,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgJourney
+    return MessagesPigeonUtils.deepEquals(this.id, other.id) && MessagesPigeonUtils.deepEquals(this.organizationId, other.organizationId) && MessagesPigeonUtils.deepEquals(this.name, other.name) && MessagesPigeonUtils.deepEquals(this.placeId, other.placeId) && MessagesPigeonUtils.deepEquals(this.speed, other.speed) && MessagesPigeonUtils.deepEquals(this.waypoints, other.waypoints) && MessagesPigeonUtils.deepEquals(this.displayName, other.displayName)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.id)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.organizationId)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.name)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.placeId)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.speed)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.waypoints)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.displayName)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgVenueDataChange (
+  /** Open-ended: `features`, `amenities`, `style`, `floors`, `places`, `geofences`, later more. */
+  val kinds: List<String>
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgVenueDataChange {
+      val kinds = pigeonVar_list[0] as List<String>
+      return MsgVenueDataChange(kinds)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      kinds,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgVenueDataChange
+    return MessagesPigeonUtils.deepEquals(this.kinds, other.kinds)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.kinds)
+    return result
+  }
+}
+
+/**
+ * Generated class from Pigeon that represents data sent in messages.
+ * This class should not be extended by any user class outside of the generated file.
+ */
+sealed class MsgSyncEvent 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgSyncUpdated (
+  val entity: String,
+  val id: String
+) : MsgSyncEvent()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgSyncUpdated {
+      val entity = pigeonVar_list[0] as String
+      val id = pigeonVar_list[1] as String
+      return MsgSyncUpdated(entity, id)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      entity,
+      id,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgSyncUpdated
+    return MessagesPigeonUtils.deepEquals(this.entity, other.entity) && MessagesPigeonUtils.deepEquals(this.id, other.id)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.entity)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.id)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgSyncDeleted (
+  val entity: String,
+  val id: String
+) : MsgSyncEvent()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgSyncDeleted {
+      val entity = pigeonVar_list[0] as String
+      val id = pigeonVar_list[1] as String
+      return MsgSyncDeleted(entity, id)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      entity,
+      id,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgSyncDeleted
+    return MessagesPigeonUtils.deepEquals(this.entity, other.entity) && MessagesPigeonUtils.deepEquals(this.id, other.id)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.entity)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.id)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgSyncCompleted (
+  val applied: Long
+) : MsgSyncEvent()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgSyncCompleted {
+      val applied = pigeonVar_list[0] as Long
+      return MsgSyncCompleted(applied)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      applied,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgSyncCompleted
+    return MessagesPigeonUtils.deepEquals(this.applied, other.applied)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.applied)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgSyncFailed (
+  val reason: String
+) : MsgSyncEvent()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgSyncFailed {
+      val reason = pigeonVar_list[0] as String
+      return MsgSyncFailed(reason)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      reason,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgSyncFailed
+    return MessagesPigeonUtils.deepEquals(this.reason, other.reason)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.reason)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgStoreRecreated (
+  val reason: String
+) : MsgSyncEvent()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgStoreRecreated {
+      val reason = pigeonVar_list[0] as String
+      return MsgStoreRecreated(reason)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      reason,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgStoreRecreated
+    return MessagesPigeonUtils.deepEquals(this.reason, other.reason)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.reason)
+    return result
+  }
+}
+
+/**
+ * iBeacon: [uuid], [major], [minor]; Eddystone: [namespace], [instance]; UWB accessory: [name].
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class MsgBeaconIdentifier (
+  val kind: MsgBeaconKind,
+  val uuid: String? = null,
+  val major: Long? = null,
+  val minor: Long? = null,
+  val namespace: String? = null,
+  val instance: String? = null,
+  val name: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgBeaconIdentifier {
+      val kind = pigeonVar_list[0] as MsgBeaconKind
+      val uuid = pigeonVar_list[1] as String?
+      val major = pigeonVar_list[2] as Long?
+      val minor = pigeonVar_list[3] as Long?
+      val namespace = pigeonVar_list[4] as String?
+      val instance = pigeonVar_list[5] as String?
+      val name = pigeonVar_list[6] as String?
+      return MsgBeaconIdentifier(kind, uuid, major, minor, namespace, instance, name)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      kind,
+      uuid,
+      major,
+      minor,
+      namespace,
+      instance,
+      name,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgBeaconIdentifier
+    return MessagesPigeonUtils.deepEquals(this.kind, other.kind) && MessagesPigeonUtils.deepEquals(this.uuid, other.uuid) && MessagesPigeonUtils.deepEquals(this.major, other.major) && MessagesPigeonUtils.deepEquals(this.minor, other.minor) && MessagesPigeonUtils.deepEquals(this.namespace, other.namespace) && MessagesPigeonUtils.deepEquals(this.instance, other.instance) && MessagesPigeonUtils.deepEquals(this.name, other.name)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.kind)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.uuid)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.major)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.minor)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.namespace)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.instance)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.name)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgBeaconObservation (
+  val identifier: MsgBeaconIdentifier,
+  val rssi: Long,
+  val txPower: Long? = null,
+  val timestampMs: Long,
+  val calibratedDistance: Double? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgBeaconObservation {
+      val identifier = pigeonVar_list[0] as MsgBeaconIdentifier
+      val rssi = pigeonVar_list[1] as Long
+      val txPower = pigeonVar_list[2] as Long?
+      val timestampMs = pigeonVar_list[3] as Long
+      val calibratedDistance = pigeonVar_list[4] as Double?
+      return MsgBeaconObservation(identifier, rssi, txPower, timestampMs, calibratedDistance)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      identifier,
+      rssi,
+      txPower,
+      timestampMs,
+      calibratedDistance,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgBeaconObservation
+    return MessagesPigeonUtils.deepEquals(this.identifier, other.identifier) && MessagesPigeonUtils.deepEquals(this.rssi, other.rssi) && MessagesPigeonUtils.deepEquals(this.txPower, other.txPower) && MessagesPigeonUtils.deepEquals(this.timestampMs, other.timestampMs) && MessagesPigeonUtils.deepEquals(this.calibratedDistance, other.calibratedDistance)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.identifier)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.rssi)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.txPower)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.timestampMs)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.calibratedDistance)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgBeaconTelemetry (
+  val batteryMillivolts: Long,
+  val temperatureCelsius: Double,
+  val advertisementCount: Long,
+  val uptimeSeconds: Double,
+  val receivedAtMs: Long
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgBeaconTelemetry {
+      val batteryMillivolts = pigeonVar_list[0] as Long
+      val temperatureCelsius = pigeonVar_list[1] as Double
+      val advertisementCount = pigeonVar_list[2] as Long
+      val uptimeSeconds = pigeonVar_list[3] as Double
+      val receivedAtMs = pigeonVar_list[4] as Long
+      return MsgBeaconTelemetry(batteryMillivolts, temperatureCelsius, advertisementCount, uptimeSeconds, receivedAtMs)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      batteryMillivolts,
+      temperatureCelsius,
+      advertisementCount,
+      uptimeSeconds,
+      receivedAtMs,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgBeaconTelemetry
+    return MessagesPigeonUtils.deepEquals(this.batteryMillivolts, other.batteryMillivolts) && MessagesPigeonUtils.deepEquals(this.temperatureCelsius, other.temperatureCelsius) && MessagesPigeonUtils.deepEquals(this.advertisementCount, other.advertisementCount) && MessagesPigeonUtils.deepEquals(this.uptimeSeconds, other.uptimeSeconds) && MessagesPigeonUtils.deepEquals(this.receivedAtMs, other.receivedAtMs)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.batteryMillivolts)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.temperatureCelsius)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.advertisementCount)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.uptimeSeconds)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.receivedAtMs)
+    return result
+  }
+}
+
+/**
+ * Generated class from Pigeon that represents data sent in messages.
+ * This class should not be extended by any user class outside of the generated file.
+ */
+sealed class MsgBeaconEvent 
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgBeaconFound (
+  val observation: MsgBeaconObservation
+) : MsgBeaconEvent()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgBeaconFound {
+      val observation = pigeonVar_list[0] as MsgBeaconObservation
+      return MsgBeaconFound(observation)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      observation,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgBeaconFound
+    return MessagesPigeonUtils.deepEquals(this.observation, other.observation)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.observation)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgBeaconUpdated (
+  val observation: MsgBeaconObservation
+) : MsgBeaconEvent()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgBeaconUpdated {
+      val observation = pigeonVar_list[0] as MsgBeaconObservation
+      return MsgBeaconUpdated(observation)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      observation,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgBeaconUpdated
+    return MessagesPigeonUtils.deepEquals(this.observation, other.observation)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.observation)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgBeaconLost (
+  val identifier: MsgBeaconIdentifier
+) : MsgBeaconEvent()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgBeaconLost {
+      val identifier = pigeonVar_list[0] as MsgBeaconIdentifier
+      return MsgBeaconLost(identifier)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      identifier,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgBeaconLost
+    return MessagesPigeonUtils.deepEquals(this.identifier, other.identifier)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.identifier)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgBeaconTelemetryReceived (
+  val identifier: MsgBeaconIdentifier,
+  val telemetry: MsgBeaconTelemetry
+) : MsgBeaconEvent()
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgBeaconTelemetryReceived {
+      val identifier = pigeonVar_list[0] as MsgBeaconIdentifier
+      val telemetry = pigeonVar_list[1] as MsgBeaconTelemetry
+      return MsgBeaconTelemetryReceived(identifier, telemetry)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      identifier,
+      telemetry,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgBeaconTelemetryReceived
+    return MessagesPigeonUtils.deepEquals(this.identifier, other.identifier) && MessagesPigeonUtils.deepEquals(this.telemetry, other.telemetry)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.identifier)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.telemetry)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgPackageState (
+  val kind: MsgPackageStateKind,
+  /** 0…1 while [kind] is `downloading`. */
+  val progress: Double? = null,
+  /** Set when [kind] is `ready`. */
+  val version: Long? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgPackageState {
+      val kind = pigeonVar_list[0] as MsgPackageStateKind
+      val progress = pigeonVar_list[1] as Double?
+      val version = pigeonVar_list[2] as Long?
+      return MsgPackageState(kind, progress, version)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      kind,
+      progress,
+      version,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgPackageState
+    return MessagesPigeonUtils.deepEquals(this.kind, other.kind) && MessagesPigeonUtils.deepEquals(this.progress, other.progress) && MessagesPigeonUtils.deepEquals(this.version, other.version)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.kind)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.progress)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.version)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgSimulatedWaypoint (
+  val coordinate: MsgCoordinate,
+  val level: Long
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgSimulatedWaypoint {
+      val coordinate = pigeonVar_list[0] as MsgCoordinate
+      val level = pigeonVar_list[1] as Long
+      return MsgSimulatedWaypoint(coordinate, level)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      coordinate,
+      level,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgSimulatedWaypoint
+    return MessagesPigeonUtils.deepEquals(this.coordinate, other.coordinate) && MessagesPigeonUtils.deepEquals(this.level, other.level)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.coordinate)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.level)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgSimulatedRoute (
+  val waypoints: List<MsgSimulatedWaypoint>,
+  val speed: Double,
+  val updateIntervalSeconds: Double,
+  val loops: Boolean,
+  val accuracy: Double
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgSimulatedRoute {
+      val waypoints = pigeonVar_list[0] as List<MsgSimulatedWaypoint>
+      val speed = pigeonVar_list[1] as Double
+      val updateIntervalSeconds = pigeonVar_list[2] as Double
+      val loops = pigeonVar_list[3] as Boolean
+      val accuracy = pigeonVar_list[4] as Double
+      return MsgSimulatedRoute(waypoints, speed, updateIntervalSeconds, loops, accuracy)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      waypoints,
+      speed,
+      updateIntervalSeconds,
+      loops,
+      accuracy,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgSimulatedRoute
+    return MessagesPigeonUtils.deepEquals(this.waypoints, other.waypoints) && MessagesPigeonUtils.deepEquals(this.speed, other.speed) && MessagesPigeonUtils.deepEquals(this.updateIntervalSeconds, other.updateIntervalSeconds) && MessagesPigeonUtils.deepEquals(this.loops, other.loops) && MessagesPigeonUtils.deepEquals(this.accuracy, other.accuracy)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.waypoints)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.speed)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.updateIntervalSeconds)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.loops)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.accuracy)
+    return result
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class MsgDiagnostics (
+  val state: MsgSdkState,
+  val isStarted: Boolean,
+  val isAuthenticated: Boolean,
+  val permissions: MsgPermissionStatus? = null,
+  val visibleBeaconCount: Long,
+  val registeredBeaconCount: Long,
+  val lastPositionAgeSeconds: Double? = null,
+  val lastPositionSource: MsgPositionSource? = null,
+  val pdrEnabled: Boolean,
+  val pdrRunning: Boolean,
+  val visitorReportingEnabled: Boolean,
+  /** `notStarted`, `noViablePositioningInputs`, `awaitingFirstFix`, … (the SDK's raw value). */
+  val noPositionReason: String? = null,
+  val summary: String,
+  val generatedAtMs: Long
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgDiagnostics {
+      val state = pigeonVar_list[0] as MsgSdkState
+      val isStarted = pigeonVar_list[1] as Boolean
+      val isAuthenticated = pigeonVar_list[2] as Boolean
+      val permissions = pigeonVar_list[3] as MsgPermissionStatus?
+      val visibleBeaconCount = pigeonVar_list[4] as Long
+      val registeredBeaconCount = pigeonVar_list[5] as Long
+      val lastPositionAgeSeconds = pigeonVar_list[6] as Double?
+      val lastPositionSource = pigeonVar_list[7] as MsgPositionSource?
+      val pdrEnabled = pigeonVar_list[8] as Boolean
+      val pdrRunning = pigeonVar_list[9] as Boolean
+      val visitorReportingEnabled = pigeonVar_list[10] as Boolean
+      val noPositionReason = pigeonVar_list[11] as String?
+      val summary = pigeonVar_list[12] as String
+      val generatedAtMs = pigeonVar_list[13] as Long
+      return MsgDiagnostics(state, isStarted, isAuthenticated, permissions, visibleBeaconCount, registeredBeaconCount, lastPositionAgeSeconds, lastPositionSource, pdrEnabled, pdrRunning, visitorReportingEnabled, noPositionReason, summary, generatedAtMs)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      state,
+      isStarted,
+      isAuthenticated,
+      permissions,
+      visibleBeaconCount,
+      registeredBeaconCount,
+      lastPositionAgeSeconds,
+      lastPositionSource,
+      pdrEnabled,
+      pdrRunning,
+      visitorReportingEnabled,
+      noPositionReason,
+      summary,
+      generatedAtMs,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgDiagnostics
+    return MessagesPigeonUtils.deepEquals(this.state, other.state) && MessagesPigeonUtils.deepEquals(this.isStarted, other.isStarted) && MessagesPigeonUtils.deepEquals(this.isAuthenticated, other.isAuthenticated) && MessagesPigeonUtils.deepEquals(this.permissions, other.permissions) && MessagesPigeonUtils.deepEquals(this.visibleBeaconCount, other.visibleBeaconCount) && MessagesPigeonUtils.deepEquals(this.registeredBeaconCount, other.registeredBeaconCount) && MessagesPigeonUtils.deepEquals(this.lastPositionAgeSeconds, other.lastPositionAgeSeconds) && MessagesPigeonUtils.deepEquals(this.lastPositionSource, other.lastPositionSource) && MessagesPigeonUtils.deepEquals(this.pdrEnabled, other.pdrEnabled) && MessagesPigeonUtils.deepEquals(this.pdrRunning, other.pdrRunning) && MessagesPigeonUtils.deepEquals(this.visitorReportingEnabled, other.visitorReportingEnabled) && MessagesPigeonUtils.deepEquals(this.noPositionReason, other.noPositionReason) && MessagesPigeonUtils.deepEquals(this.summary, other.summary) && MessagesPigeonUtils.deepEquals(this.generatedAtMs, other.generatedAtMs)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.state)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.isStarted)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.isAuthenticated)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.permissions)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.visibleBeaconCount)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.registeredBeaconCount)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.lastPositionAgeSeconds)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.lastPositionSource)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.pdrEnabled)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.pdrRunning)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.visitorReportingEnabled)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.noPositionReason)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.summary)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.generatedAtMs)
+    return result
+  }
+}
 private open class MessagesPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
@@ -1227,83 +2663,258 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         }
       }
       141.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          MsgAndroidServiceOptions.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          MsgRouteProfile.ofRaw(it.toInt())
         }
       }
       142.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          MsgConfiguration.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          MsgRouteAvoidance.ofRaw(it.toInt())
         }
       }
       143.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          MsgCoordinate.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          MsgInstructionKind.ofRaw(it.toInt())
         }
       }
       144.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          MsgApplication.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          MsgBeaconKind.ofRaw(it.toInt())
         }
       }
       145.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPlace.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          MsgPackageStateKind.ofRaw(it.toInt())
         }
       }
       146.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          MsgFloor.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          MsgSimulationState.ofRaw(it.toInt())
         }
       }
       147.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgZone.fromList(it)
+          MsgAndroidServiceOptions.fromList(it)
         }
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPermissionStatus.fromList(it)
+          MsgConfiguration.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgStateChange.fromList(it)
+          MsgCoordinate.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPositionUpdate.fromList(it)
+          MsgApplication.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgFloorChange.fromList(it)
+          MsgPlace.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgGeofenceEntered.fromList(it)
+          MsgFloor.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgGeofenceExited.fromList(it)
+          MsgZone.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPrivacyZoneEntered.fromList(it)
+          MsgPermissionStatus.fromList(it)
         }
       }
       155.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPrivacyZoneExited.fromList(it)
+          MsgStateChange.fromList(it)
         }
       }
       156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
+          MsgPositionUpdate.fromList(it)
+        }
+      }
+      157.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgFloorChange.fromList(it)
+        }
+      }
+      158.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgGeofenceEntered.fromList(it)
+        }
+      }
+      159.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgGeofenceExited.fromList(it)
+        }
+      }
+      160.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgPrivacyZoneEntered.fromList(it)
+        }
+      }
+      161.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgPrivacyZoneExited.fromList(it)
+        }
+      }
+      162.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
           MsgPrivacyZoneState.fromList(it)
+        }
+      }
+      163.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgRouteOptions.fromList(it)
+        }
+      }
+      164.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgRoutePoint.fromList(it)
+        }
+      }
+      165.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgLevelChange.fromList(it)
+        }
+      }
+      166.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgRouteSegment.fromList(it)
+        }
+      }
+      167.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgRouteInstruction.fromList(it)
+        }
+      }
+      168.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgComputedRoute.fromList(it)
+        }
+      }
+      169.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgDurationRow.fromList(it)
+        }
+      }
+      170.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgAmenity.fromList(it)
+        }
+      }
+      171.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgFeature.fromList(it)
+        }
+      }
+      172.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgDepartment.fromList(it)
+        }
+      }
+      173.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgJourneyWaypoint.fromList(it)
+        }
+      }
+      174.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgJourney.fromList(it)
+        }
+      }
+      175.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgVenueDataChange.fromList(it)
+        }
+      }
+      176.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgSyncUpdated.fromList(it)
+        }
+      }
+      177.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgSyncDeleted.fromList(it)
+        }
+      }
+      178.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgSyncCompleted.fromList(it)
+        }
+      }
+      179.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgSyncFailed.fromList(it)
+        }
+      }
+      180.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgStoreRecreated.fromList(it)
+        }
+      }
+      181.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgBeaconIdentifier.fromList(it)
+        }
+      }
+      182.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgBeaconObservation.fromList(it)
+        }
+      }
+      183.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgBeaconTelemetry.fromList(it)
+        }
+      }
+      184.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgBeaconFound.fromList(it)
+        }
+      }
+      185.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgBeaconUpdated.fromList(it)
+        }
+      }
+      186.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgBeaconLost.fromList(it)
+        }
+      }
+      187.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgBeaconTelemetryReceived.fromList(it)
+        }
+      }
+      188.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgPackageState.fromList(it)
+        }
+      }
+      189.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgSimulatedWaypoint.fromList(it)
+        }
+      }
+      190.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgSimulatedRoute.fromList(it)
+        }
+      }
+      191.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgDiagnostics.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -1359,68 +2970,208 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(140)
         writeValue(stream, value.raw.toLong())
       }
-      is MsgAndroidServiceOptions -> {
+      is MsgRouteProfile -> {
         stream.write(141)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is MsgConfiguration -> {
+      is MsgRouteAvoidance -> {
         stream.write(142)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is MsgCoordinate -> {
+      is MsgInstructionKind -> {
         stream.write(143)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is MsgApplication -> {
+      is MsgBeaconKind -> {
         stream.write(144)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is MsgPlace -> {
+      is MsgPackageStateKind -> {
         stream.write(145)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is MsgFloor -> {
+      is MsgSimulationState -> {
         stream.write(146)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is MsgZone -> {
+      is MsgAndroidServiceOptions -> {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is MsgPermissionStatus -> {
+      is MsgConfiguration -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is MsgStateChange -> {
+      is MsgCoordinate -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is MsgPositionUpdate -> {
+      is MsgApplication -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is MsgFloorChange -> {
+      is MsgPlace -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is MsgGeofenceEntered -> {
+      is MsgFloor -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is MsgGeofenceExited -> {
+      is MsgZone -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is MsgPrivacyZoneEntered -> {
+      is MsgPermissionStatus -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is MsgPrivacyZoneExited -> {
+      is MsgStateChange -> {
         stream.write(155)
         writeValue(stream, value.toList())
       }
-      is MsgPrivacyZoneState -> {
+      is MsgPositionUpdate -> {
         stream.write(156)
+        writeValue(stream, value.toList())
+      }
+      is MsgFloorChange -> {
+        stream.write(157)
+        writeValue(stream, value.toList())
+      }
+      is MsgGeofenceEntered -> {
+        stream.write(158)
+        writeValue(stream, value.toList())
+      }
+      is MsgGeofenceExited -> {
+        stream.write(159)
+        writeValue(stream, value.toList())
+      }
+      is MsgPrivacyZoneEntered -> {
+        stream.write(160)
+        writeValue(stream, value.toList())
+      }
+      is MsgPrivacyZoneExited -> {
+        stream.write(161)
+        writeValue(stream, value.toList())
+      }
+      is MsgPrivacyZoneState -> {
+        stream.write(162)
+        writeValue(stream, value.toList())
+      }
+      is MsgRouteOptions -> {
+        stream.write(163)
+        writeValue(stream, value.toList())
+      }
+      is MsgRoutePoint -> {
+        stream.write(164)
+        writeValue(stream, value.toList())
+      }
+      is MsgLevelChange -> {
+        stream.write(165)
+        writeValue(stream, value.toList())
+      }
+      is MsgRouteSegment -> {
+        stream.write(166)
+        writeValue(stream, value.toList())
+      }
+      is MsgRouteInstruction -> {
+        stream.write(167)
+        writeValue(stream, value.toList())
+      }
+      is MsgComputedRoute -> {
+        stream.write(168)
+        writeValue(stream, value.toList())
+      }
+      is MsgDurationRow -> {
+        stream.write(169)
+        writeValue(stream, value.toList())
+      }
+      is MsgAmenity -> {
+        stream.write(170)
+        writeValue(stream, value.toList())
+      }
+      is MsgFeature -> {
+        stream.write(171)
+        writeValue(stream, value.toList())
+      }
+      is MsgDepartment -> {
+        stream.write(172)
+        writeValue(stream, value.toList())
+      }
+      is MsgJourneyWaypoint -> {
+        stream.write(173)
+        writeValue(stream, value.toList())
+      }
+      is MsgJourney -> {
+        stream.write(174)
+        writeValue(stream, value.toList())
+      }
+      is MsgVenueDataChange -> {
+        stream.write(175)
+        writeValue(stream, value.toList())
+      }
+      is MsgSyncUpdated -> {
+        stream.write(176)
+        writeValue(stream, value.toList())
+      }
+      is MsgSyncDeleted -> {
+        stream.write(177)
+        writeValue(stream, value.toList())
+      }
+      is MsgSyncCompleted -> {
+        stream.write(178)
+        writeValue(stream, value.toList())
+      }
+      is MsgSyncFailed -> {
+        stream.write(179)
+        writeValue(stream, value.toList())
+      }
+      is MsgStoreRecreated -> {
+        stream.write(180)
+        writeValue(stream, value.toList())
+      }
+      is MsgBeaconIdentifier -> {
+        stream.write(181)
+        writeValue(stream, value.toList())
+      }
+      is MsgBeaconObservation -> {
+        stream.write(182)
+        writeValue(stream, value.toList())
+      }
+      is MsgBeaconTelemetry -> {
+        stream.write(183)
+        writeValue(stream, value.toList())
+      }
+      is MsgBeaconFound -> {
+        stream.write(184)
+        writeValue(stream, value.toList())
+      }
+      is MsgBeaconUpdated -> {
+        stream.write(185)
+        writeValue(stream, value.toList())
+      }
+      is MsgBeaconLost -> {
+        stream.write(186)
+        writeValue(stream, value.toList())
+      }
+      is MsgBeaconTelemetryReceived -> {
+        stream.write(187)
+        writeValue(stream, value.toList())
+      }
+      is MsgPackageState -> {
+        stream.write(188)
+        writeValue(stream, value.toList())
+      }
+      is MsgSimulatedWaypoint -> {
+        stream.write(189)
+        writeValue(stream, value.toList())
+      }
+      is MsgSimulatedRoute -> {
+        stream.write(190)
+        writeValue(stream, value.toList())
+      }
+      is MsgDiagnostics -> {
+        stream.write(191)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1474,6 +3225,48 @@ interface ProximiioHostApi {
   fun updateServiceNotification(options: MsgAndroidServiceOptions, callback: (Result<Boolean>) -> Unit)
   /** Android only; `unsupported` on iOS. */
   fun resetServiceNotification(callback: (Result<Unit>) -> Unit)
+  /** Throws `noRoute` with `reason` (and `nearestDistanceMeters` / `blockedBy`) in the details. */
+  fun computeRoute(from: MsgCoordinate, fromLevel: Double, to: MsgCoordinate, toLevel: Double, options: MsgRouteOptions, callback: (Result<MsgComputedRoute>) -> Unit)
+  /** Walking seconds between every pair of [points]; `null` where no route exists. */
+  fun routeDurations(points: List<MsgRoutePoint>, options: MsgRouteOptions, callback: (Result<List<MsgDurationRow>>) -> Unit)
+  /** Downloads the venue features (when changed), stores them and installs the route network. */
+  fun loadRouteNetwork(callback: (Result<Long>) -> Unit)
+  /** Installs the route network from the stored features, without a request. `0` when none are stored. */
+  fun loadCachedRouteNetwork(callback: (Result<Long>) -> Unit)
+  fun amenities(callback: (Result<List<MsgAmenity>>) -> Unit)
+  fun features(callback: (Result<List<MsgFeature>>) -> Unit)
+  fun departments(callback: (Result<List<MsgDepartment>>) -> Unit)
+  /** The organisation's MapLibre style document, as JSON. */
+  fun mapStyle(callback: (Result<String>) -> Unit)
+  fun journeys(callback: (Result<List<MsgJourney>>) -> Unit)
+  fun journey(id: String, callback: (Result<MsgJourney>) -> Unit)
+  fun syncOfflinePackage(packageId: String, place: String?, allowsCellular: Boolean, callback: (Result<MsgPackageState>) -> Unit)
+  fun offlinePackageState(packageId: String, callback: (Result<MsgPackageState>) -> Unit)
+  /** Installs a seed from a directory on disk (unpacked package files). */
+  fun installOfflineSeed(packageId: String, directory: String, callback: (Result<Unit>) -> Unit)
+  fun removeOfflinePackage(packageId: String, callback: (Result<Unit>) -> Unit)
+  fun offlinePackageDiskUsage(packageId: String, callback: (Result<Long>) -> Unit)
+  fun simulatePosition(coordinate: MsgCoordinate, level: Long, accuracy: Double, callback: (Result<MsgPositionUpdate?>) -> Unit)
+  fun startSimulation(route: MsgSimulatedRoute, callback: (Result<Unit>) -> Unit)
+  fun pauseSimulation(callback: (Result<Unit>) -> Unit)
+  fun resumeSimulation(callback: (Result<Unit>) -> Unit)
+  fun stopSimulation(callback: (Result<Unit>) -> Unit)
+  fun jumpToWaypoint(index: Long, callback: (Result<Unit>) -> Unit)
+  fun simulationState(callback: (Result<MsgSimulationState>) -> Unit)
+  /** [floorId] is looked up in the SDK's floors; unknown ids mean "no floor". */
+  fun setCustomPosition(coordinate: MsgCoordinate, accuracy: Double, floorId: String?, callback: (Result<MsgPositionUpdate?>) -> Unit)
+  fun setFloor(floorId: String?, callback: (Result<MsgFloorChange?>) -> Unit)
+  /** `null` [thresholdMeters] keeps the SDK default. */
+  fun enableRouteSnapping(thresholdMeters: Double?, callback: (Result<Unit>) -> Unit)
+  fun disableRouteSnapping(callback: (Result<Unit>) -> Unit)
+  fun enablePdr(callback: (Result<Unit>) -> Unit)
+  fun disablePdr(callback: (Result<Unit>) -> Unit)
+  fun setPositioningSourcePrivate(sinceMs: Long?, callback: (Result<Unit>) -> Unit)
+  fun diagnostics(callback: (Result<MsgDiagnostics>) -> Unit)
+  fun startDiagnosticsRecording(callback: (Result<Unit>) -> Unit)
+  fun stopDiagnosticsRecording(callback: (Result<Unit>) -> Unit)
+  /** Path of the zipped report. */
+  fun prepareDiagnosticsReport(callback: (Result<String>) -> Unit)
 
   companion object {
     /** The codec used by ProximiioHostApi. */
@@ -1976,6 +3769,628 @@ interface ProximiioHostApi {
           channel.setMessageHandler(null)
         }
       }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.computeRoute$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val fromArg = args[0] as MsgCoordinate
+            val fromLevelArg = args[1] as Double
+            val toArg = args[2] as MsgCoordinate
+            val toLevelArg = args[3] as Double
+            val optionsArg = args[4] as MsgRouteOptions
+            api.computeRoute(fromArg, fromLevelArg, toArg, toLevelArg, optionsArg) { result: Result<MsgComputedRoute> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.routeDurations$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pointsArg = args[0] as List<MsgRoutePoint>
+            val optionsArg = args[1] as MsgRouteOptions
+            api.routeDurations(pointsArg, optionsArg) { result: Result<List<MsgDurationRow>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.loadRouteNetwork$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.loadRouteNetwork{ result: Result<Long> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.loadCachedRouteNetwork$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.loadCachedRouteNetwork{ result: Result<Long> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.amenities$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.amenities{ result: Result<List<MsgAmenity>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.features$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.features{ result: Result<List<MsgFeature>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.departments$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.departments{ result: Result<List<MsgDepartment>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.mapStyle$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.mapStyle{ result: Result<String> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.journeys$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.journeys{ result: Result<List<MsgJourney>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.journey$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val idArg = args[0] as String
+            api.journey(idArg) { result: Result<MsgJourney> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.syncOfflinePackage$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val packageIdArg = args[0] as String
+            val placeArg = args[1] as String?
+            val allowsCellularArg = args[2] as Boolean
+            api.syncOfflinePackage(packageIdArg, placeArg, allowsCellularArg) { result: Result<MsgPackageState> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.offlinePackageState$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val packageIdArg = args[0] as String
+            api.offlinePackageState(packageIdArg) { result: Result<MsgPackageState> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.installOfflineSeed$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val packageIdArg = args[0] as String
+            val directoryArg = args[1] as String
+            api.installOfflineSeed(packageIdArg, directoryArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.removeOfflinePackage$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val packageIdArg = args[0] as String
+            api.removeOfflinePackage(packageIdArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.offlinePackageDiskUsage$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val packageIdArg = args[0] as String
+            api.offlinePackageDiskUsage(packageIdArg) { result: Result<Long> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.simulatePosition$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val coordinateArg = args[0] as MsgCoordinate
+            val levelArg = args[1] as Long
+            val accuracyArg = args[2] as Double
+            api.simulatePosition(coordinateArg, levelArg, accuracyArg) { result: Result<MsgPositionUpdate?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.startSimulation$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val routeArg = args[0] as MsgSimulatedRoute
+            api.startSimulation(routeArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.pauseSimulation$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.pauseSimulation{ result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.resumeSimulation$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.resumeSimulation{ result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.stopSimulation$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.stopSimulation{ result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.jumpToWaypoint$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val indexArg = args[0] as Long
+            api.jumpToWaypoint(indexArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.simulationState$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.simulationState{ result: Result<MsgSimulationState> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.setCustomPosition$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val coordinateArg = args[0] as MsgCoordinate
+            val accuracyArg = args[1] as Double
+            val floorIdArg = args[2] as String?
+            api.setCustomPosition(coordinateArg, accuracyArg, floorIdArg) { result: Result<MsgPositionUpdate?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.setFloor$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val floorIdArg = args[0] as String?
+            api.setFloor(floorIdArg) { result: Result<MsgFloorChange?> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.enableRouteSnapping$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val thresholdMetersArg = args[0] as Double?
+            api.enableRouteSnapping(thresholdMetersArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.disableRouteSnapping$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.disableRouteSnapping{ result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.enablePdr$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.enablePdr{ result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.disablePdr$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.disablePdr{ result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.setPositioningSourcePrivate$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val sinceMsArg = args[0] as Long?
+            api.setPositioningSourcePrivate(sinceMsArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.diagnostics$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.diagnostics{ result: Result<MsgDiagnostics> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.startDiagnosticsRecording$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.startDiagnosticsRecording{ result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.stopDiagnosticsRecording$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.stopDiagnosticsRecording{ result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                reply.reply(MessagesPigeonUtils.wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.prepareDiagnosticsReport$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            api.prepareDiagnosticsReport{ result: Result<String> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(MessagesPigeonUtils.wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(MessagesPigeonUtils.wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
     }
   }
 }
@@ -2118,6 +4533,57 @@ abstract class PrivacyZoneStateChangesStreamHandler : MessagesPigeonEventChannel
   }
 // Implement methods from MessagesPigeonEventChannelWrapper
 override fun onListen(p0: Any?, sink: PigeonEventSink<MsgPrivacyZoneState>) {}
+
+override fun onCancel(p0: Any?) {}
+}
+      
+abstract class VenueDataChangesStreamHandler : MessagesPigeonEventChannelWrapper<MsgVenueDataChange> {
+  companion object {
+    fun register(messenger: BinaryMessenger, streamHandler: VenueDataChangesStreamHandler, instanceName: String = "") {
+      var channelName: String = "dev.flutter.pigeon.flutter_proximiio.ProximiioEventApi.venueDataChanges"
+      if (instanceName.isNotEmpty()) {
+        channelName += ".$instanceName"
+      }
+      val internalStreamHandler = MessagesPigeonStreamHandler<MsgVenueDataChange>(streamHandler)
+      EventChannel(messenger, channelName, MessagesPigeonMethodCodec).setStreamHandler(internalStreamHandler)
+    }
+  }
+// Implement methods from MessagesPigeonEventChannelWrapper
+override fun onListen(p0: Any?, sink: PigeonEventSink<MsgVenueDataChange>) {}
+
+override fun onCancel(p0: Any?) {}
+}
+      
+abstract class SyncEventsStreamHandler : MessagesPigeonEventChannelWrapper<MsgSyncEvent> {
+  companion object {
+    fun register(messenger: BinaryMessenger, streamHandler: SyncEventsStreamHandler, instanceName: String = "") {
+      var channelName: String = "dev.flutter.pigeon.flutter_proximiio.ProximiioEventApi.syncEvents"
+      if (instanceName.isNotEmpty()) {
+        channelName += ".$instanceName"
+      }
+      val internalStreamHandler = MessagesPigeonStreamHandler<MsgSyncEvent>(streamHandler)
+      EventChannel(messenger, channelName, MessagesPigeonMethodCodec).setStreamHandler(internalStreamHandler)
+    }
+  }
+// Implement methods from MessagesPigeonEventChannelWrapper
+override fun onListen(p0: Any?, sink: PigeonEventSink<MsgSyncEvent>) {}
+
+override fun onCancel(p0: Any?) {}
+}
+      
+abstract class BeaconEventsStreamHandler : MessagesPigeonEventChannelWrapper<MsgBeaconEvent> {
+  companion object {
+    fun register(messenger: BinaryMessenger, streamHandler: BeaconEventsStreamHandler, instanceName: String = "") {
+      var channelName: String = "dev.flutter.pigeon.flutter_proximiio.ProximiioEventApi.beaconEvents"
+      if (instanceName.isNotEmpty()) {
+        channelName += ".$instanceName"
+      }
+      val internalStreamHandler = MessagesPigeonStreamHandler<MsgBeaconEvent>(streamHandler)
+      EventChannel(messenger, channelName, MessagesPigeonMethodCodec).setStreamHandler(internalStreamHandler)
+    }
+  }
+// Implement methods from MessagesPigeonEventChannelWrapper
+override fun onListen(p0: Any?, sink: PigeonEventSink<MsgBeaconEvent>) {}
 
 override fun onCancel(p0: Any?) {}
 }

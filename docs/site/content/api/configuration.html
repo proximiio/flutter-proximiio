@@ -1,0 +1,67 @@
+<!--
+title: ProximiioConfiguration
+description: Every setting of ProximiioConfiguration and AndroidServiceOptions, with defaults.
+-->
+
+<p>
+  <code>ProximiioConfiguration</code> starts from a <code>preset</code>; every field that is not
+  <code>null</code> overrides the preset. It is read when <code>Proximiio.create</code> runs.
+</p>
+
+<h2>Create a configuration</h2>
+
+<pre><code class="language-dart">final configuration = ProximiioConfiguration(
+  token: token,
+  preset: ConfigurationPreset.standard,
+  apiBaseUrl: Uri.parse('https://api.proximi.fi'),
+  android: const AndroidServiceOptions(notificationTitle: 'Indoor navigation'),
+);</code></pre>
+
+<h2>Settings</h2>
+
+<table>
+  <thead><tr><th>Property</th><th>Default</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>token</code></td><td>required</td><td>Application token from the Proximi.io Portal</td></tr>
+    <tr><td><code>preset</code></td><td><code>standard</code></td><td><code>standard</code>, <code>highAccuracy</code>, <code>lowPower</code>, <code>relayOnly</code></td></tr>
+    <tr><td><code>apiBaseUrl</code></td><td><code>https://api.proximi.fi</code></td><td>API host of the residency group or installation</td></tr>
+    <tr><td><code>fallbackApiBaseUrls</code></td><td>none</td><td>Hosts tried in order when <code>apiBaseUrl</code> fails</td></tr>
+    <tr><td><code>syncInterval</code></td><td>5 min</td><td>Venue data sync while running</td></tr>
+    <tr><td><code>desiredAccuracy</code></td><td><code>bestForNavigation</code></td><td>Platform location accuracy; <code>threeKilometers</code> is <code>kilometer</code> on Android</td></tr>
+    <tr><td><code>allowsBackgroundLocationUpdates</code></td><td><code>false</code></td><td>Keep positioning in the background (iOS)</td></tr>
+    <tr><td><code>visitorReportingEnabled</code></td><td><code>true</code></td><td>Visitor analytics</td></tr>
+    <tr><td><code>geofenceExitDelay</code></td><td>3 s</td><td>Wait before reporting a geofence exit</td></tr>
+    <tr><td><code>withholdsPositionsInPrivacyZones</code></td><td><code>false</code></td><td>No positions inside privacy zones</td></tr>
+    <tr><td><code>customIBeaconUuids</code></td><td>none</td><td>Extra iBeacon UUIDs to scan for</td></tr>
+    <tr><td><code>pdrFusionEnabled</code></td><td>preset</td><td>Fuse PDR into positions</td></tr>
+    <tr><td><code>barometerEnabled</code></td><td><code>true</code></td><td>iOS only; Android always uses the barometer when present</td></tr>
+    <tr><td><code>relayRunsInBackground</code></td><td><code>false</code></td><td>iOS, <code>relayOnly</code>: keep receiving relay positions in the background</td></tr>
+    <tr><td><code>android</code></td><td>none</td><td>Android foreground service; without it no service runs</td></tr>
+  </tbody>
+</table>
+
+<h2>AndroidServiceOptions</h2>
+
+<table>
+  <thead><tr><th>Property</th><th>Default</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>mode</code></td><td><code>enabled</code></td><td><code>enabled</code>, <code>disabled</code>, <code>required</code></td></tr>
+    <tr><td><code>notificationTitle</code></td><td>Indoor positioning</td><td>Notification title</td></tr>
+    <tr><td><code>notificationText</code></td><td>Locating you inside this venue</td><td>Notification text</td></tr>
+    <tr><td><code>notificationIcon</code></td><td>App icon</td><td>Drawable resource name</td></tr>
+    <tr><td><code>channelName</code></td><td>Indoor positioning</td><td>Notification channel name</td></tr>
+    <tr><td><code>channelDescription</code></td><td>none</td><td>Notification channel description</td></tr>
+    <tr><td><code>holdsWakeLock</code></td><td><code>false</code></td><td>Partial wake lock while positioning</td></tr>
+  </tbody>
+</table>
+
+<h2>Validation</h2>
+
+<p><code>Proximiio.create</code> throws <code>invalidArgument</code> for a URL that is not absolute or a UUID that does not parse.</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}guides/tuning.html">Configuration presets</a></li>
+  <li><a href="{{root}}guides/background.html">Background positioning</a></li>
+</ul>

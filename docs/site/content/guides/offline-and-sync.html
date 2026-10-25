@@ -1,0 +1,68 @@
+<!--
+title: Offline and sync
+description: How venue data is synchronised, how to follow changes, and how to install offline venue packages.
+-->
+
+<h2>Synchronisation</h2>
+
+<p>
+  <code>authenticate</code> downloads the venue data and stores it on the device. While running, the
+  SDK synchronises changes every <code>syncInterval</code> (default 5 minutes). <code>sync()</code>
+  synchronises now and returns the number of changed records.
+</p>
+
+<pre><code class="language-dart">sdk.syncEvents.listen((event) {
+  switch (event) {
+    case SyncCompleted(:final applied):
+      print('sync: $applied changes');
+    case SyncFailed(:final reason):
+      print('sync failed, retrying later: $reason');
+    case StoreRecreated(:final reason):
+      print('store rebuilt: $reason');
+    case SyncUpdated() || SyncDeleted():
+      break;
+  }
+});</code></pre>
+
+<p>To refresh a screen, listen to <code>venueDataChanges</code> instead; see <a href="{{root}}concepts/data-model.html">Data model</a>.</p>
+
+<h2>Without a connection</h2>
+
+<p>
+  Stored venue data stays available offline. <code>authenticate</code> validates the token with the
+  Proximi.io API and throws <code>ProximiioErrorCode.api</code> (<code>kind: network</code>) without a
+  connection.
+</p>
+
+<h2>Offline packages</h2>
+
+<p>An offline package holds a venue's data and map tiles for use without a connection.</p>
+
+<pre><code class="language-dart">final state = await sdk.syncOfflinePackage('terminal-1', allowsCellular: false);
+switch (state) {
+  case PackageReady(:final version):
+    print('package version $version installed');
+  case PackageFailed():
+    print('sync failed; the previous version stays in use');
+  default:
+    break;
+}</code></pre>
+
+<table>
+  <thead><tr><th>Call</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>offlinePackageState(id)</code></td><td><code>PackageMissing</code>, <code>PackageDownloading</code>, <code>PackageReady</code>, <code>PackageStale</code>, <code>PackageVerifying</code>, <code>PackageFailed</code></td></tr>
+    <tr><td><code>installOfflineSeed(id, directory)</code></td><td>Install from unpacked package files on disk, for example extracted from the app's assets on first launch</td></tr>
+    <tr><td><code>offlinePackageDiskUsage(id)</code></td><td>Bytes on disk</td></tr>
+    <tr><td><code>removeOfflinePackage(id)</code></td><td>Delete the package</td></tr>
+  </tbody>
+</table>
+
+<p>Errors are <code>ProximiioErrorCode.offlinePackage</code> with <code>kind</code> (<code>serverUnavailable</code>, <code>checksumMismatch</code>, <code>notInstalled</code>, <code>insufficientDiskSpace</code>, …).</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}concepts/data-model.html">Data model</a></li>
+  <li><a href="{{root}}guides/errors.html">Errors and failure handling</a></li>
+</ul>

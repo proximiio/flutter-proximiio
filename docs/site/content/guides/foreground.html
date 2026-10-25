@@ -1,0 +1,61 @@
+<!--
+title: Foreground positioning
+description: Position only while the app is visible, following the Flutter app lifecycle.
+-->
+
+<p>
+  Foreground positioning runs the SDK while the app is visible and stops it when the app is paused.
+  It needs only the when-in-use location permission and no background setup.
+</p>
+
+<h2>Follow the app lifecycle</h2>
+
+<pre><code class="language-dart">class PositioningLifecycle with WidgetsBindingObserver {
+  PositioningLifecycle(this.sdk) {
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  final Proximiio sdk;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        unawaited(sdk.start());
+      case AppLifecycleState.paused:
+        unawaited(sdk.stop());
+      default:
+        break;
+    }
+  }
+
+  void dispose() =&gt; WidgetsBinding.instance.removeObserver(this);
+}</code></pre>
+
+<p>
+  <code>start</code> while running and <code>stop</code> while stopped do nothing, so the observer
+  needs no state of its own. Stream subscriptions stay valid across the cycle.
+</p>
+
+<h2>Configure</h2>
+
+<p>The default configuration does not keep positioning in the background:</p>
+
+<pre><code class="language-dart">final sdk = await Proximiio.create(const ProximiioConfiguration(token: token));</code></pre>
+
+<p>
+  Without <code>android:</code> options the Android SDK runs no foreground service and shows no
+  notification, and <code>requestPermissions</code> does not ask for the notification permission.
+  <code>allowsBackgroundLocationUpdates</code> is <code>false</code> by default on iOS.
+</p>
+
+<h2>Verify</h2>
+
+<p>Send the app to the background: <code>stateChanges</code> reports <code>authenticated</code>. Bring it back: <code>running</code>.</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}guides/background.html">Background positioning</a></li>
+  <li><a href="{{root}}concepts/lifecycle.html">Lifecycle and streams</a></li>
+</ul>

@@ -1,0 +1,71 @@
+<!--
+title: Models
+description: The data classes of flutter_proximiio and their fields.
+-->
+
+<p>
+  All models are immutable and compare by value (<code>==</code> and <code>hashCode</code> over every
+  field). Times are UTC <code>DateTime</code>s, durations are <code>Duration</code>s, lengths are
+  metres.
+</p>
+
+<h2>Venue</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>Fields</th></tr></thead>
+  <tbody>
+    <tr><td><code>ProximiioApplication</code></td><td><code>id</code>, <code>name</code></td></tr>
+    <tr><td><code>ProximiioPlace</code></td><td><code>id</code>, <code>name</code>, <code>address</code>, <code>tags</code>, <code>location</code>, <code>metadata</code></td></tr>
+    <tr><td><code>ProximiioFloor</code></td><td><code>id</code>, <code>name</code>, <code>placeId</code>, <code>floorId</code>, <code>level</code> (<code>double</code>), <code>anchors</code>, <code>floorPlanImageUrl</code>, <code>metadata</code></td></tr>
+    <tr><td><code>ProximiioDepartment</code></td><td><code>id</code>, <code>name</code>, <code>placeId</code>, <code>floorId</code>, <code>tags</code>, <code>metadata</code></td></tr>
+    <tr><td><code>ProximiioGeofence</code></td><td><code>id</code>, <code>name</code>, <code>type</code>, <code>area</code>, <code>radius</code>, <code>polygon</code>, <code>address</code>, <code>placeId</code>, <code>departmentId</code>, <code>floorId</code>, <code>remoteId</code>, <code>metadata</code>, <code>geometryIssue</code>, <code>isPolygon</code></td></tr>
+    <tr><td><code>ProximiioPrivacyZone</code></td><td>As <code>ProximiioGeofence</code>, without <code>remoteId</code></td></tr>
+    <tr><td><code>ProximiioFeature</code></td><td><code>id</code>, <code>type</code>, <code>geometry</code>, <code>properties</code>, <code>level</code>, <code>featureClass</code>, <code>propertyType</code>, <code>isLevelChanger</code>, <code>titleTranslations</code>, <code>title([language])</code></td></tr>
+    <tr><td><code>ProximiioAmenity</code></td><td><code>id</code>, <code>title</code>, <code>category</code>, <code>icon</code>, <code>details</code></td></tr>
+    <tr><td><code>ProximiioJourney</code></td><td><code>id</code>, <code>organizationId</code>, <code>name</code>, <code>placeId</code>, <code>speed</code>, <code>waypoints</code> (<code>JourneyWaypoint</code>), <code>displayName</code></td></tr>
+    <tr><td><code>Coordinate</code></td><td><code>latitude</code>, <code>longitude</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Events</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>Fields</th></tr></thead>
+  <tbody>
+    <tr><td><code>PositionUpdate</code></td><td><code>coordinate</code>, <code>horizontalAccuracy</code>, <code>floor</code>, <code>source</code>, <code>timestamp</code>, <code>background</code></td></tr>
+    <tr><td><code>FloorChangeEvent</code></td><td><code>previousFloor</code>, <code>floor</code>, <code>direction</code>, <code>confidence</code>, <code>source</code>, <code>timestamp</code></td></tr>
+    <tr><td><code>GeofenceExited</code></td><td><code>geofence</code>, <code>dwellTime</code></td></tr>
+    <tr><td><code>PrivacyZoneState</code></td><td><code>isInPrivacyZone</code>, <code>positioningSourcePrivateSince</code>, <code>isPrivate</code></td></tr>
+    <tr><td><code>VenueDataChange</code></td><td><code>kinds</code> (<code>VenueDataKind</code>: <code>features</code>, <code>amenities</code>, <code>style</code>, <code>floors</code>, <code>places</code>, <code>geofences</code>, open-ended)</td></tr>
+    <tr><td><code>BeaconObservation</code></td><td><code>identifier</code>, <code>rssi</code>, <code>txPower</code>, <code>timestamp</code>, <code>calibratedDistance</code></td></tr>
+    <tr><td><code>PermissionStatus</code></td><td><code>location</code>, <code>accuracy</code>, <code>bluetooth</code>, <code>motion</code>, <code>isLocationAuthorized</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Wayfinding</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>Fields</th></tr></thead>
+  <tbody>
+    <tr><td><code>RouteOptions</code></td><td><code>profile</code> (<code>RouteProfile</code>), <code>avoid</code> (<code>Set&lt;RouteAvoidance&gt;</code>)</td></tr>
+    <tr><td><code>ComputedRoute</code></td><td><code>coordinates</code>, <code>distanceMeters</code>, <code>segments</code>, <code>level</code>, <code>levelChanges</code>, <code>instructions</code>, <code>duration</code>, <code>estimatedArrival()</code></td></tr>
+    <tr><td><code>RouteInstruction</code></td><td><code>kind</code>, <code>coordinate</code>, <code>distanceMeters</code>, <code>level</code>, <code>duration</code>, <code>levelChange</code></td></tr>
+    <tr><td><code>LevelChange</code></td><td><code>featureType</code>, <code>fromLevel</code>, <code>toLevel</code>, <code>coordinate</code></td></tr>
+    <tr><td><code>RoutePoint</code></td><td><code>coordinate</code>, <code>level</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Tools</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>Fields</th></tr></thead>
+  <tbody>
+    <tr><td><code>PackageState</code></td><td><code>PackageMissing</code>, <code>PackageDownloading(progress)</code>, <code>PackageReady(version)</code>, <code>PackageStale</code>, <code>PackageVerifying</code>, <code>PackageFailed</code></td></tr>
+    <tr><td><code>SimulatedRoute</code></td><td><code>waypoints</code>, <code>speed</code>, <code>updateInterval</code>, <code>loops</code>, <code>accuracy</code></td></tr>
+    <tr><td><code>ProximiioDiagnostics</code></td><td>See <a href="{{root}}guides/diagnostics.html">Diagnostics and logging</a></td></tr>
+  </tbody>
+</table>
+
+<h2>Metadata</h2>
+
+<p><code>metadata</code>, <code>geometry</code> and <code>properties</code> hold decoded JSON. JSON that does not decode becomes <code>null</code>.</p>

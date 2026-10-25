@@ -21,15 +21,31 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
   `currentFloor`, `lastPosition`, `enteredGeofenceIds`, `isInPrivacyZone`.
 - Visitor analytics `visitorId`, `resetVisitorId`, `visitorReportingConsent`, `setVisitorReportingConsent`;
   `Proximiio.setLogLevel`.
-- Android: `sdk.android.updateServiceNotification` / `resetServiceNotification`. Bluetooth and (with the
-  service notification on) notification permissions are asked by `requestPermissions`, as iOS does.
-- `ProximiioException` with a `code` per SDK error case, `isRetryable`, and API failure details.
+- Streams `venueDataChanges`, `syncEvents` and `beaconEvents` (sealed `BeaconFound` / `BeaconUpdated` /
+  `BeaconLost` / `BeaconTelemetryReceived`).
+- Wayfinding: `loadRouteNetwork`, `loadCachedRouteNetwork`, `computeRoute` with `RouteOptions` (profiles
+  `pedestrian`, `wheelchair`, `stroller`, `staff` and avoidances), `routeDurations`. `ComputedRoute` carries
+  segments, level changes and turn-by-turn instructions.
+- Venue data `features` (GeoJSON, with titles by language), `amenities`, `departments`, `mapStyle`, `journeys`,
+  `journey(id)`.
+- Offline packages: `syncOfflinePackage`, `offlinePackageState`, `installOfflineSeed`, `removeOfflinePackage`,
+  `offlinePackageDiskUsage`.
+- Simulation: `simulatePosition`, `startSimulation`, `pauseSimulation`, `resumeSimulation`, `stopSimulation`,
+  `jumpToWaypoint`, `simulationState`.
+- Positioning inputs: `setCustomPosition`, `setFloor`, `enableRouteSnapping` / `disableRouteSnapping`,
+  `enablePdr` / `disablePdr`, `setPositioningSourcePrivate`.
+- Diagnostics: `diagnostics`, `startDiagnosticsRecording`, `stopDiagnosticsRecording`, `prepareDiagnosticsReport`.
+- Android: `sdk.android.updateServiceNotification` / `resetServiceNotification`. Bluetooth and, when the
+  foreground service runs, notification permissions are asked by `requestPermissions`, as iOS does.
+- `ProximiioException` with a `code` per SDK error case (`noRoute` with `noRouteReason`, `api` with `kind`, …),
+  `isRetryable`, and `underlying` naming the system error behind a failure.
 - Swift Package Manager support on iOS next to CocoaPods.
+- Documentation site (`docs/site`) in the style of the iOS and Android SDK docs, for Partner Zone.
 
 ### Changed
 - BREAKING: the plugin is rebuilt on the Proximi.io SDK v6 (iOS `Proximiio` 6.0.0-beta.64, Android
   `io.proximi.sdk:proximiio` 6.0.0-beta.31). The 1.x API (`FlutterProximiio.authorize`, `subscribe`,
-  `ProximiioEvents`) is removed; see the migration guide in `docs/MIGRATION.md`.
+  `ProximiioEvents`) is removed; see the migration guide (`docs/site/content/reference/migration.html`).
 - BREAKING: minimum platforms are iOS 15 and Android API 26.
 
 ## [1.0.0]

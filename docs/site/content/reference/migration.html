@@ -1,0 +1,72 @@
+<!--
+title: Migrating from 1.x
+description: Move an app from flutter_proximiio 1.x (Proximi.io SDK 5.x) to 6.0 (SDK v6).
+-->
+
+<p>6.0 moves the plugin from the Proximi.io SDK 5.x to SDK v6 and replaces the Dart API. Nothing of the 1.x API remains; this page maps each use.</p>
+
+<h2>Platform setup</h2>
+
+<ul>
+  <li>iOS 15 and the <code>Proximiio</code> pod line in the Podfile. Remove <code>pod 'Proximiio', '5.x'</code>.</li>
+  <li>Android: minSdk 26, compileSdk 37, Android Gradle Plugin 8.13, Kotlin 2.2. Remove the old repositories <code>maven.proximi.io/repository/android-releases</code>, IndoorAtlas and Mapbox unless something else needs them.</li>
+</ul>
+
+<p>See <a href="{{root}}getting-started/installation.html">Installation</a>.</p>
+
+<h2>Setup and lifecycle</h2>
+
+<table>
+  <thead><tr><th>1.x</th><th>6.0</th></tr></thead>
+  <tbody>
+    <tr><td><code>FlutterProximiio.authorize(token)</code></td><td><code>Proximiio.create(ProximiioConfiguration(token: token))</code>, then <code>authenticate()</code> and <code>start()</code></td></tr>
+    <tr><td><code>ProximiioInitState.visitorId</code></td><td><code>visitorId()</code></td></tr>
+    <tr><td><code>requestPermissions(useAlways: true)</code></td><td><code>requestPermissions(always: true)</code>, returns <code>PermissionStatus</code></td></tr>
+    <tr><td><code>enable()</code> / <code>disable()</code></td><td><code>start()</code> / <code>stop()</code></td></tr>
+    <tr><td><code>setNativeAccuracy(NativeAccuracy.x)</code></td><td><code>ProximiioConfiguration(desiredAccuracy: DesiredAccuracy.x)</code></td></tr>
+    <tr><td><code>setBufferSize(...)</code></td><td>Removed; SDK v6 has no buffer setting</td></tr>
+    <tr><td><code>setNotificationMode/Title/Text/Icon</code>, <code>updateOptions()</code></td><td><code>ProximiioConfiguration(android: AndroidServiceOptions(...))</code>; at runtime <code>sdk.android.updateServiceNotification(...)</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Events</h2>
+
+<p><code>subscribe(ProximiioEvents.x, callback)</code> becomes a typed stream. Cancel the <code>StreamSubscription</code> instead of calling <code>unsubscribe</code>.</p>
+
+<table>
+  <thead><tr><th>1.x event</th><th>6.0</th></tr></thead>
+  <tbody>
+    <tr><td><code>positionUpdated</code></td><td><code>positions</code></td></tr>
+    <tr><td><code>floorChanged</code></td><td><code>floorChanges</code></td></tr>
+    <tr><td><code>enteredGeofence</code>, <code>exitedGeofence</code></td><td><code>geofenceEvents</code>: <code>GeofenceEntered</code>, <code>GeofenceExited</code> (<code>dwellTime</code>)</td></tr>
+    <tr><td><code>enteredPrivacyZone</code>, <code>exitedPrivacyZone</code></td><td><code>geofenceEvents</code>: <code>PrivacyZoneEntered</code>, <code>PrivacyZoneExited</code>; <code>privacyZoneStateChanges</code></td></tr>
+    <tr><td><code>foundIBeacon</code>, <code>lostIBeacon</code>, <code>foundEddystoneBeacon</code>, …</td><td><code>beaconEvents</code>: <code>BeaconFound</code>, <code>BeaconLost</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Data</h2>
+
+<table>
+  <thead><tr><th>1.x</th><th>6.0</th></tr></thead>
+  <tbody>
+    <tr><td><code>currentFloor()</code></td><td><code>currentFloor()</code></td></tr>
+    <tr><td><code>floors()</code>, <code>floorById(id)</code></td><td><code>floors()</code>, <code>floor(id)</code></td></tr>
+    <tr><td><code>geofences()</code>, <code>geofenceById(id)</code></td><td><code>geofences()</code></td></tr>
+    <tr><td><code>currentGeofences()</code></td><td><code>enteredGeofenceIds()</code></td></tr>
+  </tbody>
+</table>
+
+<p><code>ProximiioFloor.level</code> is a <code>double</code>. <code>ProximiioGeofence.polygon</code> is a list of <code>Coordinate</code>s.</p>
+
+<h2>Errors</h2>
+
+<p>1.x threw <code>Exception('Failed to …')</code>. 6.0 throws <code>ProximiioException</code> with a <code>code</code>; see <a href="{{root}}guides/errors.html">Errors and failure handling</a>.</p>
+
+<h2>Behaviour that changes</h2>
+
+<ul>
+  <li>Visitor analytics are on by default. Set <code>visitorReportingEnabled: false</code> if the app has no consent.</li>
+  <li>A geofence exit is reported <code>geofenceExitDelay</code> (default 3 s) after the device leaves.</li>
+  <li><code>stop()</code> reports an exit for every geofence the device is in.</li>
+  <li>On Android, positioning in the background needs <code>android:</code> options (the foreground service).</li>
+</ul>

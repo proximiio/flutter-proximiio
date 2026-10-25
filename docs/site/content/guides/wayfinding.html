@@ -1,0 +1,133 @@
+<!--
+title: Wayfinding
+description: Compute routes on the device, choose accessibility profiles, read instructions, and handle "no route".
+-->
+
+<p>
+  The SDK computes routes on the device from the venue's path network. It fetches the network, never
+  a route. It draws nothing and does not reroute by itself: watch <code>positions</code> and compute
+  again when the visitor leaves the route, or use the map plugin's guidance.
+</p>
+
+<h2>Load the path network</h2>
+
+<p>Install the network once after <code>authenticate</code>, before computing routes. <code>start</code> does not load it.</p>
+
+<pre><code class="language-dart">// Offline or cold start: install the stored copy at once, no request.
+var paths = await sdk.loadCachedRouteNetwork();
+try {
+  // Online: download the features when they changed, store them, install the network.
+  paths = await sdk.loadRouteNetwork();
+} on ProximiioException catch (e) {
+  // Keep routing on the stored network.
+  log('route network refresh failed: ${e.code.name}');
+}</code></pre>
+
+<p>
+  Both return the number of routable paths; <code>0</code> means none are installed. The download is
+  conditional, so calling <code>loadRouteNetwork</code> again costs one small request while the venue
+  is unchanged. The features it stores are what <code>features()</code> returns. Sync keeps them
+  current afterwards.
+</p>
+
+<h2>Compute a route</h2>
+
+<pre><code class="language-dart">final route = await sdk.computeRoute(
+  from: const Coordinate(latitude: 24.4866, longitude: 54.6074),
+  fromLevel: 0,
+  to: const Coordinate(latitude: 24.4871, longitude: 54.6081),
+  toLevel: 2,
+);
+print('${route.distanceMeters.round()} m, about ${route.duration.inMinutes} min');</code></pre>
+
+<p><code>toLevel</code> defaults to <code>fromLevel</code>. Levels are the <code>level</code> of the floors, not floor ids.</p>
+
+<h2>Accessibility</h2>
+
+<pre><code class="language-dart">final route = await sdk.computeRoute(
+  from: start, fromLevel: 0, to: goal, toLevel: 1,
+  options: const RouteOptions(profile: RouteProfile.wheelchair, avoid: {RouteAvoidance.revolvingDoors}),
+);</code></pre>
+
+<table>
+  <thead><tr><th>Profile</th><th>Avoids</th></tr></thead>
+  <tbody>
+    <tr><td><code>pedestrian</code></td><td>Nothing (default)</td></tr>
+    <tr><td><code>wheelchair</code></td><td>Staircases, escalators, narrow paths</td></tr>
+    <tr><td><code>stroller</code></td><td>Staircases, escalators</td></tr>
+    <tr><td><code>staff</code></td><td>Nothing; reserved for staff-only paths</td></tr>
+  </tbody>
+</table>
+
+<p>
+  <code>avoid</code> adds to the profile: <code>elevators</code>, <code>escalators</code>,
+  <code>staircases</code>, <code>ramps</code>, <code>narrowPaths</code>, <code>hills</code>,
+  <code>revolvingDoors</code>, <code>ticketGates</code>, <code>barriers</code>.
+</p>
+
+<h2>The route</h2>
+
+<table>
+  <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code>coordinates</code></td><td>The route line</td></tr>
+    <tr><td><code>distanceMeters</code>, <code>duration</code></td><td>Length and estimated time, level changes included</td></tr>
+    <tr><td><code>levelChanges</code></td><td>One <code>LevelChange</code> per ride (elevator, staircase, escalator, ramp)</td></tr>
+    <tr><td><code>instructions</code></td><td>Turn-by-turn <code>RouteInstruction</code>s</td></tr>
+    <tr><td><code>estimatedArrival()</code></td><td>Now plus <code>duration</code></td></tr>
+  </tbody>
+</table>
+
+<pre><code class="language-dart">for (final step in route.instructions) {
+  final text = switch (step.kind) {
+    RouteInstructionKind.levelChange =&gt;
+      'Take the ${step.levelChange!.featureType} to level ${step.levelChange!.toLevel}',
+    RouteInstructionKind.arrive =&gt; 'Arrive',
+    _ =&gt; '${step.kind.name} in ${step.distanceMeters.round()} m',
+  };
+  print(text);
+}</code></pre>
+
+<h2>No route</h2>
+
+<p><code>computeRoute</code> throws <code>ProximiioErrorCode.noRoute</code> with the reason:</p>
+
+<table>
+  <thead><tr><th><code>noRouteReason</code></th><th>Meaning</th><th>Details</th></tr></thead>
+  <tbody>
+    <tr><td><code>emptyNetwork</code></td><td>No path network (not drawn, or not loaded yet)</td><td></td></tr>
+    <tr><td><code>startOffNetwork</code></td><td>The start is too far from a path</td><td><code>nearestDistanceMeters</code></td></tr>
+    <tr><td><code>goalOffNetwork</code></td><td>The destination is too far from a path</td><td><code>nearestDistanceMeters</code></td></tr>
+    <tr><td><code>disconnected</code></td><td>The paths of start and destination do not connect</td><td></td></tr>
+    <tr><td><code>noLevelTransition</code></td><td>No level changer connects the levels</td><td></td></tr>
+    <tr><td><code>noAccessibleRoute</code></td><td>Every route uses something the options avoid</td><td><code>blockedBy</code></td></tr>
+  </tbody>
+</table>
+
+<pre><code class="language-dart">try {
+  route = await sdk.computeRoute(from: start, fromLevel: 0, to: goal, options: wheelchair);
+} on ProximiioException catch (e) when (e.noRouteReason == NoRouteReason.noAccessibleRoute) {
+  showMessage('No step-free route. Blocked by: ${e.blockedBy.map((a) =&gt; a.name).join(', ')}');
+}</code></pre>
+
+<h2>Travel times</h2>
+
+<p><code>routeDurations</code> returns the walking time between every pair of points, for sorting destinations by distance:</p>
+
+<pre><code class="language-dart">final matrix = await sdk.routeDurations([
+  RoutePoint(here, level: 0),
+  RoutePoint(cafe, level: 1),
+  RoutePoint(exit, level: 0),
+]);
+final toCafe = matrix[0][1]; // null when there is no route</code></pre>
+
+<h2>Showing the route</h2>
+
+<p>The map plugin <code>flutter_proximiio_map</code> draws routes and turn-by-turn guidance.</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}concepts/coordinates.html">Coordinates and floors</a></li>
+  <li><a href="{{root}}guides/errors.html">Errors and failure handling</a></li>
+</ul>

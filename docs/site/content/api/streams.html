@@ -1,0 +1,52 @@
+<!--
+title: Streams
+description: Every stream of Proximiio, its event type, and when it delivers events.
+-->
+
+<p>
+  All streams are broadcast streams that stay open for the life of the app. They deliver events while
+  the SDK runs (the first two always) and survive <code>stop</code> and <code>start</code>. A stream
+  error is a <code>ProximiioException</code>.
+</p>
+
+<table>
+  <thead><tr><th>Stream</th><th>Event</th><th>Delivers</th></tr></thead>
+  <tbody>
+    <tr><td><code>stateChanges</code></td><td><code>ProximiioState</code></td><td>The state after each lifecycle call</td></tr>
+    <tr><td><code>permissionUpdates</code></td><td><code>PermissionStatus</code></td><td>Permission changes, also from the system settings</td></tr>
+    <tr><td><code>positions</code></td><td><code>PositionUpdate</code></td><td>Device positions</td></tr>
+    <tr><td><code>floorChanges</code></td><td><code>FloorChangeEvent</code></td><td>Floor changes</td></tr>
+    <tr><td><code>geofenceEvents</code></td><td><code>GeofenceEvent</code></td><td><code>GeofenceEntered</code>, <code>GeofenceExited</code>, <code>PrivacyZoneEntered</code>, <code>PrivacyZoneExited</code></td></tr>
+    <tr><td><code>privacyZoneStateChanges</code></td><td><code>PrivacyZoneState</code></td><td>Whether the position is private</td></tr>
+    <tr><td><code>venueDataChanges</code></td><td><code>VenueDataChange</code></td><td>Which kinds of venue data changed</td></tr>
+    <tr><td><code>syncEvents</code></td><td><code>SyncEvent</code></td><td><code>SyncUpdated</code>, <code>SyncDeleted</code>, <code>SyncCompleted</code>, <code>SyncFailed</code>, <code>StoreRecreated</code></td></tr>
+    <tr><td><code>beaconEvents</code></td><td><code>BeaconEvent</code></td><td><code>BeaconFound</code>, <code>BeaconUpdated</code>, <code>BeaconLost</code>, <code>BeaconTelemetryReceived</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Sealed events</h2>
+
+<p><code>GeofenceEvent</code>, <code>SyncEvent</code> and <code>BeaconEvent</code> are sealed classes. A <code>switch</code> over them is exhaustive:</p>
+
+<pre><code class="language-dart">final text = switch (event) {
+  GeofenceEntered(:final geofence) =&gt; 'in ${geofence.name}',
+  GeofenceExited(:final geofence, :final dwellTime) =&gt; 'left ${geofence.name} after $dwellTime',
+  PrivacyZoneEntered(:final zone) =&gt; 'private: ${zone.name}',
+  PrivacyZoneExited(:final zone) =&gt; 'public again: ${zone.name}',
+};</code></pre>
+
+<h2>In widgets</h2>
+
+<pre><code class="language-dart">StreamBuilder&lt;PositionUpdate&gt;(
+  stream: sdk.positions,
+  builder: (context, snapshot) =&gt; Text(snapshot.data?.coordinate.toString() ?? 'Locating…'),
+)</code></pre>
+
+<p>Events emitted before a listener subscribes are not replayed. Seed the widget with <code>lastPosition()</code> if it needs a value at once.</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}concepts/lifecycle.html">Lifecycle and streams</a></li>
+  <li><a href="{{root}}api/models.html">Models</a></li>
+</ul>

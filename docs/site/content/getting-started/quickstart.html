@@ -1,0 +1,109 @@
+<!--
+title: Quick start
+description: Create the SDK, ask for permissions, authenticate, start positioning, listen to positions, and stop.
+-->
+
+<p>A basic integration creates the SDK, asks for permissions, authenticates, starts positioning, listens to <code>positions</code> and stops the SDK with the app.</p>
+
+<h2>Prerequisites</h2>
+
+<ul>
+  <li>
+    An <strong>application token</strong> from the Proximi.io Portal. Keep it out of version
+    control: pass it with <code>--dart-define-from-file</code> from a git-ignored file, as the
+    example app does.
+  </li>
+  <li>
+    A <strong>physical device</strong> for beacon positioning. Simulators and emulators have no
+    Bluetooth; use a <a href="{{root}}guides/simulator.html">simulated route</a> there.
+  </li>
+  <li>The platform setup from <a href="{{root}}getting-started/installation.html">Installation</a>.</li>
+</ul>
+
+<h2>The lifecycle</h2>
+
+<p>
+  The order is fixed: <strong><code>create</code> → <code>requestPermissions</code> →
+  <code>authenticate</code> → <code>start</code> → listen → <code>stop</code></strong>. Every
+  method returns a <code>Future</code> and throws <code>ProximiioException</code> on failure.
+</p>
+
+<pre><code class="language-dart">import 'dart:async';
+
+import 'package:flutter_proximiio/flutter_proximiio.dart';
+
+const token = String.fromEnvironment('PROXIMIIO_TOKEN');
+
+Future&lt;Proximiio&gt; startPositioning() async {
+  final sdk = await Proximiio.create(const ProximiioConfiguration(token: token));
+
+  final permissions = await sdk.requestPermissions();
+  if (!permissions.isLocationAuthorized) {
+    throw StateError('Location permission is needed for indoor positioning.');
+  }
+
+  await sdk.authenticate();
+  await sdk.start();
+  return sdk;
+}</code></pre>
+
+<h2>Listen to positions</h2>
+
+<pre><code class="language-dart">final StreamSubscription&lt;PositionUpdate&gt; subscription = sdk.positions.listen((position) {
+  final floor = position.floor;
+  print('${position.coordinate.latitude}, ${position.coordinate.longitude} '
+      '±${position.horizontalAccuracy} m, floor ${floor?.name ?? floor?.level}, ${position.source.name}');
+});</code></pre>
+
+<p>
+  Streams can be listened to before <code>start</code> and stay open across <code>stop</code> and
+  <code>start</code>. Cancel the subscription when the screen goes away.
+</p>
+
+<h2>Stop</h2>
+
+<pre><code class="language-dart">await subscription.cancel();
+await sdk.stop();</code></pre>
+
+<p><code>stop</code> ends positioning and reports an exit for every geofence the device is in.</p>
+
+<h2>Handle errors</h2>
+
+<pre><code class="language-dart">try {
+  await sdk.authenticate();
+  await sdk.start();
+} on ProximiioException catch (error) {
+  switch (error.code) {
+    case ProximiioErrorCode.invalidToken:
+      // The token is wrong or revoked; retrying does not help.
+      rethrow;
+    case ProximiioErrorCode.api when error.isRetryable:
+      // No connection or a server error: retry later.
+      break;
+    default:
+      rethrow;
+  }
+}</code></pre>
+
+<p>
+  <code>authenticate</code> validates the token with the Proximi.io API and needs a connection.
+  <code>start</code> throws <code>notAuthenticated</code> until <code>authenticate</code> has
+  succeeded. Without the location permission <code>start</code> succeeds but produces no positions;
+  check the permission status first.
+</p>
+
+<h2>Verify</h2>
+
+<p>
+  On a device inside a configured venue, <code>stateChanges</code> reports <code>running</code> and
+  <code>positions</code> delivers updates with a <code>floor</code>. Outside a venue, positions come
+  from the platform location service (<code>PositionSource.native</code>).
+</p>
+
+<h2>Next</h2>
+
+<ul>
+  <li><a href="{{root}}concepts/lifecycle.html">Lifecycle and streams</a></li>
+  <li><a href="{{root}}guides/geofences-and-pois.html">Geofences and POIs</a></li>
+  <li><a href="{{root}}guides/errors.html">Errors and failure handling</a></li>
+</ul>

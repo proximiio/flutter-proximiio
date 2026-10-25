@@ -1,0 +1,62 @@
+<!--
+title: Configuration presets
+description: Select an SDK configuration preset and override supported settings.
+-->
+
+<p>
+  Start with the preset that matches the app's position source and power needs. Keep the defaults
+  unless a deployment has a verified reason to change them.
+</p>
+
+<h2>Presets</h2>
+
+<table>
+  <thead><tr><th><code>ConfigurationPreset</code></th><th>Use when</th></tr></thead>
+  <tbody>
+    <tr><td><code>standard</code></td><td>The app uses on-device positioning (default).</td></tr>
+    <tr><td><code>highAccuracy</code></td><td>Positions must update quickly, at the cost of battery.</td></tr>
+    <tr><td><code>lowPower</code></td><td>Battery matters more than update rate.</td></tr>
+    <tr><td><code>relayOnly</code></td><td>Positions come from venue infrastructure through a relay; no beacon or native location.</td></tr>
+  </tbody>
+</table>
+
+<pre><code class="language-dart">const configuration = ProximiioConfiguration(
+  token: token,
+  preset: ConfigurationPreset.highAccuracy,
+);</code></pre>
+
+<h2>Overrides</h2>
+
+<p>Every field that is not <code>null</code> replaces the preset's value. Unset fields keep the preset.</p>
+
+<pre><code class="language-dart">final configuration = ProximiioConfiguration(
+  token: token,
+  preset: ConfigurationPreset.lowPower,
+  apiBaseUrl: Uri.parse('https://api.proximi.fi'),
+  geofenceExitDelay: const Duration(seconds: 5),
+  visitorReportingEnabled: false,
+);</code></pre>
+
+<p>
+  With <code>relayOnly</code> on iOS, <code>relayRunsInBackground: true</code> keeps receiving relay
+  positions in the background. On Android the foreground service does this.
+</p>
+
+<h2>Applying changes</h2>
+
+<p>
+  The configuration is read when the SDK instance is created. To change it, call
+  <code>Proximiio.create</code> again with the new configuration; it stops and replaces the instance.
+  Authenticate and start again afterwards.
+</p>
+
+<h2>Validation</h2>
+
+<p>Change one setting at a time and test it in the target venue. Compare <code>diagnostics()</code> before and after.</p>
+
+<h2>Next</h2>
+
+<ul>
+  <li><a href="{{root}}api/configuration.html">Configuration reference</a></li>
+  <li><a href="{{root}}guides/diagnostics.html">Diagnostics and logging</a></li>
+</ul>

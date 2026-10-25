@@ -1,0 +1,74 @@
+<!--
+title: Geofences and POIs
+description: React to geofence entries and exits, read dwell time, handle privacy zones, and list points of interest.
+-->
+
+<p>
+  Geofences are circles or polygons defined in the Proximi.io Portal. The SDK checks every position
+  against them and reports entries and exits on <code>geofenceEvents</code>.
+</p>
+
+<h2>Entries and exits</h2>
+
+<pre><code class="language-dart">sdk.geofenceEvents.listen((event) {
+  switch (event) {
+    case GeofenceEntered(:final geofence):
+      showWelcome(geofence.name);
+    case GeofenceExited(:final geofence, :final dwellTime):
+      log('${geofence.name}: ${dwellTime.inSeconds} s');
+    case PrivacyZoneEntered() || PrivacyZoneExited():
+      break;
+  }
+});</code></pre>
+
+<ul>
+  <li>An exit is reported <code>geofenceExitDelay</code> after the device leaves (default 3 s), so a short step outside does not end the visit.</li>
+  <li><code>dwellTime</code> is measured by the SDK from the entry to the leave.</li>
+  <li><code>stop</code> reports an exit for every geofence the device is in.</li>
+</ul>
+
+<p>The geofences the device is in now: <code>await sdk.enteredGeofenceIds()</code>.</p>
+
+<h2>Geometry</h2>
+
+<p>
+  A circular geofence has <code>area</code> and <code>radius</code> (metres); a polygon has
+  <code>polygon</code> and <code>isPolygon</code>. When the SDK could not read a geofence's stored
+  geometry, <code>geometryIssue</code> says why (<code>unreadableArea</code>,
+  <code>degenerateOutline</code>); fix the geofence in the Proximi.io Portal.
+</p>
+
+<h2>Privacy zones</h2>
+
+<p>
+  Privacy zones are areas where the visitor's position must not be shown or reported.
+  <code>privacyZoneStateChanges</code> reports whether the position is private now.
+</p>
+
+<pre><code class="language-dart">sdk.privacyZoneStateChanges.listen((state) {
+  hideDot = state.isPrivate;
+});</code></pre>
+
+<p>
+  With <code>withholdsPositionsInPrivacyZones: true</code> the SDK does not emit positions inside a
+  privacy zone. <code>isPrivate</code> is also true when the positioning source marks the position
+  private (<code>setPositioningSourcePrivate</code>).
+</p>
+
+<h2>Points of interest</h2>
+
+<p>POIs are GeoJSON features with <code>properties.type</code> <code>poi</code>. Their amenity links to an icon and a category. <code>features()</code> returns the features stored by <code>loadRouteNetwork()</code>; call it once after <code>authenticate</code>.</p>
+
+<pre><code class="language-dart">final amenities = {for (final a in await sdk.amenities()) a.id: a};
+final pois = (await sdk.features()).where((f) =&gt; f.propertyType == 'poi');
+for (final poi in pois) {
+  final amenity = amenities[poi.properties?['amenity']];
+  print('${poi.title()} (${amenity?.title}) on level ${poi.level}');
+}</code></pre>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}guides/wayfinding.html">Wayfinding</a></li>
+  <li><a href="{{root}}guides/analytics.html">Visitor analytics</a></li>
+</ul>

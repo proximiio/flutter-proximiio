@@ -1,0 +1,63 @@
+<!--
+title: Troubleshooting
+description: Common integration problems and how to find their cause.
+-->
+
+<p>Start with <code>diagnostics()</code> and the <code>code</code> and <code>underlying</code> of the exception.</p>
+
+<h2>authenticate fails with api / network</h2>
+
+<p>
+  <code>authenticate</code> validates the token with the API. <code>kind: network</code> means the
+  device did not reach <code>apiBaseUrl</code>; <code>underlying</code> names the cause.
+</p>
+
+<ul>
+  <li>Check the device connection and that <code>apiBaseUrl</code> is the host of your installation.</li>
+  <li>Recent Android versions block the network of apps that are not in the foreground (seen on Android 17). An app, or an integration test, started on a locked and dozing device cannot resolve hosts (<code>UnknownHostException</code>). Unlock the device.</li>
+</ul>
+
+<h2>No positions</h2>
+
+<table>
+  <thead><tr><th>Check</th><th>How</th></tr></thead>
+  <tbody>
+    <tr><td>State is <code>running</code></td><td><code>await sdk.state()</code></td></tr>
+    <tr><td>Location is granted with full accuracy</td><td><code>(await sdk.diagnostics()).permissions</code></td></tr>
+    <tr><td>Beacons are in range</td><td><code>visibleBeaconCount</code> &gt; 0 in <code>diagnostics()</code></td></tr>
+    <tr><td>Reason</td><td><code>noPositionReason</code> in <code>diagnostics()</code></td></tr>
+    <tr><td>Device</td><td>Simulators and emulators have no Bluetooth; use <a href="{{root}}guides/simulator.html">simulation</a></td></tr>
+  </tbody>
+</table>
+
+<h2>computeRoute throws noRoute / emptyNetwork</h2>
+
+<p>The route network is not installed. Call <code>loadRouteNetwork()</code> (or <code>loadCachedRouteNetwork()</code> offline) after <code>authenticate</code>.</p>
+
+<h2>features() is empty</h2>
+
+<p><code>features()</code> returns the features stored by <code>loadRouteNetwork()</code>. Call it once after <code>authenticate</code>.</p>
+
+<h2>Positioning stops in the background on Android</h2>
+
+<p>Without <code>android:</code> options in the configuration the SDK runs no foreground service. See <a href="{{root}}guides/background.html">Background positioning</a>.</p>
+
+<h2>Android build: Failed to find Platform SDK with path: platforms;android-37</h2>
+
+<p>Use the Android Gradle Plugin 8.13 or newer and Gradle 8.13 or newer; see <a href="{{root}}getting-started/installation.html">Installation</a>.</p>
+
+<h2>Android build fails with a Java version such as 25.0.2</h2>
+
+<p>Gradle 8 cannot run on JDK 25, which recent Android Studio versions bundle. Point Flutter at JDK 17 or 21: <code>flutter config --jdk-dir=&lt;path&gt;</code>.</p>
+
+<h2>iOS app does not launch on iOS 27</h2>
+
+<p>iOS 27 requires the UIScene life cycle. Migrate the Flutter app's <code>AppDelegate</code> to UIScene as described in the Flutter documentation; the plugin needs no change.</p>
+
+<h2>iOS: pod 'Proximiio' not found</h2>
+
+<p>The pod is not on the CocoaPods trunk. Add the <code>:podspec</code> line from <a href="{{root}}getting-started/installation.html">Installation</a> to the Podfile.</p>
+
+<h2>Calls throw notConfigured</h2>
+
+<p>Call <code>Proximiio.create</code> before any other method.</p>

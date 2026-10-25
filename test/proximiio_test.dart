@@ -146,7 +146,7 @@ void main() {
       sdk.authenticate(),
       throwsA(
         isA<ProximiioException>()
-            .having((e) => e.apiKind, 'apiKind', 'server')
+            .having((e) => e.kind, 'kind', 'server')
             .having((e) => e.statusCode, 'statusCode', 503)
             .having((e) => e.isRetryable, 'isRetryable', isTrue),
       ),

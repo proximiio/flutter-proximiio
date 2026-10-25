@@ -1,0 +1,57 @@
+<!--
+title: Beacons
+description: Which beacons the SDK reports, beacon identifiers, and the beaconEvents stream.
+-->
+
+<p>
+  The SDK scans for the beacons registered in the venue data, plus the iBeacon UUIDs in
+  <code>customIBeaconUuids</code>. <code>beaconEvents</code> reports them while the SDK runs.
+</p>
+
+<h2>Identifiers</h2>
+
+<table>
+  <thead><tr><th>Class</th><th>Fields</th></tr></thead>
+  <tbody>
+    <tr><td><code>IBeaconIdentifier</code></td><td><code>uuid</code> (upper case), <code>major</code>, <code>minor</code></td></tr>
+    <tr><td><code>EddystoneIdentifier</code></td><td><code>namespace</code>, <code>instance</code> (hex)</td></tr>
+    <tr><td><code>UwbAccessoryIdentifier</code></td><td><code>name</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Events</h2>
+
+<pre><code class="language-dart">sdk.beaconEvents.listen((event) {
+  switch (event) {
+    case BeaconFound(:final observation):
+      print('found ${observation.identifier}, rssi ${observation.rssi}');
+    case BeaconUpdated():
+      break;
+    case BeaconLost(:final identifier):
+      print('lost $identifier');
+    case BeaconTelemetryReceived(:final identifier, :final telemetry):
+      print('$identifier battery ${telemetry.batteryMillivolts} mV');
+  }
+});</code></pre>
+
+<p>
+  A <code>BeaconObservation</code> has <code>rssi</code> (dBm), <code>txPower</code>,
+  <code>timestamp</code> and, for calibrated beacons, <code>calibratedDistance</code> in metres.
+  Telemetry comes from Eddystone TLM frames.
+</p>
+
+<h2>Custom UUIDs</h2>
+
+<pre><code class="language-dart">const configuration = ProximiioConfiguration(
+  token: token,
+  customIBeaconUuids: ['F7826DA6-4FA2-4E98-8024-BC5B71E0893E'],
+);</code></pre>
+
+<p>The SDK scans for these UUIDs in addition to those of the venue data. Register the beacons in the Proximi.io Portal to use them for positioning.</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}concepts/positioning.html">Positioning</a></li>
+  <li><a href="{{root}}getting-started/permissions.html">Permissions</a></li>
+</ul>

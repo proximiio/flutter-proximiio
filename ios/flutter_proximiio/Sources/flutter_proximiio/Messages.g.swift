@@ -262,6 +262,59 @@ enum MsgFloorChangeSource: Int {
   case unknown = 3
 }
 
+enum MsgRouteProfile: Int {
+  case pedestrian = 0
+  case wheelchair = 1
+  case stroller = 2
+  case staff = 3
+}
+
+enum MsgRouteAvoidance: Int {
+  case elevators = 0
+  case escalators = 1
+  case staircases = 2
+  case ramps = 3
+  case narrowPaths = 4
+  case hills = 5
+  case revolvingDoors = 6
+  case ticketGates = 7
+  case barriers = 8
+}
+
+enum MsgInstructionKind: Int {
+  case start = 0
+  case continueStraight = 1
+  case turnSlightLeft = 2
+  case turnLeft = 3
+  case turnSharpLeft = 4
+  case turnSlightRight = 5
+  case turnRight = 6
+  case turnSharpRight = 7
+  case levelChange = 8
+  case arrive = 9
+}
+
+enum MsgBeaconKind: Int {
+  case iBeacon = 0
+  case eddystone = 1
+  case uwbAccessory = 2
+}
+
+enum MsgPackageStateKind: Int {
+  case missing = 0
+  case downloading = 1
+  case ready = 2
+  case stale = 3
+  case verifying = 4
+  case failed = 5
+}
+
+enum MsgSimulationState: Int {
+  case idle = 0
+  case running = 1
+  case paused = 2
+}
+
 /// Android foreground-service notification. Ignored on iOS.
 ///
 /// Generated class from Pigeon that represents data sent in messages.
@@ -1083,6 +1136,1351 @@ struct MsgPrivacyZoneState: Hashable {
   }
 }
 
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgRouteOptions: Hashable {
+  var profile: MsgRouteProfile
+  var avoid: [MsgRouteAvoidance]
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgRouteOptions? {
+    let profile = pigeonVar_list[0] as! MsgRouteProfile
+    let avoid = pigeonVar_list[1] as! [MsgRouteAvoidance]
+
+    return MsgRouteOptions(
+      profile: profile,
+      avoid: avoid
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      profile,
+      avoid,
+    ]
+  }
+  static func == (lhs: MsgRouteOptions, rhs: MsgRouteOptions) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.profile, rhs.profile) && deepEqualsMessages(lhs.avoid, rhs.avoid)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgRouteOptions")
+    deepHashMessages(value: profile, hasher: &hasher)
+    deepHashMessages(value: avoid, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgRoutePoint: Hashable {
+  var coordinate: MsgCoordinate
+  var level: Double
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgRoutePoint? {
+    let coordinate = pigeonVar_list[0] as! MsgCoordinate
+    let level = pigeonVar_list[1] as! Double
+
+    return MsgRoutePoint(
+      coordinate: coordinate,
+      level: level
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      coordinate,
+      level,
+    ]
+  }
+  static func == (lhs: MsgRoutePoint, rhs: MsgRoutePoint) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.coordinate, rhs.coordinate) && deepEqualsMessages(lhs.level, rhs.level)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgRoutePoint")
+    deepHashMessages(value: coordinate, hasher: &hasher)
+    deepHashMessages(value: level, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgLevelChange: Hashable {
+  var featureType: String
+  var fromLevel: Double
+  var toLevel: Double
+  var coordinate: MsgCoordinate
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgLevelChange? {
+    let featureType = pigeonVar_list[0] as! String
+    let fromLevel = pigeonVar_list[1] as! Double
+    let toLevel = pigeonVar_list[2] as! Double
+    let coordinate = pigeonVar_list[3] as! MsgCoordinate
+
+    return MsgLevelChange(
+      featureType: featureType,
+      fromLevel: fromLevel,
+      toLevel: toLevel,
+      coordinate: coordinate
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      featureType,
+      fromLevel,
+      toLevel,
+      coordinate,
+    ]
+  }
+  static func == (lhs: MsgLevelChange, rhs: MsgLevelChange) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.featureType, rhs.featureType) && deepEqualsMessages(lhs.fromLevel, rhs.fromLevel) && deepEqualsMessages(lhs.toLevel, rhs.toLevel) && deepEqualsMessages(lhs.coordinate, rhs.coordinate)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgLevelChange")
+    deepHashMessages(value: featureType, hasher: &hasher)
+    deepHashMessages(value: fromLevel, hasher: &hasher)
+    deepHashMessages(value: toLevel, hasher: &hasher)
+    deepHashMessages(value: coordinate, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgRouteSegment: Hashable {
+  var start: MsgCoordinate
+  var end: MsgCoordinate
+  var distanceMeters: Double
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgRouteSegment? {
+    let start = pigeonVar_list[0] as! MsgCoordinate
+    let end = pigeonVar_list[1] as! MsgCoordinate
+    let distanceMeters = pigeonVar_list[2] as! Double
+
+    return MsgRouteSegment(
+      start: start,
+      end: end,
+      distanceMeters: distanceMeters
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      start,
+      end,
+      distanceMeters,
+    ]
+  }
+  static func == (lhs: MsgRouteSegment, rhs: MsgRouteSegment) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.start, rhs.start) && deepEqualsMessages(lhs.end, rhs.end) && deepEqualsMessages(lhs.distanceMeters, rhs.distanceMeters)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgRouteSegment")
+    deepHashMessages(value: start, hasher: &hasher)
+    deepHashMessages(value: end, hasher: &hasher)
+    deepHashMessages(value: distanceMeters, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgRouteInstruction: Hashable {
+  var kind: MsgInstructionKind
+  var coordinate: MsgCoordinate
+  var distanceMeters: Double
+  var level: Double
+  var durationSeconds: Double
+  /// Set when [kind] is `levelChange`.
+  var levelChange: MsgLevelChange? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgRouteInstruction? {
+    let kind = pigeonVar_list[0] as! MsgInstructionKind
+    let coordinate = pigeonVar_list[1] as! MsgCoordinate
+    let distanceMeters = pigeonVar_list[2] as! Double
+    let level = pigeonVar_list[3] as! Double
+    let durationSeconds = pigeonVar_list[4] as! Double
+    let levelChange: MsgLevelChange? = nilOrValue(pigeonVar_list[5])
+
+    return MsgRouteInstruction(
+      kind: kind,
+      coordinate: coordinate,
+      distanceMeters: distanceMeters,
+      level: level,
+      durationSeconds: durationSeconds,
+      levelChange: levelChange
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      kind,
+      coordinate,
+      distanceMeters,
+      level,
+      durationSeconds,
+      levelChange,
+    ]
+  }
+  static func == (lhs: MsgRouteInstruction, rhs: MsgRouteInstruction) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.kind, rhs.kind) && deepEqualsMessages(lhs.coordinate, rhs.coordinate) && deepEqualsMessages(lhs.distanceMeters, rhs.distanceMeters) && deepEqualsMessages(lhs.level, rhs.level) && deepEqualsMessages(lhs.durationSeconds, rhs.durationSeconds) && deepEqualsMessages(lhs.levelChange, rhs.levelChange)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgRouteInstruction")
+    deepHashMessages(value: kind, hasher: &hasher)
+    deepHashMessages(value: coordinate, hasher: &hasher)
+    deepHashMessages(value: distanceMeters, hasher: &hasher)
+    deepHashMessages(value: level, hasher: &hasher)
+    deepHashMessages(value: durationSeconds, hasher: &hasher)
+    deepHashMessages(value: levelChange, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgComputedRoute: Hashable {
+  var coordinates: [MsgCoordinate]
+  var distanceMeters: Double
+  var segments: [MsgRouteSegment]
+  var level: Double
+  var levelChanges: [MsgLevelChange]
+  var instructions: [MsgRouteInstruction]
+  var durationSeconds: Double
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgComputedRoute? {
+    let coordinates = pigeonVar_list[0] as! [MsgCoordinate]
+    let distanceMeters = pigeonVar_list[1] as! Double
+    let segments = pigeonVar_list[2] as! [MsgRouteSegment]
+    let level = pigeonVar_list[3] as! Double
+    let levelChanges = pigeonVar_list[4] as! [MsgLevelChange]
+    let instructions = pigeonVar_list[5] as! [MsgRouteInstruction]
+    let durationSeconds = pigeonVar_list[6] as! Double
+
+    return MsgComputedRoute(
+      coordinates: coordinates,
+      distanceMeters: distanceMeters,
+      segments: segments,
+      level: level,
+      levelChanges: levelChanges,
+      instructions: instructions,
+      durationSeconds: durationSeconds
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      coordinates,
+      distanceMeters,
+      segments,
+      level,
+      levelChanges,
+      instructions,
+      durationSeconds,
+    ]
+  }
+  static func == (lhs: MsgComputedRoute, rhs: MsgComputedRoute) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.coordinates, rhs.coordinates) && deepEqualsMessages(lhs.distanceMeters, rhs.distanceMeters) && deepEqualsMessages(lhs.segments, rhs.segments) && deepEqualsMessages(lhs.level, rhs.level) && deepEqualsMessages(lhs.levelChanges, rhs.levelChanges) && deepEqualsMessages(lhs.instructions, rhs.instructions) && deepEqualsMessages(lhs.durationSeconds, rhs.durationSeconds)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgComputedRoute")
+    deepHashMessages(value: coordinates, hasher: &hasher)
+    deepHashMessages(value: distanceMeters, hasher: &hasher)
+    deepHashMessages(value: segments, hasher: &hasher)
+    deepHashMessages(value: level, hasher: &hasher)
+    deepHashMessages(value: levelChanges, hasher: &hasher)
+    deepHashMessages(value: instructions, hasher: &hasher)
+    deepHashMessages(value: durationSeconds, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgDurationRow: Hashable {
+  var seconds: [Double?]
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgDurationRow? {
+    let seconds = pigeonVar_list[0] as! [Double?]
+
+    return MsgDurationRow(
+      seconds: seconds
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      seconds
+    ]
+  }
+  static func == (lhs: MsgDurationRow, rhs: MsgDurationRow) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.seconds, rhs.seconds)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgDurationRow")
+    deepHashMessages(value: seconds, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgAmenity: Hashable {
+  var id: String
+  var title: String? = nil
+  var category: String? = nil
+  var icon: String? = nil
+  var details: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgAmenity? {
+    let id = pigeonVar_list[0] as! String
+    let title: String? = nilOrValue(pigeonVar_list[1])
+    let category: String? = nilOrValue(pigeonVar_list[2])
+    let icon: String? = nilOrValue(pigeonVar_list[3])
+    let details: String? = nilOrValue(pigeonVar_list[4])
+
+    return MsgAmenity(
+      id: id,
+      title: title,
+      category: category,
+      icon: icon,
+      details: details
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      id,
+      title,
+      category,
+      icon,
+      details,
+    ]
+  }
+  static func == (lhs: MsgAmenity, rhs: MsgAmenity) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.id, rhs.id) && deepEqualsMessages(lhs.title, rhs.title) && deepEqualsMessages(lhs.category, rhs.category) && deepEqualsMessages(lhs.icon, rhs.icon) && deepEqualsMessages(lhs.details, rhs.details)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgAmenity")
+    deepHashMessages(value: id, hasher: &hasher)
+    deepHashMessages(value: title, hasher: &hasher)
+    deepHashMessages(value: category, hasher: &hasher)
+    deepHashMessages(value: icon, hasher: &hasher)
+    deepHashMessages(value: details, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgFeature: Hashable {
+  var id: String
+  var type: String
+  /// GeoJSON geometry object, as JSON.
+  var geometryJson: String? = nil
+  /// GeoJSON properties object, as JSON.
+  var propertiesJson: String? = nil
+  var level: Double? = nil
+  var featureClass: String? = nil
+  var propertyType: String? = nil
+  var isLevelChanger: Bool
+  var titleTranslations: [String: String]
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgFeature? {
+    let id = pigeonVar_list[0] as! String
+    let type = pigeonVar_list[1] as! String
+    let geometryJson: String? = nilOrValue(pigeonVar_list[2])
+    let propertiesJson: String? = nilOrValue(pigeonVar_list[3])
+    let level: Double? = nilOrValue(pigeonVar_list[4])
+    let featureClass: String? = nilOrValue(pigeonVar_list[5])
+    let propertyType: String? = nilOrValue(pigeonVar_list[6])
+    let isLevelChanger = pigeonVar_list[7] as! Bool
+    let titleTranslations = pigeonVar_list[8] as! [String: String]
+
+    return MsgFeature(
+      id: id,
+      type: type,
+      geometryJson: geometryJson,
+      propertiesJson: propertiesJson,
+      level: level,
+      featureClass: featureClass,
+      propertyType: propertyType,
+      isLevelChanger: isLevelChanger,
+      titleTranslations: titleTranslations
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      id,
+      type,
+      geometryJson,
+      propertiesJson,
+      level,
+      featureClass,
+      propertyType,
+      isLevelChanger,
+      titleTranslations,
+    ]
+  }
+  static func == (lhs: MsgFeature, rhs: MsgFeature) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.id, rhs.id) && deepEqualsMessages(lhs.type, rhs.type) && deepEqualsMessages(lhs.geometryJson, rhs.geometryJson) && deepEqualsMessages(lhs.propertiesJson, rhs.propertiesJson) && deepEqualsMessages(lhs.level, rhs.level) && deepEqualsMessages(lhs.featureClass, rhs.featureClass) && deepEqualsMessages(lhs.propertyType, rhs.propertyType) && deepEqualsMessages(lhs.isLevelChanger, rhs.isLevelChanger) && deepEqualsMessages(lhs.titleTranslations, rhs.titleTranslations)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgFeature")
+    deepHashMessages(value: id, hasher: &hasher)
+    deepHashMessages(value: type, hasher: &hasher)
+    deepHashMessages(value: geometryJson, hasher: &hasher)
+    deepHashMessages(value: propertiesJson, hasher: &hasher)
+    deepHashMessages(value: level, hasher: &hasher)
+    deepHashMessages(value: featureClass, hasher: &hasher)
+    deepHashMessages(value: propertyType, hasher: &hasher)
+    deepHashMessages(value: isLevelChanger, hasher: &hasher)
+    deepHashMessages(value: titleTranslations, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgDepartment: Hashable {
+  var id: String
+  var name: String? = nil
+  var placeId: String? = nil
+  var floorId: String? = nil
+  var tags: [String]? = nil
+  var metadataJson: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgDepartment? {
+    let id = pigeonVar_list[0] as! String
+    let name: String? = nilOrValue(pigeonVar_list[1])
+    let placeId: String? = nilOrValue(pigeonVar_list[2])
+    let floorId: String? = nilOrValue(pigeonVar_list[3])
+    let tags: [String]? = nilOrValue(pigeonVar_list[4])
+    let metadataJson: String? = nilOrValue(pigeonVar_list[5])
+
+    return MsgDepartment(
+      id: id,
+      name: name,
+      placeId: placeId,
+      floorId: floorId,
+      tags: tags,
+      metadataJson: metadataJson
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      id,
+      name,
+      placeId,
+      floorId,
+      tags,
+      metadataJson,
+    ]
+  }
+  static func == (lhs: MsgDepartment, rhs: MsgDepartment) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.id, rhs.id) && deepEqualsMessages(lhs.name, rhs.name) && deepEqualsMessages(lhs.placeId, rhs.placeId) && deepEqualsMessages(lhs.floorId, rhs.floorId) && deepEqualsMessages(lhs.tags, rhs.tags) && deepEqualsMessages(lhs.metadataJson, rhs.metadataJson)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgDepartment")
+    deepHashMessages(value: id, hasher: &hasher)
+    deepHashMessages(value: name, hasher: &hasher)
+    deepHashMessages(value: placeId, hasher: &hasher)
+    deepHashMessages(value: floorId, hasher: &hasher)
+    deepHashMessages(value: tags, hasher: &hasher)
+    deepHashMessages(value: metadataJson, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgJourneyWaypoint: Hashable {
+  var latitude: Double? = nil
+  var longitude: Double? = nil
+  var level: Double? = nil
+  var floorId: String? = nil
+  var label: String? = nil
+  var dwellSeconds: Double? = nil
+  var speed: Double? = nil
+  var transitionSeconds: Double? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgJourneyWaypoint? {
+    let latitude: Double? = nilOrValue(pigeonVar_list[0])
+    let longitude: Double? = nilOrValue(pigeonVar_list[1])
+    let level: Double? = nilOrValue(pigeonVar_list[2])
+    let floorId: String? = nilOrValue(pigeonVar_list[3])
+    let label: String? = nilOrValue(pigeonVar_list[4])
+    let dwellSeconds: Double? = nilOrValue(pigeonVar_list[5])
+    let speed: Double? = nilOrValue(pigeonVar_list[6])
+    let transitionSeconds: Double? = nilOrValue(pigeonVar_list[7])
+
+    return MsgJourneyWaypoint(
+      latitude: latitude,
+      longitude: longitude,
+      level: level,
+      floorId: floorId,
+      label: label,
+      dwellSeconds: dwellSeconds,
+      speed: speed,
+      transitionSeconds: transitionSeconds
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      latitude,
+      longitude,
+      level,
+      floorId,
+      label,
+      dwellSeconds,
+      speed,
+      transitionSeconds,
+    ]
+  }
+  static func == (lhs: MsgJourneyWaypoint, rhs: MsgJourneyWaypoint) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.latitude, rhs.latitude) && deepEqualsMessages(lhs.longitude, rhs.longitude) && deepEqualsMessages(lhs.level, rhs.level) && deepEqualsMessages(lhs.floorId, rhs.floorId) && deepEqualsMessages(lhs.label, rhs.label) && deepEqualsMessages(lhs.dwellSeconds, rhs.dwellSeconds) && deepEqualsMessages(lhs.speed, rhs.speed) && deepEqualsMessages(lhs.transitionSeconds, rhs.transitionSeconds)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgJourneyWaypoint")
+    deepHashMessages(value: latitude, hasher: &hasher)
+    deepHashMessages(value: longitude, hasher: &hasher)
+    deepHashMessages(value: level, hasher: &hasher)
+    deepHashMessages(value: floorId, hasher: &hasher)
+    deepHashMessages(value: label, hasher: &hasher)
+    deepHashMessages(value: dwellSeconds, hasher: &hasher)
+    deepHashMessages(value: speed, hasher: &hasher)
+    deepHashMessages(value: transitionSeconds, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgJourney: Hashable {
+  var id: String? = nil
+  var organizationId: String? = nil
+  var name: String? = nil
+  var placeId: String? = nil
+  var speed: Double? = nil
+  var waypoints: [MsgJourneyWaypoint]
+  var displayName: String
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgJourney? {
+    let id: String? = nilOrValue(pigeonVar_list[0])
+    let organizationId: String? = nilOrValue(pigeonVar_list[1])
+    let name: String? = nilOrValue(pigeonVar_list[2])
+    let placeId: String? = nilOrValue(pigeonVar_list[3])
+    let speed: Double? = nilOrValue(pigeonVar_list[4])
+    let waypoints = pigeonVar_list[5] as! [MsgJourneyWaypoint]
+    let displayName = pigeonVar_list[6] as! String
+
+    return MsgJourney(
+      id: id,
+      organizationId: organizationId,
+      name: name,
+      placeId: placeId,
+      speed: speed,
+      waypoints: waypoints,
+      displayName: displayName
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      id,
+      organizationId,
+      name,
+      placeId,
+      speed,
+      waypoints,
+      displayName,
+    ]
+  }
+  static func == (lhs: MsgJourney, rhs: MsgJourney) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.id, rhs.id) && deepEqualsMessages(lhs.organizationId, rhs.organizationId) && deepEqualsMessages(lhs.name, rhs.name) && deepEqualsMessages(lhs.placeId, rhs.placeId) && deepEqualsMessages(lhs.speed, rhs.speed) && deepEqualsMessages(lhs.waypoints, rhs.waypoints) && deepEqualsMessages(lhs.displayName, rhs.displayName)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgJourney")
+    deepHashMessages(value: id, hasher: &hasher)
+    deepHashMessages(value: organizationId, hasher: &hasher)
+    deepHashMessages(value: name, hasher: &hasher)
+    deepHashMessages(value: placeId, hasher: &hasher)
+    deepHashMessages(value: speed, hasher: &hasher)
+    deepHashMessages(value: waypoints, hasher: &hasher)
+    deepHashMessages(value: displayName, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgVenueDataChange: Hashable {
+  /// Open-ended: `features`, `amenities`, `style`, `floors`, `places`, `geofences`, later more.
+  var kinds: [String]
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgVenueDataChange? {
+    let kinds = pigeonVar_list[0] as! [String]
+
+    return MsgVenueDataChange(
+      kinds: kinds
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      kinds
+    ]
+  }
+  static func == (lhs: MsgVenueDataChange, rhs: MsgVenueDataChange) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.kinds, rhs.kinds)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgVenueDataChange")
+    deepHashMessages(value: kinds, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+/// This protocol should not be extended by any user class outside of the generated file.
+protocol MsgSyncEvent {
+
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgSyncUpdated: MsgSyncEvent {
+  var entity: String
+  var id: String
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgSyncUpdated? {
+    let entity = pigeonVar_list[0] as! String
+    let id = pigeonVar_list[1] as! String
+
+    return MsgSyncUpdated(
+      entity: entity,
+      id: id
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      entity,
+      id,
+    ]
+  }
+  static func == (lhs: MsgSyncUpdated, rhs: MsgSyncUpdated) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.entity, rhs.entity) && deepEqualsMessages(lhs.id, rhs.id)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgSyncUpdated")
+    deepHashMessages(value: entity, hasher: &hasher)
+    deepHashMessages(value: id, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgSyncDeleted: MsgSyncEvent {
+  var entity: String
+  var id: String
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgSyncDeleted? {
+    let entity = pigeonVar_list[0] as! String
+    let id = pigeonVar_list[1] as! String
+
+    return MsgSyncDeleted(
+      entity: entity,
+      id: id
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      entity,
+      id,
+    ]
+  }
+  static func == (lhs: MsgSyncDeleted, rhs: MsgSyncDeleted) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.entity, rhs.entity) && deepEqualsMessages(lhs.id, rhs.id)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgSyncDeleted")
+    deepHashMessages(value: entity, hasher: &hasher)
+    deepHashMessages(value: id, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgSyncCompleted: MsgSyncEvent {
+  var applied: Int64
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgSyncCompleted? {
+    let applied = pigeonVar_list[0] as! Int64
+
+    return MsgSyncCompleted(
+      applied: applied
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      applied
+    ]
+  }
+  static func == (lhs: MsgSyncCompleted, rhs: MsgSyncCompleted) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.applied, rhs.applied)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgSyncCompleted")
+    deepHashMessages(value: applied, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgSyncFailed: MsgSyncEvent {
+  var reason: String
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgSyncFailed? {
+    let reason = pigeonVar_list[0] as! String
+
+    return MsgSyncFailed(
+      reason: reason
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      reason
+    ]
+  }
+  static func == (lhs: MsgSyncFailed, rhs: MsgSyncFailed) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.reason, rhs.reason)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgSyncFailed")
+    deepHashMessages(value: reason, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgStoreRecreated: MsgSyncEvent {
+  var reason: String
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgStoreRecreated? {
+    let reason = pigeonVar_list[0] as! String
+
+    return MsgStoreRecreated(
+      reason: reason
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      reason
+    ]
+  }
+  static func == (lhs: MsgStoreRecreated, rhs: MsgStoreRecreated) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.reason, rhs.reason)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgStoreRecreated")
+    deepHashMessages(value: reason, hasher: &hasher)
+  }
+}
+
+/// iBeacon: [uuid], [major], [minor]; Eddystone: [namespace], [instance]; UWB accessory: [name].
+///
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgBeaconIdentifier: Hashable {
+  var kind: MsgBeaconKind
+  var uuid: String? = nil
+  var major: Int64? = nil
+  var minor: Int64? = nil
+  var namespace: String? = nil
+  var instance: String? = nil
+  var name: String? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgBeaconIdentifier? {
+    let kind = pigeonVar_list[0] as! MsgBeaconKind
+    let uuid: String? = nilOrValue(pigeonVar_list[1])
+    let major: Int64? = nilOrValue(pigeonVar_list[2])
+    let minor: Int64? = nilOrValue(pigeonVar_list[3])
+    let namespace: String? = nilOrValue(pigeonVar_list[4])
+    let instance: String? = nilOrValue(pigeonVar_list[5])
+    let name: String? = nilOrValue(pigeonVar_list[6])
+
+    return MsgBeaconIdentifier(
+      kind: kind,
+      uuid: uuid,
+      major: major,
+      minor: minor,
+      namespace: namespace,
+      instance: instance,
+      name: name
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      kind,
+      uuid,
+      major,
+      minor,
+      namespace,
+      instance,
+      name,
+    ]
+  }
+  static func == (lhs: MsgBeaconIdentifier, rhs: MsgBeaconIdentifier) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.kind, rhs.kind) && deepEqualsMessages(lhs.uuid, rhs.uuid) && deepEqualsMessages(lhs.major, rhs.major) && deepEqualsMessages(lhs.minor, rhs.minor) && deepEqualsMessages(lhs.namespace, rhs.namespace) && deepEqualsMessages(lhs.instance, rhs.instance) && deepEqualsMessages(lhs.name, rhs.name)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgBeaconIdentifier")
+    deepHashMessages(value: kind, hasher: &hasher)
+    deepHashMessages(value: uuid, hasher: &hasher)
+    deepHashMessages(value: major, hasher: &hasher)
+    deepHashMessages(value: minor, hasher: &hasher)
+    deepHashMessages(value: namespace, hasher: &hasher)
+    deepHashMessages(value: instance, hasher: &hasher)
+    deepHashMessages(value: name, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgBeaconObservation: Hashable {
+  var identifier: MsgBeaconIdentifier
+  var rssi: Int64
+  var txPower: Int64? = nil
+  var timestampMs: Int64
+  var calibratedDistance: Double? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgBeaconObservation? {
+    let identifier = pigeonVar_list[0] as! MsgBeaconIdentifier
+    let rssi = pigeonVar_list[1] as! Int64
+    let txPower: Int64? = nilOrValue(pigeonVar_list[2])
+    let timestampMs = pigeonVar_list[3] as! Int64
+    let calibratedDistance: Double? = nilOrValue(pigeonVar_list[4])
+
+    return MsgBeaconObservation(
+      identifier: identifier,
+      rssi: rssi,
+      txPower: txPower,
+      timestampMs: timestampMs,
+      calibratedDistance: calibratedDistance
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      identifier,
+      rssi,
+      txPower,
+      timestampMs,
+      calibratedDistance,
+    ]
+  }
+  static func == (lhs: MsgBeaconObservation, rhs: MsgBeaconObservation) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.identifier, rhs.identifier) && deepEqualsMessages(lhs.rssi, rhs.rssi) && deepEqualsMessages(lhs.txPower, rhs.txPower) && deepEqualsMessages(lhs.timestampMs, rhs.timestampMs) && deepEqualsMessages(lhs.calibratedDistance, rhs.calibratedDistance)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgBeaconObservation")
+    deepHashMessages(value: identifier, hasher: &hasher)
+    deepHashMessages(value: rssi, hasher: &hasher)
+    deepHashMessages(value: txPower, hasher: &hasher)
+    deepHashMessages(value: timestampMs, hasher: &hasher)
+    deepHashMessages(value: calibratedDistance, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgBeaconTelemetry: Hashable {
+  var batteryMillivolts: Int64
+  var temperatureCelsius: Double
+  var advertisementCount: Int64
+  var uptimeSeconds: Double
+  var receivedAtMs: Int64
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgBeaconTelemetry? {
+    let batteryMillivolts = pigeonVar_list[0] as! Int64
+    let temperatureCelsius = pigeonVar_list[1] as! Double
+    let advertisementCount = pigeonVar_list[2] as! Int64
+    let uptimeSeconds = pigeonVar_list[3] as! Double
+    let receivedAtMs = pigeonVar_list[4] as! Int64
+
+    return MsgBeaconTelemetry(
+      batteryMillivolts: batteryMillivolts,
+      temperatureCelsius: temperatureCelsius,
+      advertisementCount: advertisementCount,
+      uptimeSeconds: uptimeSeconds,
+      receivedAtMs: receivedAtMs
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      batteryMillivolts,
+      temperatureCelsius,
+      advertisementCount,
+      uptimeSeconds,
+      receivedAtMs,
+    ]
+  }
+  static func == (lhs: MsgBeaconTelemetry, rhs: MsgBeaconTelemetry) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.batteryMillivolts, rhs.batteryMillivolts) && deepEqualsMessages(lhs.temperatureCelsius, rhs.temperatureCelsius) && deepEqualsMessages(lhs.advertisementCount, rhs.advertisementCount) && deepEqualsMessages(lhs.uptimeSeconds, rhs.uptimeSeconds) && deepEqualsMessages(lhs.receivedAtMs, rhs.receivedAtMs)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgBeaconTelemetry")
+    deepHashMessages(value: batteryMillivolts, hasher: &hasher)
+    deepHashMessages(value: temperatureCelsius, hasher: &hasher)
+    deepHashMessages(value: advertisementCount, hasher: &hasher)
+    deepHashMessages(value: uptimeSeconds, hasher: &hasher)
+    deepHashMessages(value: receivedAtMs, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+/// This protocol should not be extended by any user class outside of the generated file.
+protocol MsgBeaconEvent {
+
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgBeaconFound: MsgBeaconEvent {
+  var observation: MsgBeaconObservation
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgBeaconFound? {
+    let observation = pigeonVar_list[0] as! MsgBeaconObservation
+
+    return MsgBeaconFound(
+      observation: observation
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      observation
+    ]
+  }
+  static func == (lhs: MsgBeaconFound, rhs: MsgBeaconFound) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.observation, rhs.observation)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgBeaconFound")
+    deepHashMessages(value: observation, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgBeaconUpdated: MsgBeaconEvent {
+  var observation: MsgBeaconObservation
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgBeaconUpdated? {
+    let observation = pigeonVar_list[0] as! MsgBeaconObservation
+
+    return MsgBeaconUpdated(
+      observation: observation
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      observation
+    ]
+  }
+  static func == (lhs: MsgBeaconUpdated, rhs: MsgBeaconUpdated) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.observation, rhs.observation)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgBeaconUpdated")
+    deepHashMessages(value: observation, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgBeaconLost: MsgBeaconEvent {
+  var identifier: MsgBeaconIdentifier
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgBeaconLost? {
+    let identifier = pigeonVar_list[0] as! MsgBeaconIdentifier
+
+    return MsgBeaconLost(
+      identifier: identifier
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      identifier
+    ]
+  }
+  static func == (lhs: MsgBeaconLost, rhs: MsgBeaconLost) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.identifier, rhs.identifier)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgBeaconLost")
+    deepHashMessages(value: identifier, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgBeaconTelemetryReceived: MsgBeaconEvent {
+  var identifier: MsgBeaconIdentifier
+  var telemetry: MsgBeaconTelemetry
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgBeaconTelemetryReceived? {
+    let identifier = pigeonVar_list[0] as! MsgBeaconIdentifier
+    let telemetry = pigeonVar_list[1] as! MsgBeaconTelemetry
+
+    return MsgBeaconTelemetryReceived(
+      identifier: identifier,
+      telemetry: telemetry
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      identifier,
+      telemetry,
+    ]
+  }
+  static func == (lhs: MsgBeaconTelemetryReceived, rhs: MsgBeaconTelemetryReceived) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.identifier, rhs.identifier) && deepEqualsMessages(lhs.telemetry, rhs.telemetry)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgBeaconTelemetryReceived")
+    deepHashMessages(value: identifier, hasher: &hasher)
+    deepHashMessages(value: telemetry, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgPackageState: Hashable {
+  var kind: MsgPackageStateKind
+  /// 0…1 while [kind] is `downloading`.
+  var progress: Double? = nil
+  /// Set when [kind] is `ready`.
+  var version: Int64? = nil
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgPackageState? {
+    let kind = pigeonVar_list[0] as! MsgPackageStateKind
+    let progress: Double? = nilOrValue(pigeonVar_list[1])
+    let version: Int64? = nilOrValue(pigeonVar_list[2])
+
+    return MsgPackageState(
+      kind: kind,
+      progress: progress,
+      version: version
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      kind,
+      progress,
+      version,
+    ]
+  }
+  static func == (lhs: MsgPackageState, rhs: MsgPackageState) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.kind, rhs.kind) && deepEqualsMessages(lhs.progress, rhs.progress) && deepEqualsMessages(lhs.version, rhs.version)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgPackageState")
+    deepHashMessages(value: kind, hasher: &hasher)
+    deepHashMessages(value: progress, hasher: &hasher)
+    deepHashMessages(value: version, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgSimulatedWaypoint: Hashable {
+  var coordinate: MsgCoordinate
+  var level: Int64
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgSimulatedWaypoint? {
+    let coordinate = pigeonVar_list[0] as! MsgCoordinate
+    let level = pigeonVar_list[1] as! Int64
+
+    return MsgSimulatedWaypoint(
+      coordinate: coordinate,
+      level: level
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      coordinate,
+      level,
+    ]
+  }
+  static func == (lhs: MsgSimulatedWaypoint, rhs: MsgSimulatedWaypoint) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.coordinate, rhs.coordinate) && deepEqualsMessages(lhs.level, rhs.level)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgSimulatedWaypoint")
+    deepHashMessages(value: coordinate, hasher: &hasher)
+    deepHashMessages(value: level, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgSimulatedRoute: Hashable {
+  var waypoints: [MsgSimulatedWaypoint]
+  var speed: Double
+  var updateIntervalSeconds: Double
+  var loops: Bool
+  var accuracy: Double
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgSimulatedRoute? {
+    let waypoints = pigeonVar_list[0] as! [MsgSimulatedWaypoint]
+    let speed = pigeonVar_list[1] as! Double
+    let updateIntervalSeconds = pigeonVar_list[2] as! Double
+    let loops = pigeonVar_list[3] as! Bool
+    let accuracy = pigeonVar_list[4] as! Double
+
+    return MsgSimulatedRoute(
+      waypoints: waypoints,
+      speed: speed,
+      updateIntervalSeconds: updateIntervalSeconds,
+      loops: loops,
+      accuracy: accuracy
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      waypoints,
+      speed,
+      updateIntervalSeconds,
+      loops,
+      accuracy,
+    ]
+  }
+  static func == (lhs: MsgSimulatedRoute, rhs: MsgSimulatedRoute) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.waypoints, rhs.waypoints) && deepEqualsMessages(lhs.speed, rhs.speed) && deepEqualsMessages(lhs.updateIntervalSeconds, rhs.updateIntervalSeconds) && deepEqualsMessages(lhs.loops, rhs.loops) && deepEqualsMessages(lhs.accuracy, rhs.accuracy)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgSimulatedRoute")
+    deepHashMessages(value: waypoints, hasher: &hasher)
+    deepHashMessages(value: speed, hasher: &hasher)
+    deepHashMessages(value: updateIntervalSeconds, hasher: &hasher)
+    deepHashMessages(value: loops, hasher: &hasher)
+    deepHashMessages(value: accuracy, hasher: &hasher)
+  }
+}
+
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgDiagnostics: Hashable {
+  var state: MsgSdkState
+  var isStarted: Bool
+  var isAuthenticated: Bool
+  var permissions: MsgPermissionStatus? = nil
+  var visibleBeaconCount: Int64
+  var registeredBeaconCount: Int64
+  var lastPositionAgeSeconds: Double? = nil
+  var lastPositionSource: MsgPositionSource? = nil
+  var pdrEnabled: Bool
+  var pdrRunning: Bool
+  var visitorReportingEnabled: Bool
+  /// `notStarted`, `noViablePositioningInputs`, `awaitingFirstFix`, … (the SDK's raw value).
+  var noPositionReason: String? = nil
+  var summary: String
+  var generatedAtMs: Int64
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgDiagnostics? {
+    let state = pigeonVar_list[0] as! MsgSdkState
+    let isStarted = pigeonVar_list[1] as! Bool
+    let isAuthenticated = pigeonVar_list[2] as! Bool
+    let permissions: MsgPermissionStatus? = nilOrValue(pigeonVar_list[3])
+    let visibleBeaconCount = pigeonVar_list[4] as! Int64
+    let registeredBeaconCount = pigeonVar_list[5] as! Int64
+    let lastPositionAgeSeconds: Double? = nilOrValue(pigeonVar_list[6])
+    let lastPositionSource: MsgPositionSource? = nilOrValue(pigeonVar_list[7])
+    let pdrEnabled = pigeonVar_list[8] as! Bool
+    let pdrRunning = pigeonVar_list[9] as! Bool
+    let visitorReportingEnabled = pigeonVar_list[10] as! Bool
+    let noPositionReason: String? = nilOrValue(pigeonVar_list[11])
+    let summary = pigeonVar_list[12] as! String
+    let generatedAtMs = pigeonVar_list[13] as! Int64
+
+    return MsgDiagnostics(
+      state: state,
+      isStarted: isStarted,
+      isAuthenticated: isAuthenticated,
+      permissions: permissions,
+      visibleBeaconCount: visibleBeaconCount,
+      registeredBeaconCount: registeredBeaconCount,
+      lastPositionAgeSeconds: lastPositionAgeSeconds,
+      lastPositionSource: lastPositionSource,
+      pdrEnabled: pdrEnabled,
+      pdrRunning: pdrRunning,
+      visitorReportingEnabled: visitorReportingEnabled,
+      noPositionReason: noPositionReason,
+      summary: summary,
+      generatedAtMs: generatedAtMs
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      state,
+      isStarted,
+      isAuthenticated,
+      permissions,
+      visibleBeaconCount,
+      registeredBeaconCount,
+      lastPositionAgeSeconds,
+      lastPositionSource,
+      pdrEnabled,
+      pdrRunning,
+      visitorReportingEnabled,
+      noPositionReason,
+      summary,
+      generatedAtMs,
+    ]
+  }
+  static func == (lhs: MsgDiagnostics, rhs: MsgDiagnostics) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.state, rhs.state) && deepEqualsMessages(lhs.isStarted, rhs.isStarted) && deepEqualsMessages(lhs.isAuthenticated, rhs.isAuthenticated) && deepEqualsMessages(lhs.permissions, rhs.permissions) && deepEqualsMessages(lhs.visibleBeaconCount, rhs.visibleBeaconCount) && deepEqualsMessages(lhs.registeredBeaconCount, rhs.registeredBeaconCount) && deepEqualsMessages(lhs.lastPositionAgeSeconds, rhs.lastPositionAgeSeconds) && deepEqualsMessages(lhs.lastPositionSource, rhs.lastPositionSource) && deepEqualsMessages(lhs.pdrEnabled, rhs.pdrEnabled) && deepEqualsMessages(lhs.pdrRunning, rhs.pdrRunning) && deepEqualsMessages(lhs.visitorReportingEnabled, rhs.visitorReportingEnabled) && deepEqualsMessages(lhs.noPositionReason, rhs.noPositionReason) && deepEqualsMessages(lhs.summary, rhs.summary) && deepEqualsMessages(lhs.generatedAtMs, rhs.generatedAtMs)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgDiagnostics")
+    deepHashMessages(value: state, hasher: &hasher)
+    deepHashMessages(value: isStarted, hasher: &hasher)
+    deepHashMessages(value: isAuthenticated, hasher: &hasher)
+    deepHashMessages(value: permissions, hasher: &hasher)
+    deepHashMessages(value: visibleBeaconCount, hasher: &hasher)
+    deepHashMessages(value: registeredBeaconCount, hasher: &hasher)
+    deepHashMessages(value: lastPositionAgeSeconds, hasher: &hasher)
+    deepHashMessages(value: lastPositionSource, hasher: &hasher)
+    deepHashMessages(value: pdrEnabled, hasher: &hasher)
+    deepHashMessages(value: pdrRunning, hasher: &hasher)
+    deepHashMessages(value: visitorReportingEnabled, hasher: &hasher)
+    deepHashMessages(value: noPositionReason, hasher: &hasher)
+    deepHashMessages(value: summary, hasher: &hasher)
+    deepHashMessages(value: generatedAtMs, hasher: &hasher)
+  }
+}
+
 private class MessagesPigeonCodecReader: FlutterStandardReader {
   override func readValue(ofType type: UInt8) -> Any? {
     switch type {
@@ -1159,37 +2557,131 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
       }
       return nil
     case 141:
-      return MsgAndroidServiceOptions.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return MsgRouteProfile(rawValue: enumResultAsInt)
+      }
+      return nil
     case 142:
-      return MsgConfiguration.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return MsgRouteAvoidance(rawValue: enumResultAsInt)
+      }
+      return nil
     case 143:
-      return MsgCoordinate.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return MsgInstructionKind(rawValue: enumResultAsInt)
+      }
+      return nil
     case 144:
-      return MsgApplication.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return MsgBeaconKind(rawValue: enumResultAsInt)
+      }
+      return nil
     case 145:
-      return MsgPlace.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return MsgPackageStateKind(rawValue: enumResultAsInt)
+      }
+      return nil
     case 146:
-      return MsgFloor.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return MsgSimulationState(rawValue: enumResultAsInt)
+      }
+      return nil
     case 147:
-      return MsgZone.fromList(self.readValue() as! [Any?])
+      return MsgAndroidServiceOptions.fromList(self.readValue() as! [Any?])
     case 148:
-      return MsgPermissionStatus.fromList(self.readValue() as! [Any?])
+      return MsgConfiguration.fromList(self.readValue() as! [Any?])
     case 149:
-      return MsgStateChange.fromList(self.readValue() as! [Any?])
+      return MsgCoordinate.fromList(self.readValue() as! [Any?])
     case 150:
-      return MsgPositionUpdate.fromList(self.readValue() as! [Any?])
+      return MsgApplication.fromList(self.readValue() as! [Any?])
     case 151:
-      return MsgFloorChange.fromList(self.readValue() as! [Any?])
+      return MsgPlace.fromList(self.readValue() as! [Any?])
     case 152:
-      return MsgGeofenceEntered.fromList(self.readValue() as! [Any?])
+      return MsgFloor.fromList(self.readValue() as! [Any?])
     case 153:
-      return MsgGeofenceExited.fromList(self.readValue() as! [Any?])
+      return MsgZone.fromList(self.readValue() as! [Any?])
     case 154:
-      return MsgPrivacyZoneEntered.fromList(self.readValue() as! [Any?])
+      return MsgPermissionStatus.fromList(self.readValue() as! [Any?])
     case 155:
-      return MsgPrivacyZoneExited.fromList(self.readValue() as! [Any?])
+      return MsgStateChange.fromList(self.readValue() as! [Any?])
     case 156:
+      return MsgPositionUpdate.fromList(self.readValue() as! [Any?])
+    case 157:
+      return MsgFloorChange.fromList(self.readValue() as! [Any?])
+    case 158:
+      return MsgGeofenceEntered.fromList(self.readValue() as! [Any?])
+    case 159:
+      return MsgGeofenceExited.fromList(self.readValue() as! [Any?])
+    case 160:
+      return MsgPrivacyZoneEntered.fromList(self.readValue() as! [Any?])
+    case 161:
+      return MsgPrivacyZoneExited.fromList(self.readValue() as! [Any?])
+    case 162:
       return MsgPrivacyZoneState.fromList(self.readValue() as! [Any?])
+    case 163:
+      return MsgRouteOptions.fromList(self.readValue() as! [Any?])
+    case 164:
+      return MsgRoutePoint.fromList(self.readValue() as! [Any?])
+    case 165:
+      return MsgLevelChange.fromList(self.readValue() as! [Any?])
+    case 166:
+      return MsgRouteSegment.fromList(self.readValue() as! [Any?])
+    case 167:
+      return MsgRouteInstruction.fromList(self.readValue() as! [Any?])
+    case 168:
+      return MsgComputedRoute.fromList(self.readValue() as! [Any?])
+    case 169:
+      return MsgDurationRow.fromList(self.readValue() as! [Any?])
+    case 170:
+      return MsgAmenity.fromList(self.readValue() as! [Any?])
+    case 171:
+      return MsgFeature.fromList(self.readValue() as! [Any?])
+    case 172:
+      return MsgDepartment.fromList(self.readValue() as! [Any?])
+    case 173:
+      return MsgJourneyWaypoint.fromList(self.readValue() as! [Any?])
+    case 174:
+      return MsgJourney.fromList(self.readValue() as! [Any?])
+    case 175:
+      return MsgVenueDataChange.fromList(self.readValue() as! [Any?])
+    case 176:
+      return MsgSyncUpdated.fromList(self.readValue() as! [Any?])
+    case 177:
+      return MsgSyncDeleted.fromList(self.readValue() as! [Any?])
+    case 178:
+      return MsgSyncCompleted.fromList(self.readValue() as! [Any?])
+    case 179:
+      return MsgSyncFailed.fromList(self.readValue() as! [Any?])
+    case 180:
+      return MsgStoreRecreated.fromList(self.readValue() as! [Any?])
+    case 181:
+      return MsgBeaconIdentifier.fromList(self.readValue() as! [Any?])
+    case 182:
+      return MsgBeaconObservation.fromList(self.readValue() as! [Any?])
+    case 183:
+      return MsgBeaconTelemetry.fromList(self.readValue() as! [Any?])
+    case 184:
+      return MsgBeaconFound.fromList(self.readValue() as! [Any?])
+    case 185:
+      return MsgBeaconUpdated.fromList(self.readValue() as! [Any?])
+    case 186:
+      return MsgBeaconLost.fromList(self.readValue() as! [Any?])
+    case 187:
+      return MsgBeaconTelemetryReceived.fromList(self.readValue() as! [Any?])
+    case 188:
+      return MsgPackageState.fromList(self.readValue() as! [Any?])
+    case 189:
+      return MsgSimulatedWaypoint.fromList(self.readValue() as! [Any?])
+    case 190:
+      return MsgSimulatedRoute.fromList(self.readValue() as! [Any?])
+    case 191:
+      return MsgDiagnostics.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
     }
@@ -1234,53 +2726,158 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? MsgFloorChangeSource {
       super.writeByte(140)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgAndroidServiceOptions {
+    } else if let value = value as? MsgRouteProfile {
       super.writeByte(141)
-      super.writeValue(value.toList())
-    } else if let value = value as? MsgConfiguration {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? MsgRouteAvoidance {
       super.writeByte(142)
-      super.writeValue(value.toList())
-    } else if let value = value as? MsgCoordinate {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? MsgInstructionKind {
       super.writeByte(143)
-      super.writeValue(value.toList())
-    } else if let value = value as? MsgApplication {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? MsgBeaconKind {
       super.writeByte(144)
-      super.writeValue(value.toList())
-    } else if let value = value as? MsgPlace {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? MsgPackageStateKind {
       super.writeByte(145)
-      super.writeValue(value.toList())
-    } else if let value = value as? MsgFloor {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? MsgSimulationState {
       super.writeByte(146)
-      super.writeValue(value.toList())
-    } else if let value = value as? MsgZone {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? MsgAndroidServiceOptions {
       super.writeByte(147)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPermissionStatus {
+    } else if let value = value as? MsgConfiguration {
       super.writeByte(148)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgStateChange {
+    } else if let value = value as? MsgCoordinate {
       super.writeByte(149)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPositionUpdate {
+    } else if let value = value as? MsgApplication {
       super.writeByte(150)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgFloorChange {
+    } else if let value = value as? MsgPlace {
       super.writeByte(151)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgGeofenceEntered {
+    } else if let value = value as? MsgFloor {
       super.writeByte(152)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgGeofenceExited {
+    } else if let value = value as? MsgZone {
       super.writeByte(153)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPrivacyZoneEntered {
+    } else if let value = value as? MsgPermissionStatus {
       super.writeByte(154)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPrivacyZoneExited {
+    } else if let value = value as? MsgStateChange {
       super.writeByte(155)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPrivacyZoneState {
+    } else if let value = value as? MsgPositionUpdate {
       super.writeByte(156)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgFloorChange {
+      super.writeByte(157)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgGeofenceEntered {
+      super.writeByte(158)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgGeofenceExited {
+      super.writeByte(159)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgPrivacyZoneEntered {
+      super.writeByte(160)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgPrivacyZoneExited {
+      super.writeByte(161)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgPrivacyZoneState {
+      super.writeByte(162)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgRouteOptions {
+      super.writeByte(163)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgRoutePoint {
+      super.writeByte(164)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgLevelChange {
+      super.writeByte(165)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgRouteSegment {
+      super.writeByte(166)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgRouteInstruction {
+      super.writeByte(167)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgComputedRoute {
+      super.writeByte(168)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgDurationRow {
+      super.writeByte(169)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgAmenity {
+      super.writeByte(170)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgFeature {
+      super.writeByte(171)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgDepartment {
+      super.writeByte(172)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgJourneyWaypoint {
+      super.writeByte(173)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgJourney {
+      super.writeByte(174)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgVenueDataChange {
+      super.writeByte(175)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgSyncUpdated {
+      super.writeByte(176)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgSyncDeleted {
+      super.writeByte(177)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgSyncCompleted {
+      super.writeByte(178)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgSyncFailed {
+      super.writeByte(179)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgStoreRecreated {
+      super.writeByte(180)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgBeaconIdentifier {
+      super.writeByte(181)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgBeaconObservation {
+      super.writeByte(182)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgBeaconTelemetry {
+      super.writeByte(183)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgBeaconFound {
+      super.writeByte(184)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgBeaconUpdated {
+      super.writeByte(185)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgBeaconLost {
+      super.writeByte(186)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgBeaconTelemetryReceived {
+      super.writeByte(187)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgPackageState {
+      super.writeByte(188)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgSimulatedWaypoint {
+      super.writeByte(189)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgSimulatedRoute {
+      super.writeByte(190)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgDiagnostics {
+      super.writeByte(191)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -1344,6 +2941,48 @@ protocol ProximiioHostApi {
   func updateServiceNotification(options: MsgAndroidServiceOptions, completion: @escaping (Result<Bool, Error>) -> Void)
   /// Android only; `unsupported` on iOS.
   func resetServiceNotification(completion: @escaping (Result<Void, Error>) -> Void)
+  /// Throws `noRoute` with `reason` (and `nearestDistanceMeters` / `blockedBy`) in the details.
+  func computeRoute(from: MsgCoordinate, fromLevel: Double, to: MsgCoordinate, toLevel: Double, options: MsgRouteOptions, completion: @escaping (Result<MsgComputedRoute, Error>) -> Void)
+  /// Walking seconds between every pair of [points]; `null` where no route exists.
+  func routeDurations(points: [MsgRoutePoint], options: MsgRouteOptions, completion: @escaping (Result<[MsgDurationRow], Error>) -> Void)
+  /// Downloads the venue features (when changed), stores them and installs the route network.
+  func loadRouteNetwork(completion: @escaping (Result<Int64, Error>) -> Void)
+  /// Installs the route network from the stored features, without a request. `0` when none are stored.
+  func loadCachedRouteNetwork(completion: @escaping (Result<Int64, Error>) -> Void)
+  func amenities(completion: @escaping (Result<[MsgAmenity], Error>) -> Void)
+  func features(completion: @escaping (Result<[MsgFeature], Error>) -> Void)
+  func departments(completion: @escaping (Result<[MsgDepartment], Error>) -> Void)
+  /// The organisation's MapLibre style document, as JSON.
+  func mapStyle(completion: @escaping (Result<String, Error>) -> Void)
+  func journeys(completion: @escaping (Result<[MsgJourney], Error>) -> Void)
+  func journey(id: String, completion: @escaping (Result<MsgJourney, Error>) -> Void)
+  func syncOfflinePackage(packageId: String, place: String?, allowsCellular: Bool, completion: @escaping (Result<MsgPackageState, Error>) -> Void)
+  func offlinePackageState(packageId: String, completion: @escaping (Result<MsgPackageState, Error>) -> Void)
+  /// Installs a seed from a directory on disk (unpacked package files).
+  func installOfflineSeed(packageId: String, directory: String, completion: @escaping (Result<Void, Error>) -> Void)
+  func removeOfflinePackage(packageId: String, completion: @escaping (Result<Void, Error>) -> Void)
+  func offlinePackageDiskUsage(packageId: String, completion: @escaping (Result<Int64, Error>) -> Void)
+  func simulatePosition(coordinate: MsgCoordinate, level: Int64, accuracy: Double, completion: @escaping (Result<MsgPositionUpdate?, Error>) -> Void)
+  func startSimulation(route: MsgSimulatedRoute, completion: @escaping (Result<Void, Error>) -> Void)
+  func pauseSimulation(completion: @escaping (Result<Void, Error>) -> Void)
+  func resumeSimulation(completion: @escaping (Result<Void, Error>) -> Void)
+  func stopSimulation(completion: @escaping (Result<Void, Error>) -> Void)
+  func jumpToWaypoint(index: Int64, completion: @escaping (Result<Void, Error>) -> Void)
+  func simulationState(completion: @escaping (Result<MsgSimulationState, Error>) -> Void)
+  /// [floorId] is looked up in the SDK's floors; unknown ids mean "no floor".
+  func setCustomPosition(coordinate: MsgCoordinate, accuracy: Double, floorId: String?, completion: @escaping (Result<MsgPositionUpdate?, Error>) -> Void)
+  func setFloor(floorId: String?, completion: @escaping (Result<MsgFloorChange?, Error>) -> Void)
+  /// `null` [thresholdMeters] keeps the SDK default.
+  func enableRouteSnapping(thresholdMeters: Double?, completion: @escaping (Result<Void, Error>) -> Void)
+  func disableRouteSnapping(completion: @escaping (Result<Void, Error>) -> Void)
+  func enablePdr(completion: @escaping (Result<Void, Error>) -> Void)
+  func disablePdr(completion: @escaping (Result<Void, Error>) -> Void)
+  func setPositioningSourcePrivate(sinceMs: Int64?, completion: @escaping (Result<Void, Error>) -> Void)
+  func diagnostics(completion: @escaping (Result<MsgDiagnostics, Error>) -> Void)
+  func startDiagnosticsRecording(completion: @escaping (Result<Void, Error>) -> Void)
+  func stopDiagnosticsRecording(completion: @escaping (Result<Void, Error>) -> Void)
+  /// Path of the zipped report.
+  func prepareDiagnosticsReport(completion: @escaping (Result<String, Error>) -> Void)
 }
 
 /// Generated setup class from Pigeon to handle messages through the `binaryMessenger`.
@@ -1773,6 +3412,552 @@ class ProximiioHostApiSetup {
     } else {
       resetServiceNotificationChannel.setMessageHandler(nil)
     }
+    /// Throws `noRoute` with `reason` (and `nearestDistanceMeters` / `blockedBy`) in the details.
+    let computeRouteChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.computeRoute\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      computeRouteChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let fromArg = args[0] as! MsgCoordinate
+        let fromLevelArg = args[1] as! Double
+        let toArg = args[2] as! MsgCoordinate
+        let toLevelArg = args[3] as! Double
+        let optionsArg = args[4] as! MsgRouteOptions
+        api.computeRoute(from: fromArg, fromLevel: fromLevelArg, to: toArg, toLevel: toLevelArg, options: optionsArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      computeRouteChannel.setMessageHandler(nil)
+    }
+    /// Walking seconds between every pair of [points]; `null` where no route exists.
+    let routeDurationsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.routeDurations\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      routeDurationsChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let pointsArg = args[0] as! [MsgRoutePoint]
+        let optionsArg = args[1] as! MsgRouteOptions
+        api.routeDurations(points: pointsArg, options: optionsArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      routeDurationsChannel.setMessageHandler(nil)
+    }
+    /// Downloads the venue features (when changed), stores them and installs the route network.
+    let loadRouteNetworkChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.loadRouteNetwork\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      loadRouteNetworkChannel.setMessageHandler { _, reply in
+        api.loadRouteNetwork { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      loadRouteNetworkChannel.setMessageHandler(nil)
+    }
+    /// Installs the route network from the stored features, without a request. `0` when none are stored.
+    let loadCachedRouteNetworkChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.loadCachedRouteNetwork\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      loadCachedRouteNetworkChannel.setMessageHandler { _, reply in
+        api.loadCachedRouteNetwork { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      loadCachedRouteNetworkChannel.setMessageHandler(nil)
+    }
+    let amenitiesChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.amenities\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      amenitiesChannel.setMessageHandler { _, reply in
+        api.amenities { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      amenitiesChannel.setMessageHandler(nil)
+    }
+    let featuresChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.features\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      featuresChannel.setMessageHandler { _, reply in
+        api.features { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      featuresChannel.setMessageHandler(nil)
+    }
+    let departmentsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.departments\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      departmentsChannel.setMessageHandler { _, reply in
+        api.departments { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      departmentsChannel.setMessageHandler(nil)
+    }
+    /// The organisation's MapLibre style document, as JSON.
+    let mapStyleChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.mapStyle\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      mapStyleChannel.setMessageHandler { _, reply in
+        api.mapStyle { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      mapStyleChannel.setMessageHandler(nil)
+    }
+    let journeysChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.journeys\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      journeysChannel.setMessageHandler { _, reply in
+        api.journeys { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      journeysChannel.setMessageHandler(nil)
+    }
+    let journeyChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.journey\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      journeyChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let idArg = args[0] as! String
+        api.journey(id: idArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      journeyChannel.setMessageHandler(nil)
+    }
+    let syncOfflinePackageChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.syncOfflinePackage\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      syncOfflinePackageChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let packageIdArg = args[0] as! String
+        let placeArg: String? = nilOrValue(args[1])
+        let allowsCellularArg = args[2] as! Bool
+        api.syncOfflinePackage(packageId: packageIdArg, place: placeArg, allowsCellular: allowsCellularArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      syncOfflinePackageChannel.setMessageHandler(nil)
+    }
+    let offlinePackageStateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.offlinePackageState\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      offlinePackageStateChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let packageIdArg = args[0] as! String
+        api.offlinePackageState(packageId: packageIdArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      offlinePackageStateChannel.setMessageHandler(nil)
+    }
+    /// Installs a seed from a directory on disk (unpacked package files).
+    let installOfflineSeedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.installOfflineSeed\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      installOfflineSeedChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let packageIdArg = args[0] as! String
+        let directoryArg = args[1] as! String
+        api.installOfflineSeed(packageId: packageIdArg, directory: directoryArg) { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      installOfflineSeedChannel.setMessageHandler(nil)
+    }
+    let removeOfflinePackageChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.removeOfflinePackage\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      removeOfflinePackageChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let packageIdArg = args[0] as! String
+        api.removeOfflinePackage(packageId: packageIdArg) { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      removeOfflinePackageChannel.setMessageHandler(nil)
+    }
+    let offlinePackageDiskUsageChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.offlinePackageDiskUsage\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      offlinePackageDiskUsageChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let packageIdArg = args[0] as! String
+        api.offlinePackageDiskUsage(packageId: packageIdArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      offlinePackageDiskUsageChannel.setMessageHandler(nil)
+    }
+    let simulatePositionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.simulatePosition\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      simulatePositionChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let coordinateArg = args[0] as! MsgCoordinate
+        let levelArg = args[1] as! Int64
+        let accuracyArg = args[2] as! Double
+        api.simulatePosition(coordinate: coordinateArg, level: levelArg, accuracy: accuracyArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      simulatePositionChannel.setMessageHandler(nil)
+    }
+    let startSimulationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.startSimulation\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startSimulationChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let routeArg = args[0] as! MsgSimulatedRoute
+        api.startSimulation(route: routeArg) { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startSimulationChannel.setMessageHandler(nil)
+    }
+    let pauseSimulationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.pauseSimulation\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      pauseSimulationChannel.setMessageHandler { _, reply in
+        api.pauseSimulation { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      pauseSimulationChannel.setMessageHandler(nil)
+    }
+    let resumeSimulationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.resumeSimulation\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      resumeSimulationChannel.setMessageHandler { _, reply in
+        api.resumeSimulation { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      resumeSimulationChannel.setMessageHandler(nil)
+    }
+    let stopSimulationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.stopSimulation\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      stopSimulationChannel.setMessageHandler { _, reply in
+        api.stopSimulation { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      stopSimulationChannel.setMessageHandler(nil)
+    }
+    let jumpToWaypointChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.jumpToWaypoint\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      jumpToWaypointChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let indexArg = args[0] as! Int64
+        api.jumpToWaypoint(index: indexArg) { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      jumpToWaypointChannel.setMessageHandler(nil)
+    }
+    let simulationStateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.simulationState\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      simulationStateChannel.setMessageHandler { _, reply in
+        api.simulationState { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      simulationStateChannel.setMessageHandler(nil)
+    }
+    /// [floorId] is looked up in the SDK's floors; unknown ids mean "no floor".
+    let setCustomPositionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.setCustomPosition\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setCustomPositionChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let coordinateArg = args[0] as! MsgCoordinate
+        let accuracyArg = args[1] as! Double
+        let floorIdArg: String? = nilOrValue(args[2])
+        api.setCustomPosition(coordinate: coordinateArg, accuracy: accuracyArg, floorId: floorIdArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      setCustomPositionChannel.setMessageHandler(nil)
+    }
+    let setFloorChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.setFloor\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setFloorChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let floorIdArg: String? = nilOrValue(args[0])
+        api.setFloor(floorId: floorIdArg) { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      setFloorChannel.setMessageHandler(nil)
+    }
+    /// `null` [thresholdMeters] keeps the SDK default.
+    let enableRouteSnappingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.enableRouteSnapping\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      enableRouteSnappingChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let thresholdMetersArg: Double? = nilOrValue(args[0])
+        api.enableRouteSnapping(thresholdMeters: thresholdMetersArg) { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      enableRouteSnappingChannel.setMessageHandler(nil)
+    }
+    let disableRouteSnappingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.disableRouteSnapping\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      disableRouteSnappingChannel.setMessageHandler { _, reply in
+        api.disableRouteSnapping { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      disableRouteSnappingChannel.setMessageHandler(nil)
+    }
+    let enablePdrChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.enablePdr\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      enablePdrChannel.setMessageHandler { _, reply in
+        api.enablePdr { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      enablePdrChannel.setMessageHandler(nil)
+    }
+    let disablePdrChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.disablePdr\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      disablePdrChannel.setMessageHandler { _, reply in
+        api.disablePdr { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      disablePdrChannel.setMessageHandler(nil)
+    }
+    let setPositioningSourcePrivateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.setPositioningSourcePrivate\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      setPositioningSourcePrivateChannel.setMessageHandler { message, reply in
+        let args = message as! [Any?]
+        let sinceMsArg: Int64? = nilOrValue(args[0])
+        api.setPositioningSourcePrivate(sinceMs: sinceMsArg) { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      setPositioningSourcePrivateChannel.setMessageHandler(nil)
+    }
+    let diagnosticsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.diagnostics\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      diagnosticsChannel.setMessageHandler { _, reply in
+        api.diagnostics { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      diagnosticsChannel.setMessageHandler(nil)
+    }
+    let startDiagnosticsRecordingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.startDiagnosticsRecording\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      startDiagnosticsRecordingChannel.setMessageHandler { _, reply in
+        api.startDiagnosticsRecording { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      startDiagnosticsRecordingChannel.setMessageHandler(nil)
+    }
+    let stopDiagnosticsRecordingChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.stopDiagnosticsRecording\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      stopDiagnosticsRecordingChannel.setMessageHandler { _, reply in
+        api.stopDiagnosticsRecording { result in
+          switch result {
+          case .success:
+            reply(wrapResult(nil))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      stopDiagnosticsRecordingChannel.setMessageHandler(nil)
+    }
+    /// Path of the zipped report.
+    let prepareDiagnosticsReportChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.prepareDiagnosticsReport\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      prepareDiagnosticsReportChannel.setMessageHandler { _, reply in
+        api.prepareDiagnosticsReport { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      prepareDiagnosticsReportChannel.setMessageHandler(nil)
+    }
   }
 }
 
@@ -1906,6 +4091,48 @@ class PrivacyZoneStateChangesStreamHandler: PigeonEventChannelWrapper<MsgPrivacy
       channelName += ".\(instanceName)"
     }
     let internalStreamHandler = PigeonStreamHandler<MsgPrivacyZoneState>(wrapper: streamHandler)
+    let channel = FlutterEventChannel(name: channelName, binaryMessenger: messenger, codec: messagesPigeonMethodCodec)
+    channel.setStreamHandler(internalStreamHandler)
+  }
+}
+      
+class VenueDataChangesStreamHandler: PigeonEventChannelWrapper<MsgVenueDataChange> {
+  static func register(with messenger: FlutterBinaryMessenger,
+                      instanceName: String = "",
+                      streamHandler: VenueDataChangesStreamHandler) {
+    var channelName = "dev.flutter.pigeon.flutter_proximiio.ProximiioEventApi.venueDataChanges"
+    if !instanceName.isEmpty {
+      channelName += ".\(instanceName)"
+    }
+    let internalStreamHandler = PigeonStreamHandler<MsgVenueDataChange>(wrapper: streamHandler)
+    let channel = FlutterEventChannel(name: channelName, binaryMessenger: messenger, codec: messagesPigeonMethodCodec)
+    channel.setStreamHandler(internalStreamHandler)
+  }
+}
+      
+class SyncEventsStreamHandler: PigeonEventChannelWrapper<MsgSyncEvent> {
+  static func register(with messenger: FlutterBinaryMessenger,
+                      instanceName: String = "",
+                      streamHandler: SyncEventsStreamHandler) {
+    var channelName = "dev.flutter.pigeon.flutter_proximiio.ProximiioEventApi.syncEvents"
+    if !instanceName.isEmpty {
+      channelName += ".\(instanceName)"
+    }
+    let internalStreamHandler = PigeonStreamHandler<MsgSyncEvent>(wrapper: streamHandler)
+    let channel = FlutterEventChannel(name: channelName, binaryMessenger: messenger, codec: messagesPigeonMethodCodec)
+    channel.setStreamHandler(internalStreamHandler)
+  }
+}
+      
+class BeaconEventsStreamHandler: PigeonEventChannelWrapper<MsgBeaconEvent> {
+  static func register(with messenger: FlutterBinaryMessenger,
+                      instanceName: String = "",
+                      streamHandler: BeaconEventsStreamHandler) {
+    var channelName = "dev.flutter.pigeon.flutter_proximiio.ProximiioEventApi.beaconEvents"
+    if !instanceName.isEmpty {
+      channelName += ".\(instanceName)"
+    }
+    let internalStreamHandler = PigeonStreamHandler<MsgBeaconEvent>(wrapper: streamHandler)
     let channel = FlutterEventChannel(name: channelName, binaryMessenger: messenger, codec: messagesPigeonMethodCodec)
     channel.setStreamHandler(internalStreamHandler)
   }

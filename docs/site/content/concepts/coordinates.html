@@ -1,0 +1,49 @@
+<!--
+title: Coordinates and floors
+description: Coordinate order, floor levels as doubles, and how floors relate to positions, geofences and routes.
+-->
+
+<h2>Coordinates</h2>
+
+<p>
+  <code>Coordinate</code> has <code>latitude</code> and <code>longitude</code> in degrees, WGS 84.
+  Geofence and privacy-zone outlines (<code>polygon</code>) are lists of <code>Coordinate</code>s.
+</p>
+
+<div class="doc-aside doc-aside-caution"><p>
+  GeoJSON lists positions as <code>[longitude, latitude]</code>. Feature <code>geometry</code> keeps
+  the GeoJSON order; <code>Coordinate</code> and <code>polygon</code> are already converted.
+</p></div>
+
+<h2>Floors</h2>
+
+<p>
+  <code>ProximiioFloor.level</code> is a <code>double</code>. Venues can have intermediate levels such
+  as 0.5. Compare levels with <code>==</code> only when both come from the SDK.
+</p>
+
+<table>
+  <thead><tr><th>Where</th><th>Floor information</th></tr></thead>
+  <tbody>
+    <tr><td><code>PositionUpdate.floor</code></td><td>The floor of the position, when known</td></tr>
+    <tr><td><code>FloorChangeEvent</code></td><td><code>previousFloor</code>, <code>floor</code>, <code>direction</code>, <code>source</code> (<code>barometer</code>, <code>beacon</code>, <code>manual</code>)</td></tr>
+    <tr><td><code>ProximiioGeofence.floorId</code></td><td>The floor of the geofence</td></tr>
+    <tr><td><code>computeRoute(fromLevel:, toLevel:)</code></td><td>Levels, not floor ids</td></tr>
+    <tr><td><code>SimulatedWaypoint.level</code></td><td>Whole levels only (<code>int</code>)</td></tr>
+  </tbody>
+</table>
+
+<h2>Floor changes</h2>
+
+<pre><code class="language-dart">sdk.floorChanges.listen((change) {
+  print('${change.previousFloor?.name} → ${change.floor?.name} (${change.source.name})');
+});</code></pre>
+
+<p>To set the floor yourself, for example from a floor picker, call <code>setFloor(floorId)</code>. The change is reported with <code>source: manual</code>.</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}guides/wayfinding.html">Wayfinding</a></li>
+  <li><a href="{{root}}concepts/data-model.html">Data model</a></li>
+</ul>

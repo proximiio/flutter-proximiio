@@ -110,6 +110,39 @@ enum MsgFloorChangeDirection { up, down, unknown }
 
 enum MsgFloorChangeSource { barometer, beacon, manual, unknown }
 
+enum MsgRouteProfile { pedestrian, wheelchair, stroller, staff }
+
+enum MsgRouteAvoidance {
+  elevators,
+  escalators,
+  staircases,
+  ramps,
+  narrowPaths,
+  hills,
+  revolvingDoors,
+  ticketGates,
+  barriers,
+}
+
+enum MsgInstructionKind {
+  start,
+  continueStraight,
+  turnSlightLeft,
+  turnLeft,
+  turnSharpLeft,
+  turnSlightRight,
+  turnRight,
+  turnSharpRight,
+  levelChange,
+  arrive,
+}
+
+enum MsgBeaconKind { iBeacon, eddystone, uwbAccessory }
+
+enum MsgPackageStateKind { missing, downloading, ready, stale, verifying, failed }
+
+enum MsgSimulationState { idle, running, paused }
+
 /// Android foreground-service notification. Ignored on iOS.
 class MsgAndroidServiceOptions {
   MsgAndroidServiceOptions({
@@ -1037,6 +1070,1505 @@ class MsgPrivacyZoneState {
   int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
 }
 
+class MsgRouteOptions {
+  MsgRouteOptions({required this.profile, required this.avoid});
+
+  MsgRouteProfile profile;
+
+  List<MsgRouteAvoidance> avoid;
+
+  List<Object?> _toList() {
+    return <Object?>[profile, avoid];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgRouteOptions decode(Object result) {
+    result as List<Object?>;
+    return MsgRouteOptions(
+      profile: result[0]! as MsgRouteProfile,
+      avoid: (result[1]! as List<Object?>).cast<MsgRouteAvoidance>(),
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgRouteOptions || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(profile, other.profile) && _deepEquals(avoid, other.avoid);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgRoutePoint {
+  MsgRoutePoint({required this.coordinate, required this.level});
+
+  MsgCoordinate coordinate;
+
+  double level;
+
+  List<Object?> _toList() {
+    return <Object?>[coordinate, level];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgRoutePoint decode(Object result) {
+    result as List<Object?>;
+    return MsgRoutePoint(coordinate: result[0]! as MsgCoordinate, level: result[1]! as double);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgRoutePoint || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(coordinate, other.coordinate) && _deepEquals(level, other.level);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgLevelChange {
+  MsgLevelChange({required this.featureType, required this.fromLevel, required this.toLevel, required this.coordinate});
+
+  String featureType;
+
+  double fromLevel;
+
+  double toLevel;
+
+  MsgCoordinate coordinate;
+
+  List<Object?> _toList() {
+    return <Object?>[featureType, fromLevel, toLevel, coordinate];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgLevelChange decode(Object result) {
+    result as List<Object?>;
+    return MsgLevelChange(
+      featureType: result[0]! as String,
+      fromLevel: result[1]! as double,
+      toLevel: result[2]! as double,
+      coordinate: result[3]! as MsgCoordinate,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgLevelChange || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(featureType, other.featureType) &&
+        _deepEquals(fromLevel, other.fromLevel) &&
+        _deepEquals(toLevel, other.toLevel) &&
+        _deepEquals(coordinate, other.coordinate);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgRouteSegment {
+  MsgRouteSegment({required this.start, required this.end, required this.distanceMeters});
+
+  MsgCoordinate start;
+
+  MsgCoordinate end;
+
+  double distanceMeters;
+
+  List<Object?> _toList() {
+    return <Object?>[start, end, distanceMeters];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgRouteSegment decode(Object result) {
+    result as List<Object?>;
+    return MsgRouteSegment(
+      start: result[0]! as MsgCoordinate,
+      end: result[1]! as MsgCoordinate,
+      distanceMeters: result[2]! as double,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgRouteSegment || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(start, other.start) &&
+        _deepEquals(end, other.end) &&
+        _deepEquals(distanceMeters, other.distanceMeters);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgRouteInstruction {
+  MsgRouteInstruction({
+    required this.kind,
+    required this.coordinate,
+    required this.distanceMeters,
+    required this.level,
+    required this.durationSeconds,
+    this.levelChange,
+  });
+
+  MsgInstructionKind kind;
+
+  MsgCoordinate coordinate;
+
+  double distanceMeters;
+
+  double level;
+
+  double durationSeconds;
+
+  /// Set when [kind] is `levelChange`.
+  MsgLevelChange? levelChange;
+
+  List<Object?> _toList() {
+    return <Object?>[kind, coordinate, distanceMeters, level, durationSeconds, levelChange];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgRouteInstruction decode(Object result) {
+    result as List<Object?>;
+    return MsgRouteInstruction(
+      kind: result[0]! as MsgInstructionKind,
+      coordinate: result[1]! as MsgCoordinate,
+      distanceMeters: result[2]! as double,
+      level: result[3]! as double,
+      durationSeconds: result[4]! as double,
+      levelChange: result[5] as MsgLevelChange?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgRouteInstruction || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(kind, other.kind) &&
+        _deepEquals(coordinate, other.coordinate) &&
+        _deepEquals(distanceMeters, other.distanceMeters) &&
+        _deepEquals(level, other.level) &&
+        _deepEquals(durationSeconds, other.durationSeconds) &&
+        _deepEquals(levelChange, other.levelChange);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgComputedRoute {
+  MsgComputedRoute({
+    required this.coordinates,
+    required this.distanceMeters,
+    required this.segments,
+    required this.level,
+    required this.levelChanges,
+    required this.instructions,
+    required this.durationSeconds,
+  });
+
+  List<MsgCoordinate> coordinates;
+
+  double distanceMeters;
+
+  List<MsgRouteSegment> segments;
+
+  double level;
+
+  List<MsgLevelChange> levelChanges;
+
+  List<MsgRouteInstruction> instructions;
+
+  double durationSeconds;
+
+  List<Object?> _toList() {
+    return <Object?>[coordinates, distanceMeters, segments, level, levelChanges, instructions, durationSeconds];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgComputedRoute decode(Object result) {
+    result as List<Object?>;
+    return MsgComputedRoute(
+      coordinates: (result[0]! as List<Object?>).cast<MsgCoordinate>(),
+      distanceMeters: result[1]! as double,
+      segments: (result[2]! as List<Object?>).cast<MsgRouteSegment>(),
+      level: result[3]! as double,
+      levelChanges: (result[4]! as List<Object?>).cast<MsgLevelChange>(),
+      instructions: (result[5]! as List<Object?>).cast<MsgRouteInstruction>(),
+      durationSeconds: result[6]! as double,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgComputedRoute || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(coordinates, other.coordinates) &&
+        _deepEquals(distanceMeters, other.distanceMeters) &&
+        _deepEquals(segments, other.segments) &&
+        _deepEquals(level, other.level) &&
+        _deepEquals(levelChanges, other.levelChanges) &&
+        _deepEquals(instructions, other.instructions) &&
+        _deepEquals(durationSeconds, other.durationSeconds);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgDurationRow {
+  MsgDurationRow({required this.seconds});
+
+  List<double?> seconds;
+
+  List<Object?> _toList() {
+    return <Object?>[seconds];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgDurationRow decode(Object result) {
+    result as List<Object?>;
+    return MsgDurationRow(seconds: (result[0]! as List<Object?>).cast<double?>());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgDurationRow || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(seconds, other.seconds);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgAmenity {
+  MsgAmenity({required this.id, this.title, this.category, this.icon, this.details});
+
+  String id;
+
+  String? title;
+
+  String? category;
+
+  String? icon;
+
+  String? details;
+
+  List<Object?> _toList() {
+    return <Object?>[id, title, category, icon, details];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgAmenity decode(Object result) {
+    result as List<Object?>;
+    return MsgAmenity(
+      id: result[0]! as String,
+      title: result[1] as String?,
+      category: result[2] as String?,
+      icon: result[3] as String?,
+      details: result[4] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgAmenity || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(id, other.id) &&
+        _deepEquals(title, other.title) &&
+        _deepEquals(category, other.category) &&
+        _deepEquals(icon, other.icon) &&
+        _deepEquals(details, other.details);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgFeature {
+  MsgFeature({
+    required this.id,
+    required this.type,
+    this.geometryJson,
+    this.propertiesJson,
+    this.level,
+    this.featureClass,
+    this.propertyType,
+    required this.isLevelChanger,
+    required this.titleTranslations,
+  });
+
+  String id;
+
+  String type;
+
+  /// GeoJSON geometry object, as JSON.
+  String? geometryJson;
+
+  /// GeoJSON properties object, as JSON.
+  String? propertiesJson;
+
+  double? level;
+
+  String? featureClass;
+
+  String? propertyType;
+
+  bool isLevelChanger;
+
+  Map<String, String> titleTranslations;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      id,
+      type,
+      geometryJson,
+      propertiesJson,
+      level,
+      featureClass,
+      propertyType,
+      isLevelChanger,
+      titleTranslations,
+    ];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgFeature decode(Object result) {
+    result as List<Object?>;
+    return MsgFeature(
+      id: result[0]! as String,
+      type: result[1]! as String,
+      geometryJson: result[2] as String?,
+      propertiesJson: result[3] as String?,
+      level: result[4] as double?,
+      featureClass: result[5] as String?,
+      propertyType: result[6] as String?,
+      isLevelChanger: result[7]! as bool,
+      titleTranslations: (result[8]! as Map<Object?, Object?>).cast<String, String>(),
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgFeature || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(id, other.id) &&
+        _deepEquals(type, other.type) &&
+        _deepEquals(geometryJson, other.geometryJson) &&
+        _deepEquals(propertiesJson, other.propertiesJson) &&
+        _deepEquals(level, other.level) &&
+        _deepEquals(featureClass, other.featureClass) &&
+        _deepEquals(propertyType, other.propertyType) &&
+        _deepEquals(isLevelChanger, other.isLevelChanger) &&
+        _deepEquals(titleTranslations, other.titleTranslations);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgDepartment {
+  MsgDepartment({required this.id, this.name, this.placeId, this.floorId, this.tags, this.metadataJson});
+
+  String id;
+
+  String? name;
+
+  String? placeId;
+
+  String? floorId;
+
+  List<String>? tags;
+
+  String? metadataJson;
+
+  List<Object?> _toList() {
+    return <Object?>[id, name, placeId, floorId, tags, metadataJson];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgDepartment decode(Object result) {
+    result as List<Object?>;
+    return MsgDepartment(
+      id: result[0]! as String,
+      name: result[1] as String?,
+      placeId: result[2] as String?,
+      floorId: result[3] as String?,
+      tags: (result[4] as List<Object?>?)?.cast<String>(),
+      metadataJson: result[5] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgDepartment || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(id, other.id) &&
+        _deepEquals(name, other.name) &&
+        _deepEquals(placeId, other.placeId) &&
+        _deepEquals(floorId, other.floorId) &&
+        _deepEquals(tags, other.tags) &&
+        _deepEquals(metadataJson, other.metadataJson);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgJourneyWaypoint {
+  MsgJourneyWaypoint({
+    this.latitude,
+    this.longitude,
+    this.level,
+    this.floorId,
+    this.label,
+    this.dwellSeconds,
+    this.speed,
+    this.transitionSeconds,
+  });
+
+  double? latitude;
+
+  double? longitude;
+
+  double? level;
+
+  String? floorId;
+
+  String? label;
+
+  double? dwellSeconds;
+
+  double? speed;
+
+  double? transitionSeconds;
+
+  List<Object?> _toList() {
+    return <Object?>[latitude, longitude, level, floorId, label, dwellSeconds, speed, transitionSeconds];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgJourneyWaypoint decode(Object result) {
+    result as List<Object?>;
+    return MsgJourneyWaypoint(
+      latitude: result[0] as double?,
+      longitude: result[1] as double?,
+      level: result[2] as double?,
+      floorId: result[3] as String?,
+      label: result[4] as String?,
+      dwellSeconds: result[5] as double?,
+      speed: result[6] as double?,
+      transitionSeconds: result[7] as double?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgJourneyWaypoint || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(latitude, other.latitude) &&
+        _deepEquals(longitude, other.longitude) &&
+        _deepEquals(level, other.level) &&
+        _deepEquals(floorId, other.floorId) &&
+        _deepEquals(label, other.label) &&
+        _deepEquals(dwellSeconds, other.dwellSeconds) &&
+        _deepEquals(speed, other.speed) &&
+        _deepEquals(transitionSeconds, other.transitionSeconds);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgJourney {
+  MsgJourney({
+    this.id,
+    this.organizationId,
+    this.name,
+    this.placeId,
+    this.speed,
+    required this.waypoints,
+    required this.displayName,
+  });
+
+  String? id;
+
+  String? organizationId;
+
+  String? name;
+
+  String? placeId;
+
+  double? speed;
+
+  List<MsgJourneyWaypoint> waypoints;
+
+  String displayName;
+
+  List<Object?> _toList() {
+    return <Object?>[id, organizationId, name, placeId, speed, waypoints, displayName];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgJourney decode(Object result) {
+    result as List<Object?>;
+    return MsgJourney(
+      id: result[0] as String?,
+      organizationId: result[1] as String?,
+      name: result[2] as String?,
+      placeId: result[3] as String?,
+      speed: result[4] as double?,
+      waypoints: (result[5]! as List<Object?>).cast<MsgJourneyWaypoint>(),
+      displayName: result[6]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgJourney || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(id, other.id) &&
+        _deepEquals(organizationId, other.organizationId) &&
+        _deepEquals(name, other.name) &&
+        _deepEquals(placeId, other.placeId) &&
+        _deepEquals(speed, other.speed) &&
+        _deepEquals(waypoints, other.waypoints) &&
+        _deepEquals(displayName, other.displayName);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgVenueDataChange {
+  MsgVenueDataChange({required this.kinds});
+
+  /// Open-ended: `features`, `amenities`, `style`, `floors`, `places`, `geofences`, later more.
+  List<String> kinds;
+
+  List<Object?> _toList() {
+    return <Object?>[kinds];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgVenueDataChange decode(Object result) {
+    result as List<Object?>;
+    return MsgVenueDataChange(kinds: (result[0]! as List<Object?>).cast<String>());
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgVenueDataChange || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(kinds, other.kinds);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+sealed class MsgSyncEvent {}
+
+class MsgSyncUpdated extends MsgSyncEvent {
+  MsgSyncUpdated({required this.entity, required this.id});
+
+  String entity;
+
+  String id;
+
+  List<Object?> _toList() {
+    return <Object?>[entity, id];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgSyncUpdated decode(Object result) {
+    result as List<Object?>;
+    return MsgSyncUpdated(entity: result[0]! as String, id: result[1]! as String);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgSyncUpdated || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(entity, other.entity) && _deepEquals(id, other.id);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgSyncDeleted extends MsgSyncEvent {
+  MsgSyncDeleted({required this.entity, required this.id});
+
+  String entity;
+
+  String id;
+
+  List<Object?> _toList() {
+    return <Object?>[entity, id];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgSyncDeleted decode(Object result) {
+    result as List<Object?>;
+    return MsgSyncDeleted(entity: result[0]! as String, id: result[1]! as String);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgSyncDeleted || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(entity, other.entity) && _deepEquals(id, other.id);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgSyncCompleted extends MsgSyncEvent {
+  MsgSyncCompleted({required this.applied});
+
+  int applied;
+
+  List<Object?> _toList() {
+    return <Object?>[applied];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgSyncCompleted decode(Object result) {
+    result as List<Object?>;
+    return MsgSyncCompleted(applied: result[0]! as int);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgSyncCompleted || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(applied, other.applied);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgSyncFailed extends MsgSyncEvent {
+  MsgSyncFailed({required this.reason});
+
+  String reason;
+
+  List<Object?> _toList() {
+    return <Object?>[reason];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgSyncFailed decode(Object result) {
+    result as List<Object?>;
+    return MsgSyncFailed(reason: result[0]! as String);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgSyncFailed || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(reason, other.reason);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgStoreRecreated extends MsgSyncEvent {
+  MsgStoreRecreated({required this.reason});
+
+  String reason;
+
+  List<Object?> _toList() {
+    return <Object?>[reason];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgStoreRecreated decode(Object result) {
+    result as List<Object?>;
+    return MsgStoreRecreated(reason: result[0]! as String);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgStoreRecreated || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(reason, other.reason);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+/// iBeacon: [uuid], [major], [minor]; Eddystone: [namespace], [instance]; UWB accessory: [name].
+class MsgBeaconIdentifier {
+  MsgBeaconIdentifier({
+    required this.kind,
+    this.uuid,
+    this.major,
+    this.minor,
+    this.namespace,
+    this.instance,
+    this.name,
+  });
+
+  MsgBeaconKind kind;
+
+  String? uuid;
+
+  int? major;
+
+  int? minor;
+
+  String? namespace;
+
+  String? instance;
+
+  String? name;
+
+  List<Object?> _toList() {
+    return <Object?>[kind, uuid, major, minor, namespace, instance, name];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgBeaconIdentifier decode(Object result) {
+    result as List<Object?>;
+    return MsgBeaconIdentifier(
+      kind: result[0]! as MsgBeaconKind,
+      uuid: result[1] as String?,
+      major: result[2] as int?,
+      minor: result[3] as int?,
+      namespace: result[4] as String?,
+      instance: result[5] as String?,
+      name: result[6] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgBeaconIdentifier || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(kind, other.kind) &&
+        _deepEquals(uuid, other.uuid) &&
+        _deepEquals(major, other.major) &&
+        _deepEquals(minor, other.minor) &&
+        _deepEquals(namespace, other.namespace) &&
+        _deepEquals(instance, other.instance) &&
+        _deepEquals(name, other.name);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgBeaconObservation {
+  MsgBeaconObservation({
+    required this.identifier,
+    required this.rssi,
+    this.txPower,
+    required this.timestampMs,
+    this.calibratedDistance,
+  });
+
+  MsgBeaconIdentifier identifier;
+
+  int rssi;
+
+  int? txPower;
+
+  int timestampMs;
+
+  double? calibratedDistance;
+
+  List<Object?> _toList() {
+    return <Object?>[identifier, rssi, txPower, timestampMs, calibratedDistance];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgBeaconObservation decode(Object result) {
+    result as List<Object?>;
+    return MsgBeaconObservation(
+      identifier: result[0]! as MsgBeaconIdentifier,
+      rssi: result[1]! as int,
+      txPower: result[2] as int?,
+      timestampMs: result[3]! as int,
+      calibratedDistance: result[4] as double?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgBeaconObservation || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(identifier, other.identifier) &&
+        _deepEquals(rssi, other.rssi) &&
+        _deepEquals(txPower, other.txPower) &&
+        _deepEquals(timestampMs, other.timestampMs) &&
+        _deepEquals(calibratedDistance, other.calibratedDistance);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgBeaconTelemetry {
+  MsgBeaconTelemetry({
+    required this.batteryMillivolts,
+    required this.temperatureCelsius,
+    required this.advertisementCount,
+    required this.uptimeSeconds,
+    required this.receivedAtMs,
+  });
+
+  int batteryMillivolts;
+
+  double temperatureCelsius;
+
+  int advertisementCount;
+
+  double uptimeSeconds;
+
+  int receivedAtMs;
+
+  List<Object?> _toList() {
+    return <Object?>[batteryMillivolts, temperatureCelsius, advertisementCount, uptimeSeconds, receivedAtMs];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgBeaconTelemetry decode(Object result) {
+    result as List<Object?>;
+    return MsgBeaconTelemetry(
+      batteryMillivolts: result[0]! as int,
+      temperatureCelsius: result[1]! as double,
+      advertisementCount: result[2]! as int,
+      uptimeSeconds: result[3]! as double,
+      receivedAtMs: result[4]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgBeaconTelemetry || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(batteryMillivolts, other.batteryMillivolts) &&
+        _deepEquals(temperatureCelsius, other.temperatureCelsius) &&
+        _deepEquals(advertisementCount, other.advertisementCount) &&
+        _deepEquals(uptimeSeconds, other.uptimeSeconds) &&
+        _deepEquals(receivedAtMs, other.receivedAtMs);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+sealed class MsgBeaconEvent {}
+
+class MsgBeaconFound extends MsgBeaconEvent {
+  MsgBeaconFound({required this.observation});
+
+  MsgBeaconObservation observation;
+
+  List<Object?> _toList() {
+    return <Object?>[observation];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgBeaconFound decode(Object result) {
+    result as List<Object?>;
+    return MsgBeaconFound(observation: result[0]! as MsgBeaconObservation);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgBeaconFound || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(observation, other.observation);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgBeaconUpdated extends MsgBeaconEvent {
+  MsgBeaconUpdated({required this.observation});
+
+  MsgBeaconObservation observation;
+
+  List<Object?> _toList() {
+    return <Object?>[observation];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgBeaconUpdated decode(Object result) {
+    result as List<Object?>;
+    return MsgBeaconUpdated(observation: result[0]! as MsgBeaconObservation);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgBeaconUpdated || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(observation, other.observation);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgBeaconLost extends MsgBeaconEvent {
+  MsgBeaconLost({required this.identifier});
+
+  MsgBeaconIdentifier identifier;
+
+  List<Object?> _toList() {
+    return <Object?>[identifier];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgBeaconLost decode(Object result) {
+    result as List<Object?>;
+    return MsgBeaconLost(identifier: result[0]! as MsgBeaconIdentifier);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgBeaconLost || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(identifier, other.identifier);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgBeaconTelemetryReceived extends MsgBeaconEvent {
+  MsgBeaconTelemetryReceived({required this.identifier, required this.telemetry});
+
+  MsgBeaconIdentifier identifier;
+
+  MsgBeaconTelemetry telemetry;
+
+  List<Object?> _toList() {
+    return <Object?>[identifier, telemetry];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgBeaconTelemetryReceived decode(Object result) {
+    result as List<Object?>;
+    return MsgBeaconTelemetryReceived(
+      identifier: result[0]! as MsgBeaconIdentifier,
+      telemetry: result[1]! as MsgBeaconTelemetry,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgBeaconTelemetryReceived || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(identifier, other.identifier) && _deepEquals(telemetry, other.telemetry);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgPackageState {
+  MsgPackageState({required this.kind, this.progress, this.version});
+
+  MsgPackageStateKind kind;
+
+  /// 0…1 while [kind] is `downloading`.
+  double? progress;
+
+  /// Set when [kind] is `ready`.
+  int? version;
+
+  List<Object?> _toList() {
+    return <Object?>[kind, progress, version];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgPackageState decode(Object result) {
+    result as List<Object?>;
+    return MsgPackageState(
+      kind: result[0]! as MsgPackageStateKind,
+      progress: result[1] as double?,
+      version: result[2] as int?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgPackageState || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(kind, other.kind) &&
+        _deepEquals(progress, other.progress) &&
+        _deepEquals(version, other.version);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgSimulatedWaypoint {
+  MsgSimulatedWaypoint({required this.coordinate, required this.level});
+
+  MsgCoordinate coordinate;
+
+  int level;
+
+  List<Object?> _toList() {
+    return <Object?>[coordinate, level];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgSimulatedWaypoint decode(Object result) {
+    result as List<Object?>;
+    return MsgSimulatedWaypoint(coordinate: result[0]! as MsgCoordinate, level: result[1]! as int);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgSimulatedWaypoint || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(coordinate, other.coordinate) && _deepEquals(level, other.level);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgSimulatedRoute {
+  MsgSimulatedRoute({
+    required this.waypoints,
+    required this.speed,
+    required this.updateIntervalSeconds,
+    required this.loops,
+    required this.accuracy,
+  });
+
+  List<MsgSimulatedWaypoint> waypoints;
+
+  double speed;
+
+  double updateIntervalSeconds;
+
+  bool loops;
+
+  double accuracy;
+
+  List<Object?> _toList() {
+    return <Object?>[waypoints, speed, updateIntervalSeconds, loops, accuracy];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgSimulatedRoute decode(Object result) {
+    result as List<Object?>;
+    return MsgSimulatedRoute(
+      waypoints: (result[0]! as List<Object?>).cast<MsgSimulatedWaypoint>(),
+      speed: result[1]! as double,
+      updateIntervalSeconds: result[2]! as double,
+      loops: result[3]! as bool,
+      accuracy: result[4]! as double,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgSimulatedRoute || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(waypoints, other.waypoints) &&
+        _deepEquals(speed, other.speed) &&
+        _deepEquals(updateIntervalSeconds, other.updateIntervalSeconds) &&
+        _deepEquals(loops, other.loops) &&
+        _deepEquals(accuracy, other.accuracy);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
+class MsgDiagnostics {
+  MsgDiagnostics({
+    required this.state,
+    required this.isStarted,
+    required this.isAuthenticated,
+    this.permissions,
+    required this.visibleBeaconCount,
+    required this.registeredBeaconCount,
+    this.lastPositionAgeSeconds,
+    this.lastPositionSource,
+    required this.pdrEnabled,
+    required this.pdrRunning,
+    required this.visitorReportingEnabled,
+    this.noPositionReason,
+    required this.summary,
+    required this.generatedAtMs,
+  });
+
+  MsgSdkState state;
+
+  bool isStarted;
+
+  bool isAuthenticated;
+
+  MsgPermissionStatus? permissions;
+
+  int visibleBeaconCount;
+
+  int registeredBeaconCount;
+
+  double? lastPositionAgeSeconds;
+
+  MsgPositionSource? lastPositionSource;
+
+  bool pdrEnabled;
+
+  bool pdrRunning;
+
+  bool visitorReportingEnabled;
+
+  /// `notStarted`, `noViablePositioningInputs`, `awaitingFirstFix`, … (the SDK's raw value).
+  String? noPositionReason;
+
+  String summary;
+
+  int generatedAtMs;
+
+  List<Object?> _toList() {
+    return <Object?>[
+      state,
+      isStarted,
+      isAuthenticated,
+      permissions,
+      visibleBeaconCount,
+      registeredBeaconCount,
+      lastPositionAgeSeconds,
+      lastPositionSource,
+      pdrEnabled,
+      pdrRunning,
+      visitorReportingEnabled,
+      noPositionReason,
+      summary,
+      generatedAtMs,
+    ];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgDiagnostics decode(Object result) {
+    result as List<Object?>;
+    return MsgDiagnostics(
+      state: result[0]! as MsgSdkState,
+      isStarted: result[1]! as bool,
+      isAuthenticated: result[2]! as bool,
+      permissions: result[3] as MsgPermissionStatus?,
+      visibleBeaconCount: result[4]! as int,
+      registeredBeaconCount: result[5]! as int,
+      lastPositionAgeSeconds: result[6] as double?,
+      lastPositionSource: result[7] as MsgPositionSource?,
+      pdrEnabled: result[8]! as bool,
+      pdrRunning: result[9]! as bool,
+      visitorReportingEnabled: result[10]! as bool,
+      noPositionReason: result[11] as String?,
+      summary: result[12]! as String,
+      generatedAtMs: result[13]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgDiagnostics || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(state, other.state) &&
+        _deepEquals(isStarted, other.isStarted) &&
+        _deepEquals(isAuthenticated, other.isAuthenticated) &&
+        _deepEquals(permissions, other.permissions) &&
+        _deepEquals(visibleBeaconCount, other.visibleBeaconCount) &&
+        _deepEquals(registeredBeaconCount, other.registeredBeaconCount) &&
+        _deepEquals(lastPositionAgeSeconds, other.lastPositionAgeSeconds) &&
+        _deepEquals(lastPositionSource, other.lastPositionSource) &&
+        _deepEquals(pdrEnabled, other.pdrEnabled) &&
+        _deepEquals(pdrRunning, other.pdrRunning) &&
+        _deepEquals(visitorReportingEnabled, other.visitorReportingEnabled) &&
+        _deepEquals(noPositionReason, other.noPositionReason) &&
+        _deepEquals(summary, other.summary) &&
+        _deepEquals(generatedAtMs, other.generatedAtMs);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -1080,53 +2612,158 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is MsgFloorChangeSource) {
       buffer.putUint8(140);
       writeValue(buffer, value.index);
-    } else if (value is MsgAndroidServiceOptions) {
+    } else if (value is MsgRouteProfile) {
       buffer.putUint8(141);
-      writeValue(buffer, value.encode());
-    } else if (value is MsgConfiguration) {
+      writeValue(buffer, value.index);
+    } else if (value is MsgRouteAvoidance) {
       buffer.putUint8(142);
-      writeValue(buffer, value.encode());
-    } else if (value is MsgCoordinate) {
+      writeValue(buffer, value.index);
+    } else if (value is MsgInstructionKind) {
       buffer.putUint8(143);
-      writeValue(buffer, value.encode());
-    } else if (value is MsgApplication) {
+      writeValue(buffer, value.index);
+    } else if (value is MsgBeaconKind) {
       buffer.putUint8(144);
-      writeValue(buffer, value.encode());
-    } else if (value is MsgPlace) {
+      writeValue(buffer, value.index);
+    } else if (value is MsgPackageStateKind) {
       buffer.putUint8(145);
-      writeValue(buffer, value.encode());
-    } else if (value is MsgFloor) {
+      writeValue(buffer, value.index);
+    } else if (value is MsgSimulationState) {
       buffer.putUint8(146);
-      writeValue(buffer, value.encode());
-    } else if (value is MsgZone) {
+      writeValue(buffer, value.index);
+    } else if (value is MsgAndroidServiceOptions) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPermissionStatus) {
+    } else if (value is MsgConfiguration) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    } else if (value is MsgStateChange) {
+    } else if (value is MsgCoordinate) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPositionUpdate) {
+    } else if (value is MsgApplication) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    } else if (value is MsgFloorChange) {
+    } else if (value is MsgPlace) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    } else if (value is MsgGeofenceEntered) {
+    } else if (value is MsgFloor) {
       buffer.putUint8(152);
       writeValue(buffer, value.encode());
-    } else if (value is MsgGeofenceExited) {
+    } else if (value is MsgZone) {
       buffer.putUint8(153);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPrivacyZoneEntered) {
+    } else if (value is MsgPermissionStatus) {
       buffer.putUint8(154);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPrivacyZoneExited) {
+    } else if (value is MsgStateChange) {
       buffer.putUint8(155);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPrivacyZoneState) {
+    } else if (value is MsgPositionUpdate) {
       buffer.putUint8(156);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgFloorChange) {
+      buffer.putUint8(157);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgGeofenceEntered) {
+      buffer.putUint8(158);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgGeofenceExited) {
+      buffer.putUint8(159);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgPrivacyZoneEntered) {
+      buffer.putUint8(160);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgPrivacyZoneExited) {
+      buffer.putUint8(161);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgPrivacyZoneState) {
+      buffer.putUint8(162);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgRouteOptions) {
+      buffer.putUint8(163);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgRoutePoint) {
+      buffer.putUint8(164);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgLevelChange) {
+      buffer.putUint8(165);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgRouteSegment) {
+      buffer.putUint8(166);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgRouteInstruction) {
+      buffer.putUint8(167);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgComputedRoute) {
+      buffer.putUint8(168);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgDurationRow) {
+      buffer.putUint8(169);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgAmenity) {
+      buffer.putUint8(170);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgFeature) {
+      buffer.putUint8(171);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgDepartment) {
+      buffer.putUint8(172);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgJourneyWaypoint) {
+      buffer.putUint8(173);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgJourney) {
+      buffer.putUint8(174);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgVenueDataChange) {
+      buffer.putUint8(175);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgSyncUpdated) {
+      buffer.putUint8(176);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgSyncDeleted) {
+      buffer.putUint8(177);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgSyncCompleted) {
+      buffer.putUint8(178);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgSyncFailed) {
+      buffer.putUint8(179);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgStoreRecreated) {
+      buffer.putUint8(180);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgBeaconIdentifier) {
+      buffer.putUint8(181);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgBeaconObservation) {
+      buffer.putUint8(182);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgBeaconTelemetry) {
+      buffer.putUint8(183);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgBeaconFound) {
+      buffer.putUint8(184);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgBeaconUpdated) {
+      buffer.putUint8(185);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgBeaconLost) {
+      buffer.putUint8(186);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgBeaconTelemetryReceived) {
+      buffer.putUint8(187);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgPackageState) {
+      buffer.putUint8(188);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgSimulatedWaypoint) {
+      buffer.putUint8(189);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgSimulatedRoute) {
+      buffer.putUint8(190);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgDiagnostics) {
+      buffer.putUint8(191);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1173,37 +2810,113 @@ class _PigeonCodec extends StandardMessageCodec {
         final value = readValue(buffer) as int?;
         return value == null ? null : MsgFloorChangeSource.values[value];
       case 141:
-        return MsgAndroidServiceOptions.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : MsgRouteProfile.values[value];
       case 142:
-        return MsgConfiguration.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : MsgRouteAvoidance.values[value];
       case 143:
-        return MsgCoordinate.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : MsgInstructionKind.values[value];
       case 144:
-        return MsgApplication.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : MsgBeaconKind.values[value];
       case 145:
-        return MsgPlace.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : MsgPackageStateKind.values[value];
       case 146:
-        return MsgFloor.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : MsgSimulationState.values[value];
       case 147:
-        return MsgZone.decode(readValue(buffer)!);
+        return MsgAndroidServiceOptions.decode(readValue(buffer)!);
       case 148:
-        return MsgPermissionStatus.decode(readValue(buffer)!);
+        return MsgConfiguration.decode(readValue(buffer)!);
       case 149:
-        return MsgStateChange.decode(readValue(buffer)!);
+        return MsgCoordinate.decode(readValue(buffer)!);
       case 150:
-        return MsgPositionUpdate.decode(readValue(buffer)!);
+        return MsgApplication.decode(readValue(buffer)!);
       case 151:
-        return MsgFloorChange.decode(readValue(buffer)!);
+        return MsgPlace.decode(readValue(buffer)!);
       case 152:
-        return MsgGeofenceEntered.decode(readValue(buffer)!);
+        return MsgFloor.decode(readValue(buffer)!);
       case 153:
-        return MsgGeofenceExited.decode(readValue(buffer)!);
+        return MsgZone.decode(readValue(buffer)!);
       case 154:
-        return MsgPrivacyZoneEntered.decode(readValue(buffer)!);
+        return MsgPermissionStatus.decode(readValue(buffer)!);
       case 155:
-        return MsgPrivacyZoneExited.decode(readValue(buffer)!);
+        return MsgStateChange.decode(readValue(buffer)!);
       case 156:
+        return MsgPositionUpdate.decode(readValue(buffer)!);
+      case 157:
+        return MsgFloorChange.decode(readValue(buffer)!);
+      case 158:
+        return MsgGeofenceEntered.decode(readValue(buffer)!);
+      case 159:
+        return MsgGeofenceExited.decode(readValue(buffer)!);
+      case 160:
+        return MsgPrivacyZoneEntered.decode(readValue(buffer)!);
+      case 161:
+        return MsgPrivacyZoneExited.decode(readValue(buffer)!);
+      case 162:
         return MsgPrivacyZoneState.decode(readValue(buffer)!);
+      case 163:
+        return MsgRouteOptions.decode(readValue(buffer)!);
+      case 164:
+        return MsgRoutePoint.decode(readValue(buffer)!);
+      case 165:
+        return MsgLevelChange.decode(readValue(buffer)!);
+      case 166:
+        return MsgRouteSegment.decode(readValue(buffer)!);
+      case 167:
+        return MsgRouteInstruction.decode(readValue(buffer)!);
+      case 168:
+        return MsgComputedRoute.decode(readValue(buffer)!);
+      case 169:
+        return MsgDurationRow.decode(readValue(buffer)!);
+      case 170:
+        return MsgAmenity.decode(readValue(buffer)!);
+      case 171:
+        return MsgFeature.decode(readValue(buffer)!);
+      case 172:
+        return MsgDepartment.decode(readValue(buffer)!);
+      case 173:
+        return MsgJourneyWaypoint.decode(readValue(buffer)!);
+      case 174:
+        return MsgJourney.decode(readValue(buffer)!);
+      case 175:
+        return MsgVenueDataChange.decode(readValue(buffer)!);
+      case 176:
+        return MsgSyncUpdated.decode(readValue(buffer)!);
+      case 177:
+        return MsgSyncDeleted.decode(readValue(buffer)!);
+      case 178:
+        return MsgSyncCompleted.decode(readValue(buffer)!);
+      case 179:
+        return MsgSyncFailed.decode(readValue(buffer)!);
+      case 180:
+        return MsgStoreRecreated.decode(readValue(buffer)!);
+      case 181:
+        return MsgBeaconIdentifier.decode(readValue(buffer)!);
+      case 182:
+        return MsgBeaconObservation.decode(readValue(buffer)!);
+      case 183:
+        return MsgBeaconTelemetry.decode(readValue(buffer)!);
+      case 184:
+        return MsgBeaconFound.decode(readValue(buffer)!);
+      case 185:
+        return MsgBeaconUpdated.decode(readValue(buffer)!);
+      case 186:
+        return MsgBeaconLost.decode(readValue(buffer)!);
+      case 187:
+        return MsgBeaconTelemetryReceived.decode(readValue(buffer)!);
+      case 188:
+        return MsgPackageState.decode(readValue(buffer)!);
+      case 189:
+        return MsgSimulatedWaypoint.decode(readValue(buffer)!);
+      case 190:
+        return MsgSimulatedRoute.decode(readValue(buffer)!);
+      case 191:
+        return MsgDiagnostics.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1711,6 +3424,584 @@ class ProximiioHostApi {
 
     _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
   }
+
+  /// Throws `noRoute` with `reason` (and `nearestDistanceMeters` / `blockedBy`) in the details.
+  Future<MsgComputedRoute> computeRoute(
+    MsgCoordinate from,
+    double fromLevel,
+    MsgCoordinate to,
+    double toLevel,
+    MsgRouteOptions options,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.computeRoute$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[
+      from,
+      fromLevel,
+      to,
+      toLevel,
+      options,
+    ]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as MsgComputedRoute;
+  }
+
+  /// Walking seconds between every pair of [points]; `null` where no route exists.
+  Future<List<MsgDurationRow>> routeDurations(List<MsgRoutePoint> points, MsgRouteOptions options) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.routeDurations$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[points, options]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return (pigeonVar_replyValue! as List<Object?>).cast<MsgDurationRow>();
+  }
+
+  /// Downloads the venue features (when changed), stores them and installs the route network.
+  Future<int> loadRouteNetwork() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.loadRouteNetwork$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as int;
+  }
+
+  /// Installs the route network from the stored features, without a request. `0` when none are stored.
+  Future<int> loadCachedRouteNetwork() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.loadCachedRouteNetwork$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as int;
+  }
+
+  Future<List<MsgAmenity>> amenities() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.amenities$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return (pigeonVar_replyValue! as List<Object?>).cast<MsgAmenity>();
+  }
+
+  Future<List<MsgFeature>> features() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.features$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return (pigeonVar_replyValue! as List<Object?>).cast<MsgFeature>();
+  }
+
+  Future<List<MsgDepartment>> departments() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.departments$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return (pigeonVar_replyValue! as List<Object?>).cast<MsgDepartment>();
+  }
+
+  /// The organisation's MapLibre style document, as JSON.
+  Future<String> mapStyle() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.mapStyle$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as String;
+  }
+
+  Future<List<MsgJourney>> journeys() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.journeys$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return (pigeonVar_replyValue! as List<Object?>).cast<MsgJourney>();
+  }
+
+  Future<MsgJourney> journey(String id) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.journey$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[id]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as MsgJourney;
+  }
+
+  Future<MsgPackageState> syncOfflinePackage(String packageId, String? place, bool allowsCellular) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.syncOfflinePackage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[packageId, place, allowsCellular]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as MsgPackageState;
+  }
+
+  Future<MsgPackageState> offlinePackageState(String packageId) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.offlinePackageState$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[packageId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as MsgPackageState;
+  }
+
+  /// Installs a seed from a directory on disk (unpacked package files).
+  Future<void> installOfflineSeed(String packageId, String directory) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.installOfflineSeed$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[packageId, directory]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<void> removeOfflinePackage(String packageId) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.removeOfflinePackage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[packageId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<int> offlinePackageDiskUsage(String packageId) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.offlinePackageDiskUsage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[packageId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as int;
+  }
+
+  Future<MsgPositionUpdate?> simulatePosition(MsgCoordinate coordinate, int level, double accuracy) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.simulatePosition$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[coordinate, level, accuracy]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+    return pigeonVar_replyValue as MsgPositionUpdate?;
+  }
+
+  Future<void> startSimulation(MsgSimulatedRoute route) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.startSimulation$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[route]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<void> pauseSimulation() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.pauseSimulation$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<void> resumeSimulation() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.resumeSimulation$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<void> stopSimulation() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.stopSimulation$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<void> jumpToWaypoint(int index) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.jumpToWaypoint$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[index]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<MsgSimulationState> simulationState() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.simulationState$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as MsgSimulationState;
+  }
+
+  /// [floorId] is looked up in the SDK's floors; unknown ids mean "no floor".
+  Future<MsgPositionUpdate?> setCustomPosition(MsgCoordinate coordinate, double accuracy, String? floorId) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.setCustomPosition$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[coordinate, accuracy, floorId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+    return pigeonVar_replyValue as MsgPositionUpdate?;
+  }
+
+  Future<MsgFloorChange?> setFloor(String? floorId) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.setFloor$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[floorId]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+    return pigeonVar_replyValue as MsgFloorChange?;
+  }
+
+  /// `null` [thresholdMeters] keeps the SDK default.
+  Future<void> enableRouteSnapping(double? thresholdMeters) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.enableRouteSnapping$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[thresholdMeters]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<void> disableRouteSnapping() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.disableRouteSnapping$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<void> enablePdr() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.enablePdr$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<void> disablePdr() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.disablePdr$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<void> setPositioningSourcePrivate(int? sinceMs) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.setPositioningSourcePrivate$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[sinceMs]);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<MsgDiagnostics> diagnostics() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.diagnostics$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as MsgDiagnostics;
+  }
+
+  Future<void> startDiagnosticsRecording() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.startDiagnosticsRecording$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  Future<void> stopDiagnosticsRecording() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.stopDiagnosticsRecording$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  /// Path of the zipped report.
+  Future<String> prepareDiagnosticsReport() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.prepareDiagnosticsReport$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as String;
+  }
 }
 
 /// Streams from the SDK. They stay open across `stop()`/`start()`: the native side
@@ -1790,5 +4081,44 @@ Stream<MsgPrivacyZoneState> privacyZoneStateChanges({String instanceName = ''}) 
   );
   return privacyZoneStateChangesChannel.receiveBroadcastStream().map((dynamic event) {
     return event as MsgPrivacyZoneState;
+  });
+}
+
+Stream<MsgVenueDataChange> venueDataChanges({String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel venueDataChangesChannel = EventChannel(
+    'dev.flutter.pigeon.flutter_proximiio.ProximiioEventApi.venueDataChanges$instanceName',
+    pigeonMethodCodec,
+  );
+  return venueDataChangesChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as MsgVenueDataChange;
+  });
+}
+
+Stream<MsgSyncEvent> syncEvents({String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel syncEventsChannel = EventChannel(
+    'dev.flutter.pigeon.flutter_proximiio.ProximiioEventApi.syncEvents$instanceName',
+    pigeonMethodCodec,
+  );
+  return syncEventsChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as MsgSyncEvent;
+  });
+}
+
+Stream<MsgBeaconEvent> beaconEvents({String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel beaconEventsChannel = EventChannel(
+    'dev.flutter.pigeon.flutter_proximiio.ProximiioEventApi.beaconEvents$instanceName',
+    pigeonMethodCodec,
+  );
+  return beaconEventsChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as MsgBeaconEvent;
   });
 }

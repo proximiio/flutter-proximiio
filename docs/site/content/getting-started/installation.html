@@ -1,0 +1,146 @@
+<!--
+title: Installation
+description: Add flutter_proximiio, set up the iOS pod and Info.plist keys, and raise the Android build settings.
+-->
+
+<p>
+  The plugin is a Dart package with native code for iOS and Android. Each platform needs a few
+  build settings that the native Proximi.io SDK v6 requires.
+</p>
+
+<h2>Requirements</h2>
+
+<table>
+  <thead><tr><th>Platform</th><th>Minimum</th></tr></thead>
+  <tbody>
+    <tr><td>Flutter / Dart</td><td>Flutter 3.29, Dart 3.7</td></tr>
+    <tr><td>iOS</td><td>iOS 15.0, Xcode 16</td></tr>
+    <tr><td>Android</td><td>minSdk 26, compileSdk 37, Android Gradle Plugin 8.13, Gradle 8.13, Kotlin 2.2, JDK 17</td></tr>
+  </tbody>
+</table>
+
+<h2>Add the package</h2>
+
+<pre><code class="language-yaml">dependencies:
+  flutter_proximiio:
+    git:
+      url: https://github.com/proximiio/flutter-proximiio
+      ref: 6.0.0-beta.1</code></pre>
+
+<p>Pin <code>ref</code> to a release tag. A git dependency without <code>ref</code> follows the default branch.</p>
+
+<h2>iOS</h2>
+
+<h3>CocoaPods</h3>
+
+<p>
+  The Proximi.io SDK pod is not on the CocoaPods trunk. Add it to <code>ios/Podfile</code> inside the
+  <code>Runner</code> target, at the iOS SDK version that matches the plugin release, and set the
+  platform to iOS 15:
+</p>
+
+<pre><code class="language-ruby">platform :ios, '15.0'
+
+target 'Runner' do
+  use_frameworks!
+  pod 'Proximiio', :podspec =&gt; 'https://raw.githubusercontent.com/proximiio/proximiio-sdk-ios-binary/6.0.0-beta.64/Proximiio.podspec'
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+end</code></pre>
+
+<p>Then run <code>pod install</code> in <code>ios/</code>, or let <code>flutter run</code> do it.</p>
+
+<h3>Swift Package Manager</h3>
+
+<p>
+  With Flutter's Swift Package Manager support turned on
+  (<code>flutter config --enable-swift-package-manager</code>), the plugin's own package pulls the
+  SDK from <code>proximiio/proximiio-sdk-ios-binary</code>. The Podfile line above is not needed.
+</p>
+
+<h3>Info.plist</h3>
+
+<p>Add the usage descriptions for the permissions the app uses. A missing key makes that permission resolve as denied.</p>
+
+<table>
+  <thead><tr><th>Key</th><th>Needed for</th></tr></thead>
+  <tbody>
+    <tr><td><code>NSLocationWhenInUseUsageDescription</code></td><td>Positioning</td></tr>
+    <tr><td><code>NSLocationAlwaysAndWhenInUseUsageDescription</code></td><td>Positioning in the background</td></tr>
+    <tr><td><code>NSBluetoothAlwaysUsageDescription</code></td><td>Beacon positioning</td></tr>
+    <tr><td><code>NSMotionUsageDescription</code></td><td>PDR and floor changes from the barometer</td></tr>
+  </tbody>
+</table>
+
+<p>For background positioning also add <code>location</code> to <code>UIBackgroundModes</code>. See <a href="{{root}}guides/background.html">Background positioning</a>.</p>
+
+<h2>Android</h2>
+
+<h3>Repository</h3>
+
+<p>
+  The SDK is published to <code>https://maven.eu.proximi.fi/releases/</code> (public, no
+  credentials). The plugin adds the repository to every Gradle project. When
+  <code>settings.gradle.kts</code> uses <code>RepositoriesMode.FAIL_ON_PROJECT_REPOS</code>, add it there:
+</p>
+
+<pre><code class="language-kotlin">dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://maven.eu.proximi.fi/releases/")
+    }
+}</code></pre>
+
+<h3>Build settings</h3>
+
+<p>In <code>android/settings.gradle.kts</code>:</p>
+
+<pre><code class="language-kotlin">plugins {
+    id("dev.flutter.flutter-plugin-loader") version "1.0.0"
+    id("com.android.application") version "8.13.2" apply false
+    id("org.jetbrains.kotlin.android") version "2.2.21" apply false
+}</code></pre>
+
+<p>In <code>android/app/build.gradle.kts</code>:</p>
+
+<pre><code class="language-kotlin">android {
+    compileSdk = 37
+    defaultConfig {
+        minSdk = 26
+    }
+}</code></pre>
+
+<p>Use Gradle 8.13 or newer in <code>android/gradle/wrapper/gradle-wrapper.properties</code>.</p>
+
+<div class="doc-aside doc-aside-note"><p>
+  The Android Gradle Plugin 8.9 that older Flutter templates use cannot compile against API 37.
+  The build then fails with <code>Failed to find Platform SDK with path: platforms;android-37</code>.
+</p></div>
+
+<h3>Manifest</h3>
+
+<p>
+  The SDK's manifest adds the location, Bluetooth, foreground-service and notification permissions
+  and its foreground service to the app. Nothing has to be declared by hand. To keep an app
+  foreground-only, remove background location:
+</p>
+
+<pre><code class="language-xml">&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"&gt;
+    &lt;uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" tools:node="remove" /&gt;
+&lt;/manifest&gt;</code></pre>
+
+<h2>Verify</h2>
+
+<p>
+  <code>flutter build ios --no-codesign</code> and <code>flutter build apk</code> succeed. In the app,
+  <code>await Proximiio.create(...)</code> returns without an error.
+</p>
+
+<h2>Next</h2>
+
+<ul>
+  <li><a href="{{root}}getting-started/quickstart.html">Quick start</a></li>
+  <li><a href="{{root}}getting-started/permissions.html">Permissions</a></li>
+</ul>

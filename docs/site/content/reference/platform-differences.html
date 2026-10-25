@@ -1,0 +1,36 @@
+<!--
+title: Platform differences
+description: Where iOS and Android behave differently behind the same Dart API.
+-->
+
+<p>The Dart API is the same on both platforms. These are the places where the native SDKs differ.</p>
+
+<table>
+  <thead><tr><th>Area</th><th>iOS</th><th>Android</th></tr></thead>
+  <tbody>
+    <tr><td>Bluetooth permission</td><td>Asked by the SDK</td><td>Asked by the plugin in <code>requestPermissions</code> (Android 12+)</td></tr>
+    <tr><td>Notification permission</td><td>Not asked</td><td>Asked when the foreground service runs (Android 13+)</td></tr>
+    <tr><td>Background location prompt</td><td>One prompt</td><td>A second, separate prompt</td></tr>
+    <tr><td>Background positioning</td><td><code>UIBackgroundModes</code> <code>location</code> and <code>allowsBackgroundLocationUpdates</code></td><td>Foreground service, only with <code>android:</code> options</td></tr>
+    <tr><td><code>barometerEnabled</code></td><td>Applies</td><td>Ignored; the barometer is used when present</td></tr>
+    <tr><td><code>relayRunsInBackground</code></td><td>Applies to <code>relayOnly</code></td><td>Ignored; the foreground service keeps the relay</td></tr>
+    <tr><td><code>DesiredAccuracy.threeKilometers</code></td><td>Applies</td><td>Same as <code>kilometer</code></td></tr>
+    <tr><td><code>sdk.android.*</code></td><td>Throws <code>unsupported</code></td><td>Applies</td></tr>
+    <tr><td>Beacon UUIDs</td><td>Upper case</td><td>Converted to upper case by the plugin</td></tr>
+    <tr><td>Simulator / emulator</td><td>No Bluetooth</td><td>No Bluetooth</td></tr>
+  </tbody>
+</table>
+
+<h2>Errors</h2>
+
+<p>
+  Error codes, <code>domain</code> and <code>failureCode</code> are the same on both platforms.
+  <code>message</code> and <code>underlying</code> are platform text and differ; do not compare them.
+</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}getting-started/permissions.html">Permissions</a></li>
+  <li><a href="{{root}}guides/background.html">Background positioning</a></li>
+</ul>

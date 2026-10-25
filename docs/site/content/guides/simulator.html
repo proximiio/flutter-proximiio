@@ -1,0 +1,57 @@
+<!--
+title: Simulator and dev mode
+description: Simulate positions and walk a route without beacons, on simulators, emulators or at the desk.
+-->
+
+<p>
+  Simulators and emulators have no Bluetooth, and a desk is not a venue. The SDK can emit simulated
+  positions through the normal <code>positions</code> stream, so geofences, floors and routes react as
+  in the venue.
+</p>
+
+<h2>One position</h2>
+
+<pre><code class="language-dart">await sdk.simulatePosition(const Coordinate(latitude: 24.4866, longitude: 54.6074), level: 1);</code></pre>
+
+<h2>Walk a route</h2>
+
+<p>The SDK must be running.</p>
+
+<pre><code class="language-dart">await sdk.startSimulation(
+  const SimulatedRoute(
+    waypoints: [
+      SimulatedWaypoint(Coordinate(latitude: 24.4866, longitude: 54.6074)),
+      SimulatedWaypoint(Coordinate(latitude: 24.4869, longitude: 54.6079)),
+      SimulatedWaypoint(Coordinate(latitude: 24.4871, longitude: 54.6081), level: 1),
+    ],
+    speed: 1.3,
+    loops: true,
+  ),
+);</code></pre>
+
+<table>
+  <thead><tr><th>Setting</th><th>Default</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>speed</code></td><td>1.3 m/s</td><td>Walking speed</td></tr>
+    <tr><td><code>updateInterval</code></td><td>1 s</td><td>Time between positions</td></tr>
+    <tr><td><code>loops</code></td><td><code>false</code></td><td>Start over after the last waypoint</td></tr>
+    <tr><td><code>accuracy</code></td><td>5 m</td><td>Reported accuracy</td></tr>
+  </tbody>
+</table>
+
+<p>Control it with <code>pauseSimulation</code>, <code>resumeSimulation</code>, <code>stopSimulation</code> and <code>jumpToWaypoint(index)</code>; read <code>simulationState()</code>.</p>
+
+<div class="doc-aside doc-aside-note"><p>Simulation levels are whole numbers. Floors with intermediate levels cannot be simulated.</p></div>
+
+<h2>Keep it out of release builds</h2>
+
+<pre><code class="language-dart">if (kDebugMode) {
+  await sdk.startSimulation(route);
+}</code></pre>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}concepts/positioning.html">Positioning</a></li>
+  <li><a href="{{root}}guides/diagnostics.html">Diagnostics and logging</a></li>
+</ul>

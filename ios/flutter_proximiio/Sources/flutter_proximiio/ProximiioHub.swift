@@ -46,6 +46,24 @@ final class PrivacyZoneStateChangesRelay: PrivacyZoneStateChangesStreamHandler {
   override func onCancel(withArguments arguments: Any?) { box.sink = nil }
 }
 
+final class VenueDataChangesRelay: VenueDataChangesStreamHandler {
+  let box = EventBox<MsgVenueDataChange>()
+  override func onListen(withArguments arguments: Any?, sink: PigeonEventSink<MsgVenueDataChange>) { box.sink = sink }
+  override func onCancel(withArguments arguments: Any?) { box.sink = nil }
+}
+
+final class SyncEventsRelay: SyncEventsStreamHandler {
+  let box = EventBox<MsgSyncEvent>()
+  override func onListen(withArguments arguments: Any?, sink: PigeonEventSink<MsgSyncEvent>) { box.sink = sink }
+  override func onCancel(withArguments arguments: Any?) { box.sink = nil }
+}
+
+final class BeaconEventsRelay: BeaconEventsStreamHandler {
+  let box = EventBox<MsgBeaconEvent>()
+  override func onListen(withArguments arguments: Any?, sink: PigeonEventSink<MsgBeaconEvent>) { box.sink = sink }
+  override func onCancel(withArguments arguments: Any?) { box.sink = nil }
+}
+
 /// The event channels of one Flutter engine.
 final class EngineStreams {
   let stateChanges = StateChangesRelay()
@@ -54,8 +72,14 @@ final class EngineStreams {
   let floorChanges = FloorChangesRelay()
   let geofenceEvents = GeofenceEventsRelay()
   let privacyZoneStateChanges = PrivacyZoneStateChangesRelay()
+  let venueDataChanges = VenueDataChangesRelay()
+  let syncEvents = SyncEventsRelay()
+  let beaconEvents = BeaconEventsRelay()
 
   init(messenger: FlutterBinaryMessenger) {
+    VenueDataChangesStreamHandler.register(with: messenger, streamHandler: venueDataChanges)
+    SyncEventsStreamHandler.register(with: messenger, streamHandler: syncEvents)
+    BeaconEventsStreamHandler.register(with: messenger, streamHandler: beaconEvents)
     StateChangesStreamHandler.register(with: messenger, streamHandler: stateChanges)
     PermissionUpdatesStreamHandler.register(with: messenger, streamHandler: permissionUpdates)
     PositionsStreamHandler.register(with: messenger, streamHandler: positions)
@@ -118,11 +142,17 @@ final class ProximiioHub {
     let floorChanges = await sdk.floorChanges()
     let geofenceEvents = await sdk.geofenceEvents()
     let privacyZoneStates = await sdk.privacyZoneStateChanges()
+    let venueDataChanges = await sdk.venueDataChanges()
+    let syncEvents = await sdk.syncEvents()
+    let beaconEvents = await sdk.beaconEvents()
     runTasks = [
       forward(positions, map: Mappers.position) { $0.positions.box },
       forward(floorChanges, map: Mappers.floorChange) { $0.floorChanges.box },
       forward(geofenceEvents, map: Mappers.geofenceEvent) { $0.geofenceEvents.box },
       forward(privacyZoneStates, map: Mappers.privacyZoneState) { $0.privacyZoneStateChanges.box },
+      forward(venueDataChanges, map: VenueMappers.venueDataChange) { $0.venueDataChanges.box },
+      forward(syncEvents, map: VenueMappers.syncEvent) { $0.syncEvents.box },
+      forward(beaconEvents, map: VenueMappers.beaconEvent) { $0.beaconEvents.box },
     ]
   }
 

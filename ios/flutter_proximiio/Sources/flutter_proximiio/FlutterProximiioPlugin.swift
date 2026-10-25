@@ -175,6 +175,219 @@ private final class HostApi: ProximiioHostApi {
     completion(.failure(Self.androidOnly))
   }
 
+  // MARK: Wayfinding
+
+  func computeRoute(
+    from: MsgCoordinate,
+    fromLevel: Double,
+    to: MsgCoordinate,
+    toLevel: Double,
+    options: MsgRouteOptions,
+    completion: @escaping (Result<MsgComputedRoute, Error>) -> Void
+  ) {
+    run(completion) { sdk in
+      RouteMappers.route(
+        try await sdk.computeRoute(
+          from: RouteMappers.sdkCoordinate(from),
+          fromLevel: fromLevel,
+          to: RouteMappers.sdkCoordinate(to),
+          toLevel: toLevel,
+          options: RouteMappers.options(options)
+        )
+      )
+    }
+  }
+
+  func routeDurations(
+    points: [MsgRoutePoint],
+    options: MsgRouteOptions,
+    completion: @escaping (Result<[MsgDurationRow], Error>) -> Void
+  ) {
+    run(completion) { sdk in
+      try await sdk.routeDurations(between: points.map(RouteMappers.point), options: RouteMappers.options(options))
+        .map { MsgDurationRow(seconds: $0) }
+    }
+  }
+
+  func loadRouteNetwork(completion: @escaping (Result<Int64, Error>) -> Void) {
+    run(completion) { sdk in Int64(try await sdk.loadRouteNetwork()) }
+  }
+
+  func loadCachedRouteNetwork(completion: @escaping (Result<Int64, Error>) -> Void) {
+    run(completion) { sdk in Int64(await sdk.loadCachedRouteNetwork()) }
+  }
+
+  // MARK: Venue data
+
+  func amenities(completion: @escaping (Result<[MsgAmenity], Error>) -> Void) {
+    run(completion) { sdk in try await sdk.amenities().map(VenueMappers.amenity) }
+  }
+
+  func features(completion: @escaping (Result<[MsgFeature], Error>) -> Void) {
+    run(completion) { sdk in await sdk.features().map(VenueMappers.feature) }
+  }
+
+  func departments(completion: @escaping (Result<[MsgDepartment], Error>) -> Void) {
+    run(completion) { sdk in await sdk.departments().map(VenueMappers.department) }
+  }
+
+  func mapStyle(completion: @escaping (Result<String, Error>) -> Void) {
+    run(completion) { sdk in String(decoding: try await sdk.mapStyle(), as: UTF8.self) }
+  }
+
+  func journeys(completion: @escaping (Result<[MsgJourney], Error>) -> Void) {
+    run(completion) { sdk in try await sdk.journeys().map(VenueMappers.journey) }
+  }
+
+  func journey(id: String, completion: @escaping (Result<MsgJourney, Error>) -> Void) {
+    run(completion) { sdk in VenueMappers.journey(try await sdk.fetchJourney(id: id)) }
+  }
+
+  // MARK: Offline packages
+
+  func syncOfflinePackage(
+    packageId: String,
+    place: String?,
+    allowsCellular: Bool,
+    completion: @escaping (Result<MsgPackageState, Error>) -> Void
+  ) {
+    run(completion) { sdk in
+      VenueMappers.packageState(
+        try await sdk.syncOfflinePackage(
+          packageId: packageId,
+          place: place,
+          policy: PackagePolicy(allowsCellular: allowsCellular)
+        )
+      )
+    }
+  }
+
+  func offlinePackageState(packageId: String, completion: @escaping (Result<MsgPackageState, Error>) -> Void) {
+    run(completion) { sdk in VenueMappers.packageState(await sdk.offlinePackageState(packageId: packageId)) }
+  }
+
+  func installOfflineSeed(packageId: String, directory: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in
+      try await sdk.installOfflineSeed(packageId: packageId, at: URL(fileURLWithPath: directory, isDirectory: true))
+    }
+  }
+
+  func removeOfflinePackage(packageId: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in try await sdk.removeOfflinePackage(packageId: packageId) }
+  }
+
+  func offlinePackageDiskUsage(packageId: String, completion: @escaping (Result<Int64, Error>) -> Void) {
+    run(completion) { sdk in await sdk.offlinePackageDiskUsage(packageId: packageId) }
+  }
+
+  // MARK: Simulation
+
+  func simulatePosition(
+    coordinate: MsgCoordinate,
+    level: Int64,
+    accuracy: Double,
+    completion: @escaping (Result<MsgPositionUpdate?, Error>) -> Void
+  ) {
+    run(completion) { sdk in
+      await sdk.simulatePosition(RouteMappers.sdkCoordinate(coordinate), level: Int(level), accuracy: accuracy)
+        .map(Mappers.position)
+    }
+  }
+
+  func startSimulation(route: MsgSimulatedRoute, completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in await sdk.startSimulation(VenueMappers.simulatedRoute(route)) }
+  }
+
+  func pauseSimulation(completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in await sdk.pauseSimulation() }
+  }
+
+  func resumeSimulation(completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in await sdk.resumeSimulation() }
+  }
+
+  func stopSimulation(completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in await sdk.stopSimulation() }
+  }
+
+  func jumpToWaypoint(index: Int64, completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in await sdk.jumpToWaypoint(Int(index)) }
+  }
+
+  func simulationState(completion: @escaping (Result<MsgSimulationState, Error>) -> Void) {
+    run(completion) { sdk in VenueMappers.simulationState(await sdk.simulationState) }
+  }
+
+  // MARK: Positioning inputs
+
+  func setCustomPosition(
+    coordinate: MsgCoordinate,
+    accuracy: Double,
+    floorId: String?,
+    completion: @escaping (Result<MsgPositionUpdate?, Error>) -> Void
+  ) {
+    run(completion) { sdk in
+      var floor: ProximiioFloor?
+      if let floorId { floor = await sdk.floor(id: floorId) }
+      return await sdk.setCustomPosition(RouteMappers.sdkCoordinate(coordinate), accuracy: accuracy, floor: floor)
+        .map(Mappers.position)
+    }
+  }
+
+  func setFloor(floorId: String?, completion: @escaping (Result<MsgFloorChange?, Error>) -> Void) {
+    run(completion) { sdk in
+      var floor: ProximiioFloor?
+      if let floorId { floor = await sdk.floor(id: floorId) }
+      return await sdk.setFloor(floor).map(Mappers.floorChange)
+    }
+  }
+
+  func enableRouteSnapping(thresholdMeters: Double?, completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in
+      if let thresholdMeters {
+        await sdk.enableRouteSnapping(threshold: thresholdMeters)
+      } else {
+        await sdk.enableRouteSnapping()
+      }
+    }
+  }
+
+  func disableRouteSnapping(completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in await sdk.disableRouteSnapping() }
+  }
+
+  func enablePdr(completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in _ = await sdk.enablePdr() }
+  }
+
+  func disablePdr(completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in await sdk.disablePdr() }
+  }
+
+  func setPositioningSourcePrivate(sinceMs: Int64?, completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in
+      await sdk.setPositioningSourcePrivate(since: sinceMs.map { Date(timeIntervalSince1970: Double($0) / 1000) })
+    }
+  }
+
+  // MARK: Diagnostics
+
+  func diagnostics(completion: @escaping (Result<MsgDiagnostics, Error>) -> Void) {
+    run(completion) { sdk in VenueMappers.diagnostics(await sdk.diagnostics()) }
+  }
+
+  func startDiagnosticsRecording(completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in try await sdk.startDiagnosticsRecording() }
+  }
+
+  func stopDiagnosticsRecording(completion: @escaping (Result<Void, Error>) -> Void) {
+    run(completion) { sdk in await sdk.stopDiagnosticsRecording() }
+  }
+
+  func prepareDiagnosticsReport(completion: @escaping (Result<String, Error>) -> Void) {
+    run(completion) { sdk in try await sdk.prepareDiagnosticsReport().archiveURL.path }
+  }
+
   private static let androidOnly = ProximiioFlutterError(
     code: "unsupported",
     message: "The foreground-service notification exists only on Android.",

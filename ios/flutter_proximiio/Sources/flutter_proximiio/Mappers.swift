@@ -199,21 +199,23 @@ enum Mappers {
 
   // MARK: Events
 
-  static func position(_ value: PositionUpdate) -> MsgPositionUpdate {
-    let source: MsgPositionSource
-    switch value.source {
-    case .bleTrilateration: source = .bleTrilateration
-    case .native: source = .native
-    case .custom: source = .custom
-    case .pdrFusion: source = .pdrFusion
-    case .uwb: source = .uwb
-    @unknown default: source = .unknown
+  static func positionSource(_ value: PositionSource) -> MsgPositionSource {
+    switch value {
+    case .bleTrilateration: return .bleTrilateration
+    case .native: return .native
+    case .custom: return .custom
+    case .pdrFusion: return .pdrFusion
+    case .uwb: return .uwb
+    @unknown default: return .unknown
     }
-    return MsgPositionUpdate(
+  }
+
+  static func position(_ value: PositionUpdate) -> MsgPositionUpdate {
+    MsgPositionUpdate(
       coordinate: coordinate(value.coordinate),
       horizontalAccuracy: value.horizontalAccuracy,
       floor: value.floor.map(floor),
-      source: source,
+      source: positionSource(value.source),
       timestampMs: millis(value.timestamp),
       background: value.background
     )
@@ -281,7 +283,8 @@ enum Mappers {
   )
 
   /// Error codes are the SDK's `ProximiioError` case names, `api` for `ProximiioAPIError`
-  /// (with `kind` in the details) and `underlying` for anything else.
+  /// (with `kind` in the details), `noRoute`, `offlinePackage`, `journey`, and `underlying` for
+  /// anything else. `underlying` in the details names the system error behind a failure, for support.
   static func flutterError(_ error: Error) -> ProximiioFlutterError {
     if let error = error as? ProximiioFlutterError { return error }
     var details: [String: String] = [:]
@@ -293,6 +296,9 @@ enum Mappers {
       details["failureCode"] = String(bridged.code)
       details["retryable"] = failure.isRetryable ? "true" : "false"
       message = failure.errorDescription ?? message
+      if let cause = failure.underlyingError {
+        details["underlying"] = "\(type(of: cause)): \(cause.localizedDescription)"
+      }
     }
     let code: String
     if let error = error as? ProximiioError {
@@ -317,6 +323,15 @@ enum Mappers {
       code = "api"
       details["kind"] = caseName(error)
       if case .server(let statusCode) = error { details["statusCode"] = String(statusCode) }
+    } else if let error = error as? WayfindingRoutingError {
+      code = "noRoute"
+      if case .noRoute(let reason) = error { RouteMappers.noRouteDetails(reason, into: &details) }
+    } else if let error = error as? OfflinePackageError {
+      code = "offlinePackage"
+      details["kind"] = caseName(error)
+    } else if let error = error as? ProximiioJourneyError {
+      code = "journey"
+      details["kind"] = caseName(error)
     } else {
       code = "underlying"
     }
@@ -324,7 +339,7 @@ enum Mappers {
   }
 
   /// The case name of an enum value, without its associated values (`server(statusCode: 500)` → `server`).
-  private static func caseName(_ value: Any) -> String {
+  static func caseName(_ value: Any) -> String {
     if let label = Mirror(reflecting: value).children.first?.label { return label }
     return String(describing: value)
   }

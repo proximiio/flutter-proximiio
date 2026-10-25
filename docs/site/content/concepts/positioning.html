@@ -1,0 +1,83 @@
+<!--
+title: Positioning
+description: Position sources, what a PositionUpdate contains, and how custom positions and PDR feed in.
+-->
+
+<p>
+  The SDK combines the available sources into one stream of positions. Each
+  <code>PositionUpdate</code> names the source that produced it.
+</p>
+
+<h2>Sources</h2>
+
+<table>
+  <thead><tr><th><code>PositionSource</code></th><th>Produced by</th></tr></thead>
+  <tbody>
+    <tr><td><code>bleTrilateration</code></td><td>Bluetooth beacons registered in the venue</td></tr>
+    <tr><td><code>native</code></td><td>The platform location service (GPS, Wi-Fi, fused location)</td></tr>
+    <tr><td><code>custom</code></td><td>A position set by the app (<code>setCustomPosition</code>) or a relay</td></tr>
+    <tr><td><code>pdrFusion</code></td><td>Pedestrian dead reckoning fused with the other sources (<code>enablePdr</code>)</td></tr>
+    <tr><td><code>uwb</code></td><td>Ultra-wideband anchors</td></tr>
+    <tr><td><code>unknown</code></td><td>A source added to the SDK after this plugin release</td></tr>
+  </tbody>
+</table>
+
+<h2>A position</h2>
+
+<table>
+  <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code>coordinate</code></td><td>Latitude and longitude, WGS 84</td></tr>
+    <tr><td><code>horizontalAccuracy</code></td><td>Radius of uncertainty, metres</td></tr>
+    <tr><td><code>floor</code></td><td>The floor, when known</td></tr>
+    <tr><td><code>source</code></td><td>The <code>PositionSource</code></td></tr>
+    <tr><td><code>timestamp</code></td><td>When the position was measured, UTC</td></tr>
+    <tr><td><code>background</code></td><td>Whether the app was in the background</td></tr>
+  </tbody>
+</table>
+
+<h2>Custom positions</h2>
+
+<p>Set a position from an outside source, for example a scanned QR code at a known spot:</p>
+
+<pre><code class="language-dart">await sdk.setCustomPosition(
+  const Coordinate(latitude: 48.1486, longitude: 17.1077),
+  accuracy: 2,
+  floorId: groundFloor.id,
+);</code></pre>
+
+<p><code>floorId</code> must be the id of a floor from <code>floors()</code>; an unknown id sets no floor. To set only the floor, use <code>setFloor(floorId)</code>.</p>
+
+<h2>Pedestrian dead reckoning</h2>
+
+<p>
+  PDR uses the motion sensors to keep the position steady between beacon updates. It needs the
+  motion permission.
+</p>
+
+<pre><code class="language-dart">if (await sdk.requestMotionPermission()) {
+  await sdk.enablePdr();
+}</code></pre>
+
+<p>To fuse PDR from the start, set <code>pdrFusionEnabled: true</code> in the configuration.</p>
+
+<h2>Route snapping</h2>
+
+<p><code>enableRouteSnapping</code> moves positions onto the venue's paths when they are within the threshold (SDK default 5 m). It needs the route network; install it with <code>loadRouteNetwork()</code> first (see <a href="{{root}}guides/wayfinding.html">Wayfinding</a>).</p>
+
+<pre><code class="language-dart">await sdk.enableRouteSnapping(thresholdMeters: 4);</code></pre>
+
+<h2>No position</h2>
+
+<p>
+  When no position arrives, <code>diagnostics()</code> reports why in
+  <code>noPositionReason</code> (<code>notStarted</code>, <code>noViablePositioningInputs</code>,
+  <code>awaitingFirstFix</code>, …). See <a href="{{root}}guides/diagnostics.html">Diagnostics and logging</a>.
+</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}concepts/beacons.html">Beacons</a></li>
+  <li><a href="{{root}}concepts/coordinates.html">Coordinates and floors</a></li>
+</ul>

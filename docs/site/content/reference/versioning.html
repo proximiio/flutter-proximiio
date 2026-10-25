@@ -1,0 +1,32 @@
+<!--
+title: Versioning and releases
+description: How flutter_proximiio versions relate to the native SDK versions, and where releases are listed.
+-->
+
+<p>
+  The plugin follows the SDK v6 line: <code>6.0.0-beta.N</code>. Each release pins one iOS SDK and one
+  Android SDK version and is tested with them. The release tag is the version
+  (<code>6.0.0-beta.1</code>).
+</p>
+
+<h2>Native versions</h2>
+
+<table>
+  <thead><tr><th>flutter_proximiio</th><th>iOS SDK (<code>Proximiio</code>)</th><th>Android SDK (<code>io.proximi.sdk:proximiio</code>)</th></tr></thead>
+  <tbody>
+    <tr><td>6.0.0-beta.1</td><td>6.0.0-beta.64</td><td>6.0.0-beta.31</td></tr>
+  </tbody>
+</table>
+
+<p>
+  On iOS with CocoaPods, the Podfile names the iOS SDK version; keep it equal to the table. With Swift
+  Package Manager and on Android, the plugin pins the version itself.
+</p>
+
+<h2>Map</h2>
+
+<p><code>flutter_proximiio_map</code> is released in lockstep and names the <code>flutter_proximiio</code> release it needs.</p>
+
+<h2>Changes</h2>
+
+<p>Every release is listed in the changelog. Breaking changes are marked <code>BREAKING</code> and link the migration notes.</p>

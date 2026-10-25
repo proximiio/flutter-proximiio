@@ -5,7 +5,10 @@ import android.util.Log
 import io.flutter.plugin.common.BinaryMessenger
 import io.proximi.sdk.Proximiio
 import io.proximi.sdk.ProximiioConfiguration
+import io.proximi.sdk.beaconEvents
 import io.proximi.sdk.floorChanges
+import io.proximi.sdk.syncEvents
+import io.proximi.sdk.venueDataChanges
 import io.proximi.sdk.geofenceEvents
 import io.proximi.sdk.permissionUpdates
 import io.proximi.sdk.positions
@@ -64,6 +67,24 @@ internal class PrivacyZoneStateChangesRelay : PrivacyZoneStateChangesStreamHandl
   override fun onCancel(p0: Any?) { box.sink = null }
 }
 
+internal class VenueDataChangesRelay : VenueDataChangesStreamHandler() {
+  val box = EventBox<MsgVenueDataChange>()
+  override fun onListen(p0: Any?, sink: PigeonEventSink<MsgVenueDataChange>) { box.sink = sink }
+  override fun onCancel(p0: Any?) { box.sink = null }
+}
+
+internal class SyncEventsRelay : SyncEventsStreamHandler() {
+  val box = EventBox<MsgSyncEvent>()
+  override fun onListen(p0: Any?, sink: PigeonEventSink<MsgSyncEvent>) { box.sink = sink }
+  override fun onCancel(p0: Any?) { box.sink = null }
+}
+
+internal class BeaconEventsRelay : BeaconEventsStreamHandler() {
+  val box = EventBox<MsgBeaconEvent>()
+  override fun onListen(p0: Any?, sink: PigeonEventSink<MsgBeaconEvent>) { box.sink = sink }
+  override fun onCancel(p0: Any?) { box.sink = null }
+}
+
 /** The event channels of one Flutter engine. */
 internal class EngineStreams(messenger: BinaryMessenger) {
   val stateChanges = StateChangesRelay()
@@ -72,6 +93,9 @@ internal class EngineStreams(messenger: BinaryMessenger) {
   val floorChanges = FloorChangesRelay()
   val geofenceEvents = GeofenceEventsRelay()
   val privacyZoneStateChanges = PrivacyZoneStateChangesRelay()
+  val venueDataChanges = VenueDataChangesRelay()
+  val syncEvents = SyncEventsRelay()
+  val beaconEvents = BeaconEventsRelay()
 
   init {
     StateChangesStreamHandler.register(messenger, stateChanges)
@@ -80,6 +104,9 @@ internal class EngineStreams(messenger: BinaryMessenger) {
     FloorChangesStreamHandler.register(messenger, floorChanges)
     GeofenceEventsStreamHandler.register(messenger, geofenceEvents)
     PrivacyZoneStateChangesStreamHandler.register(messenger, privacyZoneStateChanges)
+    VenueDataChangesStreamHandler.register(messenger, venueDataChanges)
+    SyncEventsStreamHandler.register(messenger, syncEvents)
+    BeaconEventsStreamHandler.register(messenger, beaconEvents)
   }
 }
 
@@ -98,8 +125,11 @@ internal object ProximiioHub {
   var sdk: Proximiio? = null
     private set
 
-  /** Whether the foreground-service notification is on, so the plugin asks for POST_NOTIFICATIONS. */
-  var wantsNotifications: Boolean = true
+  /**
+   * Whether the foreground service runs with its notification, so the plugin asks for POST_NOTIFICATIONS.
+   * The SDK runs no service at all without `serviceOptions`.
+   */
+  var wantsNotifications: Boolean = false
     private set
 
   private val engines = mutableListOf<EngineStreams>()
@@ -124,7 +154,9 @@ internal object ProximiioHub {
     val sdk = Proximiio(context.applicationContext, configuration)
     this.sdk = sdk
     Proximiio.shared = sdk
-    wantsNotifications = configuration.serviceOptions?.notificationMode != io.proximi.sdk.service.NotificationMode.DISABLED
+    val serviceOptions = configuration.serviceOptions
+    wantsNotifications = serviceOptions != null &&
+      serviceOptions.notificationMode != io.proximi.sdk.service.NotificationMode.DISABLED
     sdk.setPermissionLauncher(permissionLauncher)
     permissionJob = forward(sdk.permissionUpdates(), Mappers::permissionStatus) { it.permissionUpdates.box }
     publishState()
@@ -146,6 +178,9 @@ internal object ProximiioHub {
       forward(sdk.floorChanges(), Mappers::floorChange) { it.floorChanges.box },
       forward(sdk.geofenceEvents(), Mappers::geofenceEvent) { it.geofenceEvents.box },
       forward(sdk.privacyZoneStateChanges(), Mappers::privacyZoneState) { it.privacyZoneStateChanges.box },
+      forward(sdk.venueDataChanges(), VenueMappers::venueDataChange) { it.venueDataChanges.box },
+      forward(sdk.syncEvents(), VenueMappers::syncEvent) { it.syncEvents.box },
+      forward(sdk.beaconEvents(), VenueMappers::beaconEvent) { it.beaconEvents.box },
     )
   }
 

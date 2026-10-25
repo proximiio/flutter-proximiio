@@ -175,7 +175,7 @@ class ProximiioGeofence with ValueEquality {
   /// Custom metadata, decoded from JSON.
   final Object? metadata;
 
-  /// Set when the SDK could not read the geometry; such a geofence never triggers.
+  /// Set when the SDK could not read the stored geometry; `null` when it read cleanly.
   final GeometryIssue? geometryIssue;
 
   /// Whether the geofence is a polygon.

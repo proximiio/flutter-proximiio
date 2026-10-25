@@ -1,0 +1,39 @@
+<!--
+title: Visitor analytics
+description: What the SDK reports for visitor analytics, the default, and how to record consent.
+-->
+
+<p>
+  With visitor reporting on, the SDK registers an anonymous visitor and reports positions and
+  geofence entries and exits to the Proximi.io analytics of the organisation.
+</p>
+
+<div class="doc-aside doc-aside-warning"><p>
+  Visitor reporting is <strong>on by default</strong> in SDK v6. If the app needs the visitor's
+  consent for analytics, turn it off in the configuration and turn it on after consent.
+</p></div>
+
+<h2>Turn it off</h2>
+
+<pre><code class="language-dart">const configuration = ProximiioConfiguration(token: token, visitorReportingEnabled: false);</code></pre>
+
+<h2>Record consent</h2>
+
+<pre><code class="language-dart">await sdk.setVisitorReportingConsent(userAgreed);
+final granted = await sdk.visitorReportingConsent();</code></pre>
+
+<p><code>setVisitorReportingConsent(false)</code> stops all reporting.</p>
+
+<h2>Visitor id</h2>
+
+<p>
+  <code>visitorId()</code> returns the anonymous id used for analytics. <code>resetVisitorId()</code>
+  replaces it with a new random id, for example when the visitor asks to be forgotten.
+</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}guides/geofences-and-pois.html">Geofences and POIs</a></li>
+  <li><a href="{{root}}api/configuration.html">Configuration reference</a></li>
+</ul>

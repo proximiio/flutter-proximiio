@@ -1,0 +1,93 @@
+<!--
+title: Background positioning
+description: Keep positioning with the app in the background on iOS (background location) and Android (foreground service).
+-->
+
+<p>
+  Background positioning keeps the SDK running when the app is not visible. Each platform needs its
+  own setup; the Dart code is the same.
+</p>
+
+<h2>Prerequisites</h2>
+
+<ul>
+  <li>The always location permission: <code>requestPermissions(always: true)</code>.</li>
+  <li>A reason the user accepts. Both stores review background location use.</li>
+</ul>
+
+<h2>Configure</h2>
+
+<pre><code class="language-dart">final sdk = await Proximiio.create(
+  const ProximiioConfiguration(
+    token: token,
+    allowsBackgroundLocationUpdates: true,
+    android: AndroidServiceOptions(
+      notificationTitle: 'Indoor navigation',
+      notificationText: 'Showing your position in the venue',
+      notificationIcon: 'ic_stat_positioning',
+    ),
+  ),
+);
+await sdk.requestPermissions(always: true);</code></pre>
+
+<h2>iOS</h2>
+
+<ol>
+  <li>Add <code>location</code> to <code>UIBackgroundModes</code> in <code>Info.plist</code>.</li>
+  <li>Add <code>NSLocationAlwaysAndWhenInUseUsageDescription</code>.</li>
+  <li>Set <code>allowsBackgroundLocationUpdates: true</code>.</li>
+</ol>
+
+<pre><code class="language-xml">&lt;key&gt;UIBackgroundModes&lt;/key&gt;
+&lt;array&gt;
+  &lt;string&gt;location&lt;/string&gt;
+&lt;/array&gt;</code></pre>
+
+<h2>Android</h2>
+
+<p>
+  On Android a foreground service keeps the process alive. The SDK declares the service and its
+  permissions. It runs only when the configuration has <code>android:</code> options; without them
+  the SDK runs no service and positioning stops once Android freezes the backgrounded process. An
+  empty <code>AndroidServiceOptions()</code> runs the service with the defaults below.
+</p>
+
+<table>
+  <thead><tr><th>Setting</th><th>Default</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>mode</code></td><td><code>enabled</code></td><td><code>disabled</code>: no service; <code>required</code>: positioning does not start without it</td></tr>
+    <tr><td><code>notificationTitle</code></td><td>Indoor positioning</td><td>Notification title</td></tr>
+    <tr><td><code>notificationText</code></td><td>Locating you inside this venue</td><td>Notification text</td></tr>
+    <tr><td><code>notificationIcon</code></td><td>The app icon</td><td>Name of a drawable in the app</td></tr>
+    <tr><td><code>channelName</code></td><td>Indoor positioning</td><td>Notification channel shown in the system settings</td></tr>
+    <tr><td><code>holdsWakeLock</code></td><td><code>false</code></td><td>Hold a partial wake lock while positioning</td></tr>
+  </tbody>
+</table>
+
+<p>Change the notification while running:</p>
+
+<pre><code class="language-dart">await sdk.android.updateServiceNotification(
+  const AndroidServiceOptions(notificationText: 'Navigating to Gate B12'),
+);
+await sdk.android.resetServiceNotification();</code></pre>
+
+<p>
+  <code>updateServiceNotification</code> returns <code>false</code> when the service is not running.
+  Both calls throw <code>ProximiioErrorCode.unsupported</code> on iOS.
+</p>
+
+<div class="doc-aside doc-aside-note"><p>
+  When Android refuses to start the foreground service from the background, the SDK positions only
+  while the app is in the foreground.
+</p></div>
+
+<h2>Verify</h2>
+
+<p>Start positioning, lock the device and walk. <code>positions</code> keeps delivering updates with <code>background: true</code>.</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}getting-started/permissions.html">Permissions</a></li>
+  <li><a href="{{root}}guides/foreground.html">Foreground positioning</a></li>
+</ul>

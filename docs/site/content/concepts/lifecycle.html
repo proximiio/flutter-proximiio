@@ -1,0 +1,86 @@
+<!--
+title: Lifecycle and streams
+description: SDK states, the order of lifecycle calls, and how the Dart streams behave across stop and start.
+-->
+
+<p>The SDK moves through five states. The lifecycle calls change the state; the streams report it.</p>
+
+<table>
+  <thead><tr><th>State</th><th>Meaning</th><th>Reached by</th></tr></thead>
+  <tbody>
+    <tr><td><code>idle</code></td><td>Created, not authenticated</td><td><code>Proximiio.create</code>, <code>signOut</code></td></tr>
+    <tr><td><code>authenticated</code></td><td>Token accepted, not positioning</td><td><code>authenticate</code>, <code>stop</code></td></tr>
+    <tr><td><code>starting</code></td><td><code>start</code> in progress</td><td><code>start</code></td></tr>
+    <tr><td><code>running</code></td><td>Positioning</td><td><code>start</code></td></tr>
+    <tr><td><code>stopping</code></td><td><code>stop</code> in progress</td><td><code>stop</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Order of calls</h2>
+
+<ol>
+  <li><code>Proximiio.create(configuration)</code></li>
+  <li><code>requestPermissions()</code></li>
+  <li><code>authenticate()</code>: validates the token with the API and applies stored venue data.</li>
+  <li><code>start()</code>: starts positioning, sync, geofencing and the event streams.</li>
+  <li><code>stop()</code>: stops them. <code>start()</code> can be called again.</li>
+  <li><code>signOut()</code>: stops, forgets the token and clears the stored data.</li>
+</ol>
+
+<p><code>start</code> throws <code>notAuthenticated</code> until <code>authenticate</code> has succeeded once on this instance.</p>
+
+<h2>State</h2>
+
+<pre><code class="language-dart">final state = await sdk.state();
+sdk.stateChanges.listen((state) =&gt; print('SDK is ${state.name}'));</code></pre>
+
+<p>
+  The native SDKs have no state stream. <code>stateChanges</code> reports the state after each
+  lifecycle call made through the plugin.
+</p>
+
+<h2>Streams</h2>
+
+<table>
+  <thead><tr><th>Stream</th><th>Events</th><th>While</th></tr></thead>
+  <tbody>
+    <tr><td><code>stateChanges</code></td><td><code>ProximiioState</code></td><td>Always</td></tr>
+    <tr><td><code>permissionUpdates</code></td><td><code>PermissionStatus</code></td><td>Always</td></tr>
+    <tr><td><code>positions</code></td><td><code>PositionUpdate</code></td><td>Running</td></tr>
+    <tr><td><code>floorChanges</code></td><td><code>FloorChangeEvent</code></td><td>Running</td></tr>
+    <tr><td><code>geofenceEvents</code></td><td><code>GeofenceEvent</code></td><td>Running</td></tr>
+    <tr><td><code>privacyZoneStateChanges</code></td><td><code>PrivacyZoneState</code></td><td>Running</td></tr>
+    <tr><td><code>venueDataChanges</code></td><td><code>VenueDataChange</code></td><td>Running</td></tr>
+    <tr><td><code>syncEvents</code></td><td><code>SyncEvent</code></td><td>Running</td></tr>
+    <tr><td><code>beaconEvents</code></td><td><code>BeaconEvent</code></td><td>Running</td></tr>
+  </tbody>
+</table>
+
+<p>
+  The native SDK streams end at <code>stop</code> and are taken again by the plugin after each
+  <code>start</code>. The Dart streams do not end: listen once, at any time, and keep the
+  subscription across <code>stop</code> and <code>start</code>. Events emitted before the listener
+  subscribes are not replayed; read the current values with <code>lastPosition</code>,
+  <code>currentFloor</code> or <code>enteredGeofenceIds</code>.
+</p>
+
+<p>
+  Every stream is a broadcast stream: several listeners share one native subscription. A stream
+  error is a <code>ProximiioException</code>.
+</p>
+
+<h2>Flutter app lifecycle</h2>
+
+<p>
+  The SDK does not follow the app's lifecycle by itself. To position only in the foreground, call
+  <code>stop</code> when the app is paused and <code>start</code> when it resumes. See
+  <a href="{{root}}guides/foreground.html">Foreground positioning</a> and
+  <a href="{{root}}guides/background.html">Background positioning</a>.
+</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}api/streams.html">Streams reference</a></li>
+  <li><a href="{{root}}api/proximiio.html">Proximiio reference</a></li>
+</ul>

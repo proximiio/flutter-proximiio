@@ -1,0 +1,66 @@
+<!--
+title: Architecture
+description: How flutter_proximiio bridges the native SDKs, why there is one SDK instance per process, and how the map plugin shares it.
+-->
+
+<p>
+  <code>flutter_proximiio</code> contains no positioning code. Each call goes to the native
+  Proximi.io SDK v6 of the platform: the Swift SDK on iOS, the Kotlin SDK on Android. The native SDKs
+  implement the same API; iOS is the reference, Android follows its names and behaviour.
+</p>
+
+<h2>Layers</h2>
+
+<table>
+  <thead><tr><th>Layer</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>Dart API (<code>Proximiio</code>, models)</td><td>Typed Dart classes, <code>Future</code>s and <code>Stream</code>s with the native names.</td></tr>
+    <tr><td>Bridge (generated)</td><td>Typed platform channels generated with Pigeon from one schema; no hand-written maps.</td></tr>
+    <tr><td>Native bridge</td><td>Swift and Kotlin code that calls the SDK, converts the results and forwards the SDK streams.</td></tr>
+    <tr><td>Proximi.io SDK v6</td><td>Positioning, venue data sync, geofencing, wayfinding.</td></tr>
+  </tbody>
+</table>
+
+<h2>One SDK instance per process</h2>
+
+<p>
+  <code>Proximiio.create</code> creates the native SDK instance and stores it as the process-wide
+  instance (<code>Proximiio.shared</code> in both native SDKs). Calling <code>create</code> again stops
+  the previous instance and replaces it; <code>Proximiio</code> objects created earlier then address
+  the new instance.
+</p>
+
+<p>
+  Several Flutter engines in one process (add-to-app, a background engine) share the instance. Each
+  engine receives every event on its own streams.
+</p>
+
+<h2>The map plugin</h2>
+
+<p>
+  <code>flutter_proximiio_map</code> reads the same process-wide instance. Create the SDK with
+  <code>Proximiio.create</code> before showing a map; the map then shows the position, floor and
+  routes of that instance.
+</p>
+
+<h2>Threads</h2>
+
+<p>
+  Dart calls arrive on the platform's main thread. The native bridge awaits the SDK (an actor on iOS,
+  a single-threaded dispatcher on Android) and replies on the main thread. Events reach Dart on the
+  main thread. Long work, such as computing a route on Android, runs on a background thread.
+</p>
+
+<h2>Versions</h2>
+
+<p>
+  Each plugin release pins one iOS SDK and one Android SDK version. The plugin version follows the
+  SDK line (<code>6.0.0-beta.N</code>). See <a href="{{root}}reference/versioning.html">Versioning and releases</a>.
+</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}concepts/lifecycle.html">Lifecycle and streams</a></li>
+  <li><a href="{{root}}reference/platform-differences.html">Platform differences</a></li>
+</ul>

@@ -154,4 +154,5 @@ cd example/android && ./gradlew :flutter_proximiio:testDebugUnitTest
 Generated files (`*.g.dart`, `Messages.g.kt`, `Messages.g.swift`) are committed; regenerate them in the
 same change as the schema.
 
-Migrating from 1.x: [docs/MIGRATION.md](docs/MIGRATION.md). Changes: [CHANGELOG.md](CHANGELOG.md).
+Documentation: `docs/site` (built with `node docs/site/build.mjs`, published to Partner Zone), including the
+migration guide from 1.x. Changes: [CHANGELOG.md](CHANGELOG.md).

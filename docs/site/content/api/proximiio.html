@@ -1,0 +1,114 @@
+<!--
+title: Proximiio
+description: The Proximiio class — creation, lifecycle, venue data, wayfinding, offline packages, simulation and diagnostics.
+-->
+
+<p>
+  <code>Proximiio</code> is the entry point. <code>Proximiio.create</code> makes the process-wide SDK
+  instance; every method returns a <code>Future</code> and throws <code>ProximiioException</code> on
+  failure. <code>Proximiio</code> is an interface, so tests can replace it with a fake.
+</p>
+
+<pre><code class="language-dart">final Proximiio sdk = await Proximiio.create(const ProximiioConfiguration(token: token));</code></pre>
+
+<h2>Static</h2>
+
+<table>
+  <thead><tr><th>Member</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>create(ProximiioConfiguration)</code></td><td>Create, or stop and replace, the process-wide instance</td></tr>
+    <tr><td><code>setLogLevel(ProximiioLogLevel)</code></td><td>Native log level, process-wide</td></tr>
+  </tbody>
+</table>
+
+<h2>Lifecycle</h2>
+
+<table>
+  <thead><tr><th>Method</th><th>Returns</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><code>requestPermissions({bool always = false})</code></td><td><code>PermissionStatus</code></td><td><a href="{{root}}getting-started/permissions.html">Permissions</a></td></tr>
+    <tr><td><code>requestMotionPermission()</code></td><td><code>bool</code></td><td>For PDR</td></tr>
+    <tr><td><code>authenticate()</code></td><td><code>ProximiioApplication?</code></td><td>Needs a connection</td></tr>
+    <tr><td><code>start()</code></td><td></td><td>Throws <code>notAuthenticated</code> before <code>authenticate</code></td></tr>
+    <tr><td><code>stop()</code></td><td></td><td>Reports exits for entered geofences</td></tr>
+    <tr><td><code>signOut()</code></td><td></td><td>Forgets the token and the stored data</td></tr>
+    <tr><td><code>sync()</code></td><td><code>int</code></td><td>Changed records</td></tr>
+    <tr><td><code>state()</code></td><td><code>ProximiioState</code></td><td></td></tr>
+  </tbody>
+</table>
+
+<h2>Venue data</h2>
+
+<table>
+  <thead><tr><th>Method</th><th>Returns</th></tr></thead>
+  <tbody>
+    <tr><td><code>application()</code></td><td><code>ProximiioApplication?</code></td></tr>
+    <tr><td><code>places()</code>, <code>place(id)</code></td><td><code>List&lt;ProximiioPlace&gt;</code>, <code>ProximiioPlace?</code></td></tr>
+    <tr><td><code>floors()</code>, <code>floor(id)</code>, <code>currentFloor()</code></td><td><code>List&lt;ProximiioFloor&gt;</code>, <code>ProximiioFloor?</code></td></tr>
+    <tr><td><code>geofences()</code>, <code>privacyZones()</code></td><td><code>List&lt;ProximiioGeofence&gt;</code>, <code>List&lt;ProximiioPrivacyZone&gt;</code></td></tr>
+    <tr><td><code>departments()</code></td><td><code>List&lt;ProximiioDepartment&gt;</code></td></tr>
+    <tr><td><code>features()</code></td><td><code>List&lt;ProximiioFeature&gt;</code> stored by <code>loadRouteNetwork</code></td></tr>
+    <tr><td><code>amenities()</code></td><td><code>List&lt;ProximiioAmenity&gt;</code></td></tr>
+    <tr><td><code>journeys()</code>, <code>journey(id)</code></td><td><code>List&lt;ProximiioJourney&gt;</code>, <code>ProximiioJourney</code></td></tr>
+    <tr><td><code>mapStyle()</code></td><td><code>Map&lt;String, Object?&gt;</code>, the MapLibre style</td></tr>
+    <tr><td><code>lastPosition()</code></td><td><code>PositionUpdate?</code></td></tr>
+    <tr><td><code>enteredGeofenceIds()</code>, <code>isInPrivacyZone()</code></td><td><code>Set&lt;String&gt;</code>, <code>bool</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Wayfinding</h2>
+
+<table>
+  <thead><tr><th>Method</th><th>Returns</th></tr></thead>
+  <tbody>
+    <tr><td><code>loadRouteNetwork()</code>, <code>loadCachedRouteNetwork()</code></td><td><code>int</code> routable paths</td></tr>
+    <tr><td><code>computeRoute({from, fromLevel, to, toLevel, options})</code></td><td><code>ComputedRoute</code></td></tr>
+    <tr><td><code>routeDurations(points, {options})</code></td><td><code>List&lt;List&lt;Duration?&gt;&gt;</code></td></tr>
+  </tbody>
+</table>
+
+<h2>Positioning inputs</h2>
+
+<table>
+  <thead><tr><th>Method</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>setCustomPosition(coordinate, {accuracy = 5, floorId})</code></td><td>A position from an outside source</td></tr>
+    <tr><td><code>setFloor(floorId)</code></td><td>Set or clear the floor</td></tr>
+    <tr><td><code>enableRouteSnapping({thresholdMeters})</code>, <code>disableRouteSnapping()</code></td><td>Snap positions to paths</td></tr>
+    <tr><td><code>enablePdr()</code>, <code>disablePdr()</code></td><td>Pedestrian dead reckoning</td></tr>
+    <tr><td><code>setPositioningSourcePrivate(DateTime? since)</code></td><td>Mark relay positions private</td></tr>
+  </tbody>
+</table>
+
+<h2>Offline packages</h2>
+
+<table>
+  <thead><tr><th>Method</th><th>Returns</th></tr></thead>
+  <tbody>
+    <tr><td><code>syncOfflinePackage(id, {place, allowsCellular = true})</code></td><td><code>PackageState</code></td></tr>
+    <tr><td><code>offlinePackageState(id)</code></td><td><code>PackageState</code></td></tr>
+    <tr><td><code>installOfflineSeed(id, directory)</code></td><td></td></tr>
+    <tr><td><code>offlinePackageDiskUsage(id)</code></td><td><code>int</code> bytes</td></tr>
+    <tr><td><code>removeOfflinePackage(id)</code></td><td></td></tr>
+  </tbody>
+</table>
+
+<h2>Simulation</h2>
+
+<p><code>simulatePosition(coordinate, {level = 0, accuracy = 5})</code>, <code>startSimulation(SimulatedRoute)</code>, <code>pauseSimulation()</code>, <code>resumeSimulation()</code>, <code>stopSimulation()</code>, <code>jumpToWaypoint(index)</code>, <code>simulationState()</code>. See <a href="{{root}}guides/simulator.html">Simulator and dev mode</a>.</p>
+
+<h2>Visitor analytics</h2>
+
+<p><code>visitorId()</code>, <code>resetVisitorId()</code>, <code>visitorReportingConsent()</code>, <code>setVisitorReportingConsent(bool)</code>. See <a href="{{root}}guides/analytics.html">Visitor analytics</a>.</p>
+
+<h2>Diagnostics</h2>
+
+<p><code>diagnostics()</code>, <code>startDiagnosticsRecording()</code>, <code>stopDiagnosticsRecording()</code>, <code>prepareDiagnosticsReport()</code> (path of the zip). See <a href="{{root}}guides/diagnostics.html">Diagnostics and logging</a>.</p>
+
+<h2>Android</h2>
+
+<p><code>sdk.android.updateServiceNotification(AndroidServiceOptions)</code> (<code>bool</code>) and <code>sdk.android.resetServiceNotification()</code>. They throw <code>unsupported</code> on iOS.</p>
+
+<h2>Streams</h2>
+
+<p>See <a href="{{root}}api/streams.html">Streams</a>.</p>

@@ -18,6 +18,9 @@ import io.proximi.sdk.core.model.ProximiioPrivacyZone
 import io.proximi.sdk.core.net.ProximiioAPIError
 import io.proximi.sdk.core.platform.PermissionStatus
 import io.proximi.sdk.geofencing.GeofenceEvent
+import io.proximi.sdk.journey.ProximiioJourneyError
+import io.proximi.sdk.offline.OfflinePackageError
+import io.proximi.sdk.wayfinding.WayfindingRoutingError
 import io.proximi.sdk.positioning.engine.PositionSource
 import io.proximi.sdk.positioning.engine.PositionUpdate
 import io.proximi.sdk.positioning.floor.FloorChangeDirection
@@ -132,7 +135,7 @@ internal object Mappers {
   fun json(value: JsonValue?): String? =
     if (value == null || value == JsonValue.Null) null else jsonElement(value).toString()
 
-  private fun jsonElement(value: JsonValue): JsonElement = when (value) {
+  fun jsonElement(value: JsonValue): JsonElement = when (value) {
     JsonValue.Null -> JsonNull
     is JsonValue.Bool -> JsonPrimitive(value.value)
     is JsonValue.Number -> JsonPrimitive(value.value)
@@ -244,16 +247,18 @@ internal object Mappers {
     coordinate = coordinate(value.coordinate),
     horizontalAccuracy = value.horizontalAccuracy,
     floor = value.floor?.let(::floor),
-    source = when (value.source) {
-      PositionSource.BLE_TRILATERATION -> MsgPositionSource.BLE_TRILATERATION
-      PositionSource.NATIVE -> MsgPositionSource.NATIVE
-      PositionSource.CUSTOM -> MsgPositionSource.CUSTOM
-      PositionSource.PDR_FUSION -> MsgPositionSource.PDR_FUSION
-      PositionSource.UWB -> MsgPositionSource.UWB
-    },
+    source = positionSource(value.source),
     timestampMs = value.timestamp,
     background = value.background,
   )
+
+  fun positionSource(value: PositionSource): MsgPositionSource = when (value) {
+    PositionSource.BLE_TRILATERATION -> MsgPositionSource.BLE_TRILATERATION
+    PositionSource.NATIVE -> MsgPositionSource.NATIVE
+    PositionSource.CUSTOM -> MsgPositionSource.CUSTOM
+    PositionSource.PDR_FUSION -> MsgPositionSource.PDR_FUSION
+    PositionSource.UWB -> MsgPositionSource.UWB
+  }
 
   fun floorChange(value: FloorChangeEvent) = MsgFloorChange(
     previousFloor = value.previousFloor?.let(::floor),
@@ -296,7 +301,8 @@ internal object Mappers {
 
   /**
    * Error codes are the SDK's `ProximiioError` case names (as on iOS), `api` for `ProximiioAPIError`
-   * (with `kind` in the details) and `underlying` for anything else.
+   * (with `kind` in the details), `noRoute`, `offlinePackage`, `journey`, and `underlying` for anything
+   * else. `underlying` in the details names the system error behind a failure, for support.
    */
   fun flutterError(error: Throwable): ProximiioFlutterError {
     if (error is ProximiioFlutterError) return error
@@ -307,6 +313,9 @@ internal object Mappers {
       details["failureCode"] = error.failureCode.toString()
       details["retryable"] = error.isRetryable.toString()
       message = error.errorDescription ?: message
+    }
+    (if (error is ProximiioFailure) error.underlyingError else error.cause)?.let { cause ->
+      details["underlying"] = "${cause::class.java.simpleName}: ${cause.message}"
     }
     val code = when (error) {
       is ProximiioError.InvalidToken -> "invalidToken"
@@ -327,14 +336,30 @@ internal object Mappers {
       is ProximiioError.Storage -> "storage"
       is ProximiioError.Underlying -> "underlying"
       is ProximiioAPIError -> {
-        details["kind"] = error::class.simpleName?.replaceFirstChar { it.lowercaseChar() } ?: "unknown"
+        details["kind"] = kindName(error)
         if (error is ProximiioAPIError.Server) details["statusCode"] = error.statusCode.toString()
         "api"
+      }
+      is WayfindingRoutingError -> {
+        RouteMappers.noRouteDetails(error.reason, details)
+        "noRoute"
+      }
+      is OfflinePackageError -> {
+        details["kind"] = kindName(error)
+        "offlinePackage"
+      }
+      is ProximiioJourneyError -> {
+        details["kind"] = kindName(error)
+        "journey"
       }
       else -> "underlying"
     }
     return ProximiioFlutterError(code, message, details)
   }
+
+  /** The subclass name of a sealed error, as the iOS case name (`ChecksumMismatch` → `checksumMismatch`). */
+  private fun kindName(error: Throwable): String =
+    error::class.simpleName?.replaceFirstChar { it.lowercaseChar() } ?: "unknown"
 
   /** `NOT_DETERMINED` → `notDetermined`, the iOS raw value. */
   internal fun Enum<*>.camelName(): String =

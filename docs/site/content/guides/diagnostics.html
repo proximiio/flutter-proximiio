@@ -1,0 +1,62 @@
+<!--
+title: Diagnostics and logging
+description: Read what the SDK is doing, find out why there is no position, set the log level, and prepare a support report.
+-->
+
+<h2>Snapshot</h2>
+
+<pre><code class="language-dart">final d = await sdk.diagnostics();
+print(d.summary);
+if (d.noPositionReason != null) print('No position: ${d.noPositionReason}');</code></pre>
+
+<table>
+  <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><code>state</code>, <code>isStarted</code>, <code>isAuthenticated</code></td><td>Lifecycle</td></tr>
+    <tr><td><code>permissions</code></td><td>The <code>PermissionStatus</code></td></tr>
+    <tr><td><code>visibleBeaconCount</code>, <code>registeredBeaconCount</code></td><td>Beacons in range, beacons in the venue data</td></tr>
+    <tr><td><code>lastPositionAge</code>, <code>lastPositionSource</code></td><td>The last position</td></tr>
+    <tr><td><code>pdrEnabled</code>, <code>pdrRunning</code></td><td>Pedestrian dead reckoning</td></tr>
+    <tr><td><code>visitorReportingEnabled</code></td><td>Analytics reporting</td></tr>
+    <tr><td><code>noPositionReason</code></td><td>Why there is no position, see below</td></tr>
+    <tr><td><code>summary</code></td><td>One paragraph for logs and support tickets</td></tr>
+  </tbody>
+</table>
+
+<h2>No position</h2>
+
+<table>
+  <thead><tr><th><code>noPositionReason</code></th><th>Check</th></tr></thead>
+  <tbody>
+    <tr><td><code>notStarted</code></td><td>Call <code>start</code>.</td></tr>
+    <tr><td><code>noViablePositioningInputs</code></td><td>Location or Bluetooth is denied or off, or the venue has no beacons.</td></tr>
+    <tr><td><code>awaitingFirstFix</code></td><td>Started, no position yet. Wait, or check that the device is inside the venue.</td></tr>
+    <tr><td><code>privacyZone</code></td><td>Positions are withheld inside a privacy zone.</td></tr>
+  </tbody>
+</table>
+
+<h2>Log level</h2>
+
+<pre><code class="language-dart">await Proximiio.setLogLevel(ProximiioLogLevel.debug);</code></pre>
+
+<p>The native SDK writes to the platform log (Xcode console, Logcat). The level is process-wide. Use <code>warning</code> or <code>error</code> in release builds.</p>
+
+<h2>Support report</h2>
+
+<p>Record while reproducing a problem, then share the zip with Proximi.io support. Secrets are removed from the report.</p>
+
+<pre><code class="language-dart">await sdk.startDiagnosticsRecording();
+// … reproduce the problem …
+await sdk.stopDiagnosticsRecording();
+final zipPath = await sdk.prepareDiagnosticsReport();</code></pre>
+
+<h2>Errors</h2>
+
+<p><code>ProximiioException.underlying</code> names the system error behind a failure, for example <code>UnknownHostException: Unable to resolve host "api.proximi.fi"</code>. Log it with the <code>code</code>.</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}guides/errors.html">Errors and failure handling</a></li>
+  <li><a href="{{root}}reference/troubleshooting.html">Troubleshooting</a></li>
+</ul>

@@ -7,25 +7,59 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.ContextCompat
 import io.proximi.sdk.Proximiio
+import io.proximi.sdk.amenities
 import io.proximi.sdk.application
+import io.proximi.sdk.computeRoute
 import io.proximi.sdk.currentFloor
+import io.proximi.sdk.departments
+import io.proximi.sdk.diagnostics
+import io.proximi.sdk.disablePdr
+import io.proximi.sdk.disableRouteSnapping
+import io.proximi.sdk.enablePdr
+import io.proximi.sdk.enableRouteSnapping
 import io.proximi.sdk.enteredGeofenceIds
+import io.proximi.sdk.features
+import io.proximi.sdk.fetchJourney
 import io.proximi.sdk.floor
 import io.proximi.sdk.floors
 import io.proximi.sdk.geofences
+import io.proximi.sdk.installOfflineSeed
 import io.proximi.sdk.isInPrivacyZone
+import io.proximi.sdk.journeys
+import io.proximi.sdk.jumpToWaypoint
 import io.proximi.sdk.lastPosition
+import io.proximi.sdk.loadCachedRouteNetwork
+import io.proximi.sdk.loadRouteNetwork
+import io.proximi.sdk.mapStyle
+import io.proximi.sdk.offline.PackagePolicy
+import io.proximi.sdk.offlinePackageDiskUsage
+import io.proximi.sdk.offlinePackageState
+import io.proximi.sdk.pauseSimulation
 import io.proximi.sdk.place
 import io.proximi.sdk.places
+import io.proximi.sdk.prepareDiagnosticsReport
 import io.proximi.sdk.privacyZones
 import io.proximi.sdk.refreshPermissions
+import io.proximi.sdk.removeOfflinePackage
 import io.proximi.sdk.requestMotionPermission
 import io.proximi.sdk.requestPermissions
 import io.proximi.sdk.resetServiceNotification
+import io.proximi.sdk.resumeSimulation
+import io.proximi.sdk.routeDurations
 import io.proximi.sdk.service.ProximiioServiceOptions
+import io.proximi.sdk.setPositioningSourcePrivate
+import io.proximi.sdk.simulatePosition
+import io.proximi.sdk.startDiagnosticsRecording
+import io.proximi.sdk.startSimulation
+import io.proximi.sdk.stopDiagnosticsRecording
+import io.proximi.sdk.stopSimulation
+import io.proximi.sdk.syncOfflinePackage
 import io.proximi.sdk.updateServiceNotification
+import java.io.File
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /** Handles the Dart → native calls. Every call runs on the main thread and suspends on the SDK. */
 internal class HostApi(private val context: Context) : ProximiioHostApi {
@@ -182,6 +216,166 @@ internal class HostApi(private val context: Context) : ProximiioHostApi {
 
   override fun resetServiceNotification(callback: (Result<Unit>) -> Unit) =
     run(callback) { it.resetServiceNotification() }
+
+  // region Wayfinding
+
+  /** The Android router is synchronous; it runs off the main thread. */
+  override fun computeRoute(
+    from: MsgCoordinate,
+    fromLevel: Double,
+    to: MsgCoordinate,
+    toLevel: Double,
+    options: MsgRouteOptions,
+    callback: (Result<MsgComputedRoute>) -> Unit,
+  ) = run(callback) { sdk ->
+    withContext(Dispatchers.Default) {
+      RouteMappers.route(
+        sdk.computeRoute(
+          from = RouteMappers.sdkCoordinate(from),
+          fromLevel = fromLevel,
+          to = RouteMappers.sdkCoordinate(to),
+          toLevel = toLevel,
+          options = RouteMappers.options(options),
+        ),
+      )
+    }
+  }
+
+  override fun routeDurations(
+    points: List<MsgRoutePoint>,
+    options: MsgRouteOptions,
+    callback: (Result<List<MsgDurationRow>>) -> Unit,
+  ) = run(callback) { sdk ->
+    sdk.routeDurations(points.map(RouteMappers::point), RouteMappers.options(options)).map { MsgDurationRow(seconds = it) }
+  }
+
+  override fun loadRouteNetwork(callback: (Result<Long>) -> Unit) =
+    run(callback) { it.loadRouteNetwork().toLong() }
+
+  override fun loadCachedRouteNetwork(callback: (Result<Long>) -> Unit) =
+    run(callback) { it.loadCachedRouteNetwork().toLong() }
+
+  // endregion
+
+  // region Venue data
+
+  override fun amenities(callback: (Result<List<MsgAmenity>>) -> Unit) =
+    run(callback) { sdk -> sdk.amenities().map(VenueMappers::amenity) }
+
+  override fun features(callback: (Result<List<MsgFeature>>) -> Unit) =
+    run(callback) { sdk -> withContext(Dispatchers.Default) { sdk.features().map(VenueMappers::feature) } }
+
+  override fun departments(callback: (Result<List<MsgDepartment>>) -> Unit) =
+    run(callback) { sdk -> sdk.departments().map(VenueMappers::department) }
+
+  override fun mapStyle(callback: (Result<String>) -> Unit) =
+    run(callback) { it.mapStyle().decodeToString() }
+
+  override fun journeys(callback: (Result<List<MsgJourney>>) -> Unit) =
+    run(callback) { sdk -> sdk.journeys().map(VenueMappers::journey) }
+
+  override fun journey(id: String, callback: (Result<MsgJourney>) -> Unit) =
+    run(callback) { sdk -> VenueMappers.journey(sdk.fetchJourney(id)) }
+
+  // endregion
+
+  // region Offline packages
+
+  override fun syncOfflinePackage(
+    packageId: String,
+    place: String?,
+    allowsCellular: Boolean,
+    callback: (Result<MsgPackageState>) -> Unit,
+  ) = run(callback) { sdk ->
+    VenueMappers.packageState(sdk.syncOfflinePackage(packageId, place, PackagePolicy(allowsCellular = allowsCellular)))
+  }
+
+  override fun offlinePackageState(packageId: String, callback: (Result<MsgPackageState>) -> Unit) =
+    run(callback) { sdk -> VenueMappers.packageState(sdk.offlinePackageState(packageId)) }
+
+  override fun installOfflineSeed(packageId: String, directory: String, callback: (Result<Unit>) -> Unit) =
+    run(callback) { it.installOfflineSeed(packageId, File(directory)) }
+
+  override fun removeOfflinePackage(packageId: String, callback: (Result<Unit>) -> Unit) =
+    run(callback) { it.removeOfflinePackage(packageId) }
+
+  override fun offlinePackageDiskUsage(packageId: String, callback: (Result<Long>) -> Unit) =
+    run(callback) { it.offlinePackageDiskUsage(packageId) }
+
+  // endregion
+
+  // region Simulation
+
+  override fun simulatePosition(
+    coordinate: MsgCoordinate,
+    level: Long,
+    accuracy: Double,
+    callback: (Result<MsgPositionUpdate?>) -> Unit,
+  ) = run(callback) { sdk ->
+    sdk.simulatePosition(RouteMappers.sdkCoordinate(coordinate), level.toInt(), accuracy)?.let(Mappers::position)
+  }
+
+  override fun startSimulation(route: MsgSimulatedRoute, callback: (Result<Unit>) -> Unit) =
+    run(callback) { it.startSimulation(VenueMappers.simulatedRoute(route)) }
+
+  override fun pauseSimulation(callback: (Result<Unit>) -> Unit) = run(callback) { it.pauseSimulation() }
+
+  override fun resumeSimulation(callback: (Result<Unit>) -> Unit) = run(callback) { it.resumeSimulation() }
+
+  override fun stopSimulation(callback: (Result<Unit>) -> Unit) = run(callback) { it.stopSimulation() }
+
+  override fun jumpToWaypoint(index: Long, callback: (Result<Unit>) -> Unit) =
+    run(callback) { it.jumpToWaypoint(index.toInt()) }
+
+  override fun simulationState(callback: (Result<MsgSimulationState>) -> Unit) =
+    run(callback) { VenueMappers.simulationState(it.simulationState()) }
+
+  // endregion
+
+  // region Positioning inputs
+
+  override fun setCustomPosition(
+    coordinate: MsgCoordinate,
+    accuracy: Double,
+    floorId: String?,
+    callback: (Result<MsgPositionUpdate?>) -> Unit,
+  ) = run(callback) { sdk ->
+    val floor = floorId?.let { sdk.floor(it) }
+    sdk.setCustomPosition(RouteMappers.sdkCoordinate(coordinate), accuracy, floor)?.let(Mappers::position)
+  }
+
+  override fun setFloor(floorId: String?, callback: (Result<MsgFloorChange?>) -> Unit) =
+    run(callback) { sdk -> sdk.setFloor(floorId?.let { sdk.floor(it) })?.let(Mappers::floorChange) }
+
+  override fun enableRouteSnapping(thresholdMeters: Double?, callback: (Result<Unit>) -> Unit) =
+    run(callback) { sdk -> if (thresholdMeters == null) sdk.enableRouteSnapping() else sdk.enableRouteSnapping(thresholdMeters) }
+
+  override fun disableRouteSnapping(callback: (Result<Unit>) -> Unit) = run(callback) { it.disableRouteSnapping() }
+
+  override fun enablePdr(callback: (Result<Unit>) -> Unit) = run(callback) { it.enablePdr() }
+
+  override fun disablePdr(callback: (Result<Unit>) -> Unit) = run(callback) { it.disablePdr() }
+
+  override fun setPositioningSourcePrivate(sinceMs: Long?, callback: (Result<Unit>) -> Unit) =
+    run(callback) { it.setPositioningSourcePrivate(sinceMs) }
+
+  // endregion
+
+  // region Diagnostics
+
+  override fun diagnostics(callback: (Result<MsgDiagnostics>) -> Unit) =
+    run(callback) { VenueMappers.diagnostics(it.diagnostics()) }
+
+  override fun startDiagnosticsRecording(callback: (Result<Unit>) -> Unit) =
+    run(callback) { it.startDiagnosticsRecording() }
+
+  override fun stopDiagnosticsRecording(callback: (Result<Unit>) -> Unit) =
+    run(callback) { it.stopDiagnosticsRecording() }
+
+  override fun prepareDiagnosticsReport(callback: (Result<String>) -> Unit) =
+    run(callback) { it.prepareDiagnosticsReport().archiveURL.absolutePath }
+
+  // endregion
 
   /** A notification on the SDK's service channel, with the configured defaults for unset fields. */
   private fun notification(options: MsgAndroidServiceOptions): Notification {

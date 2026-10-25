@@ -207,7 +207,25 @@ map.guidance.listen((RouteGuidance? g) => ...); // after map.setGuidanceRules(Ro
    remain the only v2 item.
 
 
-## Status (2026-10-25, branch `v6-migration`, not committed)
+## Status update (2026-10-25, later)
+
+- **P1 verified on a device:** iOS 26.3 simulator integration test passes against the live API (authenticate,
+  floors, amenities, map style, diagnostics; a bad token maps to `invalidToken`). On the Pixel (Android 17) the
+  bridge works end to end but the test app got no network: the phone was locked and dozing, and Android blocks
+  the network of apps that are not in the foreground (`blocked=APP_BACKGROUND`). Rerun with the phone unlocked.
+- **P2 done:** wayfinding (`loadRouteNetwork`, `loadCachedRouteNetwork`, `computeRoute`, `routeDurations`), venue
+  data (`features`, `amenities`, `departments`, `mapStyle`, `journeys`), streams (`venueDataChanges`, `syncEvents`,
+  `beaconEvents`), offline packages, simulation, positioning inputs, diagnostics; error codes `noRoute`,
+  `offlinePackage`, `journey` and the `underlying` detail. Dart tests 35/35, Kotlin tests 9/9, Android
+  `assembleDebug` and iOS SwiftPM build green. Not bridged: `startBeaconDiscovery` sessions,
+  `installBundledOfflineSeedIfNeeded` (bundle vs directory differs per platform; `installOfflineSeed` covers it).
+- **Docs:** `docs/site` (28 pages) in the iOS/Android style, strict exporter preflight clean. Blocked on Partner
+  Zone product ids `flutter` / `flutter-map` (asked).
+- Found in the SDKs and asked: `authenticate()` fails offline on both platforms, so an offline cold start cannot
+  reach `start()`; Android `MIGRATION.md` §3.5 claims `start()` checks permissions (it does not).
+- Next: P3 (map v1 with `JourneyNavigator`) in `flutter-proximiio-map`.
+
+## Status (2026-10-25, branch `v6-migration`)
 
 - **P0 done:** template and v5 code removed, strict lints, Keep a Changelog, token out of the example
   (`--dart-define-from-file`, `env.json` gitignored).

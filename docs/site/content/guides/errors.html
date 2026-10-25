@@ -1,0 +1,63 @@
+<!--
+title: Errors and failure handling
+description: ProximiioException codes, which errors are retryable, and the details each code carries.
+-->
+
+<p>
+  Every method throws <code>ProximiioException</code>, and stream errors are
+  <code>ProximiioException</code>s too. Switch on <code>code</code>; the other fields carry details.
+</p>
+
+<pre><code class="language-dart">try {
+  await sdk.authenticate();
+} on ProximiioException catch (e) {
+  if (e.isRetryable) {
+    retryLater();
+  } else {
+    log('${e.code.name}: ${e.message} (${e.underlying})');
+  }
+}</code></pre>
+
+<h2>Codes</h2>
+
+<table>
+  <thead><tr><th><code>ProximiioErrorCode</code></th><th>Meaning</th><th>Details</th></tr></thead>
+  <tbody>
+    <tr><td><code>invalidToken</code></td><td>The API rejected the token</td><td></td></tr>
+    <tr><td><code>notAuthenticated</code></td><td><code>start</code> or <code>sync</code> before a successful <code>authenticate</code></td><td></td></tr>
+    <tr><td><code>locationPermissionDenied</code>, <code>bluetoothPermissionDenied</code>, <code>motionPermissionDenied</code></td><td>A permission blocks the call</td><td><code>authorization</code></td></tr>
+    <tr><td><code>reducedLocationAccuracy</code></td><td>Approximate location only</td><td></td></tr>
+    <tr><td><code>storage</code></td><td>The local store failed</td><td><code>underlying</code></td></tr>
+    <tr><td><code>api</code></td><td>An API request failed</td><td><code>kind</code> (<code>network</code>, <code>unauthorized</code>, <code>server</code>, <code>notFound</code>, …), <code>statusCode</code></td></tr>
+    <tr><td><code>noRoute</code></td><td>No route between the points</td><td><code>noRouteReason</code>, <code>nearestDistanceMeters</code>, <code>blockedBy</code></td></tr>
+    <tr><td><code>offlinePackage</code></td><td>An offline package failed</td><td><code>kind</code></td></tr>
+    <tr><td><code>journey</code></td><td>A journey id is invalid or the journey cannot be played</td><td><code>kind</code></td></tr>
+    <tr><td><code>underlying</code></td><td>Another failure</td><td><code>underlying</code></td></tr>
+    <tr><td><code>notConfigured</code></td><td>A call before <code>Proximiio.create</code></td><td></td></tr>
+    <tr><td><code>invalidArgument</code></td><td>A malformed URL or UUID in the configuration</td><td></td></tr>
+    <tr><td><code>unsupported</code></td><td>The call does not exist on this platform</td><td></td></tr>
+    <tr><td><code>unknown</code></td><td>A code added after this plugin release</td><td></td></tr>
+  </tbody>
+</table>
+
+<h2>Retrying</h2>
+
+<p>
+  <code>isRetryable</code> is <code>true</code> for network and server failures. Retry them with a
+  delay. Do not retry <code>invalidToken</code>; the token has to be replaced.
+</p>
+
+<h2>Stable identifiers</h2>
+
+<p>
+  <code>domain</code> and <code>failureCode</code> are the SDK's stable identifiers (for example
+  <code>io.proximi.sdk</code> / 1 for an invalid token). They are the same on iOS and Android and suit
+  crash reporting and dashboards.
+</p>
+
+<h2>Related documentation</h2>
+
+<ul>
+  <li><a href="{{root}}guides/diagnostics.html">Diagnostics and logging</a></li>
+  <li><a href="{{root}}reference/troubleshooting.html">Troubleshooting</a></li>
+</ul>

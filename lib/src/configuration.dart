@@ -169,6 +169,7 @@ class ProximiioConfiguration {
   /// Use the barometer for floor changes. iOS only; Android always uses it when present.
   final bool? barometerEnabled;
 
-  /// Android foreground-service notification.
+  /// Android foreground service and its notification. Without it the Android SDK runs no foreground
+  /// service, and positioning stops once Android freezes the backgrounded app. Ignored on iOS.
   final AndroidServiceOptions? android;
 }

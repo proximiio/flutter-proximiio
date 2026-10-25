@@ -1,10 +1,14 @@
 // Conversions between the public Dart types and the Pigeon transport types. Not exported.
 import 'dart:convert';
 
+import 'beacons.dart';
 import 'configuration.dart';
 import 'events.dart';
 import 'messages.g.dart';
 import 'models.dart';
+import 'tools.dart';
+import 'venue.dart';
+import 'wayfinding.dart';
 
 /// Configuration → transport.
 MsgConfiguration toMsgConfiguration(ProximiioConfiguration c) => MsgConfiguration(
@@ -169,4 +173,201 @@ PrivacyZoneState fromMsgPrivacyZoneState(MsgPrivacyZoneState s) => PrivacyZoneSt
   positioningSourcePrivateSince:
       s.positioningSourcePrivateSinceMs == null ? null : _time(s.positioningSourcePrivateSinceMs!),
   isPrivate: s.isPrivate,
+);
+
+// ── Wayfinding ──
+
+/// Coordinate → transport.
+MsgCoordinate toMsgCoordinate(Coordinate c) => MsgCoordinate(latitude: c.latitude, longitude: c.longitude);
+
+/// Route options → transport.
+MsgRouteOptions toMsgRouteOptions(RouteOptions o) => MsgRouteOptions(
+  profile: MsgRouteProfile.values.byName(o.profile.name),
+  avoid: [for (final a in o.avoid) MsgRouteAvoidance.values.byName(a.name)],
+);
+
+/// Route point → transport.
+MsgRoutePoint toMsgRoutePoint(RoutePoint p) => MsgRoutePoint(coordinate: toMsgCoordinate(p.coordinate), level: p.level);
+
+LevelChange _levelChange(MsgLevelChange c) => LevelChange(
+  featureType: c.featureType,
+  fromLevel: c.fromLevel,
+  toLevel: c.toLevel,
+  coordinate: fromMsgCoordinate(c.coordinate),
+);
+
+/// Transport → [ComputedRoute].
+ComputedRoute fromMsgRoute(MsgComputedRoute r) => ComputedRoute(
+  coordinates: [for (final c in r.coordinates) fromMsgCoordinate(c)],
+  distanceMeters: r.distanceMeters,
+  segments: [
+    for (final s in r.segments)
+      RouteSegment(start: fromMsgCoordinate(s.start), end: fromMsgCoordinate(s.end), distanceMeters: s.distanceMeters),
+  ],
+  level: r.level,
+  levelChanges: [for (final c in r.levelChanges) _levelChange(c)],
+  instructions: [
+    for (final i in r.instructions)
+      RouteInstruction(
+        kind: RouteInstructionKind.values.byName(i.kind.name),
+        coordinate: fromMsgCoordinate(i.coordinate),
+        distanceMeters: i.distanceMeters,
+        level: i.level,
+        duration: _duration(i.durationSeconds),
+        levelChange: i.levelChange == null ? null : _levelChange(i.levelChange!),
+      ),
+  ],
+  duration: _duration(r.durationSeconds),
+);
+
+/// Transport → duration matrix.
+List<List<Duration?>> fromMsgDurations(List<MsgDurationRow> rows) => [
+  for (final row in rows) [for (final s in row.seconds) s == null ? null : _duration(s)],
+];
+
+// ── Venue data ──
+
+Map<String, Object?>? _object(String? json) {
+  final value = _metadata(json);
+  return value is Map ? value.cast<String, Object?>() : null;
+}
+
+/// Transport → [ProximiioAmenity].
+ProximiioAmenity fromMsgAmenity(MsgAmenity a) =>
+    ProximiioAmenity(id: a.id, title: a.title, category: a.category, icon: a.icon, details: a.details);
+
+/// Transport → [ProximiioFeature].
+ProximiioFeature fromMsgFeature(MsgFeature f) => ProximiioFeature(
+  id: f.id,
+  type: f.type,
+  geometry: _object(f.geometryJson),
+  properties: _object(f.propertiesJson),
+  level: f.level,
+  featureClass: f.featureClass,
+  propertyType: f.propertyType,
+  isLevelChanger: f.isLevelChanger,
+  titleTranslations: f.titleTranslations,
+);
+
+/// Transport → [ProximiioDepartment].
+ProximiioDepartment fromMsgDepartment(MsgDepartment d) => ProximiioDepartment(
+  id: d.id,
+  name: d.name,
+  placeId: d.placeId,
+  floorId: d.floorId,
+  tags: d.tags,
+  metadata: _metadata(d.metadataJson),
+);
+
+Duration? _optionalDuration(double? seconds) => seconds == null ? null : _duration(seconds);
+
+/// Transport → [ProximiioJourney].
+ProximiioJourney fromMsgJourney(MsgJourney j) => ProximiioJourney(
+  id: j.id,
+  organizationId: j.organizationId,
+  name: j.name,
+  placeId: j.placeId,
+  speed: j.speed,
+  displayName: j.displayName,
+  waypoints: [
+    for (final w in j.waypoints)
+      JourneyWaypoint(
+        latitude: w.latitude,
+        longitude: w.longitude,
+        level: w.level,
+        floorId: w.floorId,
+        label: w.label,
+        dwell: _optionalDuration(w.dwellSeconds),
+        speed: w.speed,
+        transition: _optionalDuration(w.transitionSeconds),
+      ),
+  ],
+);
+
+/// Transport → [VenueDataChange].
+VenueDataChange fromMsgVenueDataChange(MsgVenueDataChange c) =>
+    VenueDataChange({for (final k in c.kinds) VenueDataKind(k)});
+
+/// Transport → [SyncEvent].
+SyncEvent fromMsgSyncEvent(MsgSyncEvent e) => switch (e) {
+  MsgSyncUpdated(:final entity, :final id) => SyncUpdated(entity: entity, id: id),
+  MsgSyncDeleted(:final entity, :final id) => SyncDeleted(entity: entity, id: id),
+  MsgSyncCompleted(:final applied) => SyncCompleted(applied: applied),
+  MsgSyncFailed(:final reason) => SyncFailed(reason: reason),
+  MsgStoreRecreated(:final reason) => StoreRecreated(reason: reason),
+};
+
+// ── Beacons ──
+
+/// Transport → [BeaconIdentifier].
+BeaconIdentifier fromMsgBeaconIdentifier(MsgBeaconIdentifier i) => switch (i.kind) {
+  MsgBeaconKind.iBeacon => IBeaconIdentifier(uuid: i.uuid ?? '', major: i.major ?? 0, minor: i.minor ?? 0),
+  MsgBeaconKind.eddystone => EddystoneIdentifier(namespace: i.namespace ?? '', instance: i.instance ?? ''),
+  MsgBeaconKind.uwbAccessory => UwbAccessoryIdentifier(name: i.name ?? ''),
+};
+
+BeaconObservation _observation(MsgBeaconObservation o) => BeaconObservation(
+  identifier: fromMsgBeaconIdentifier(o.identifier),
+  rssi: o.rssi,
+  txPower: o.txPower,
+  timestamp: _time(o.timestampMs),
+  calibratedDistance: o.calibratedDistance,
+);
+
+/// Transport → [BeaconEvent].
+BeaconEvent fromMsgBeaconEvent(MsgBeaconEvent e) => switch (e) {
+  MsgBeaconFound(:final observation) => BeaconFound(_observation(observation)),
+  MsgBeaconUpdated(:final observation) => BeaconUpdated(_observation(observation)),
+  MsgBeaconLost(:final identifier) => BeaconLost(fromMsgBeaconIdentifier(identifier)),
+  MsgBeaconTelemetryReceived(:final identifier, :final telemetry) => BeaconTelemetryReceived(
+    fromMsgBeaconIdentifier(identifier),
+    BeaconTelemetry(
+      batteryMillivolts: telemetry.batteryMillivolts,
+      temperatureCelsius: telemetry.temperatureCelsius,
+      advertisementCount: telemetry.advertisementCount,
+      uptime: _duration(telemetry.uptimeSeconds),
+      receivedAt: _time(telemetry.receivedAtMs),
+    ),
+  ),
+};
+
+// ── Offline, simulation, diagnostics ──
+
+/// Transport → [PackageState].
+PackageState fromMsgPackageState(MsgPackageState s) => switch (s.kind) {
+  MsgPackageStateKind.missing => const PackageMissing(),
+  MsgPackageStateKind.downloading => PackageDownloading(s.progress ?? 0),
+  MsgPackageStateKind.ready => PackageReady(s.version ?? 0),
+  MsgPackageStateKind.stale => const PackageStale(),
+  MsgPackageStateKind.verifying => const PackageVerifying(),
+  MsgPackageStateKind.failed => const PackageFailed(),
+};
+
+/// Simulated route → transport.
+MsgSimulatedRoute toMsgSimulatedRoute(SimulatedRoute r) => MsgSimulatedRoute(
+  waypoints: [
+    for (final w in r.waypoints) MsgSimulatedWaypoint(coordinate: toMsgCoordinate(w.coordinate), level: w.level),
+  ],
+  speed: r.speed,
+  updateIntervalSeconds: _seconds(r.updateInterval)!,
+  loops: r.loops,
+  accuracy: r.accuracy,
+);
+
+/// Transport → [ProximiioDiagnostics].
+ProximiioDiagnostics fromMsgDiagnostics(MsgDiagnostics d) => ProximiioDiagnostics(
+  state: fromMsgState(d.state),
+  isStarted: d.isStarted,
+  isAuthenticated: d.isAuthenticated,
+  permissions: d.permissions == null ? null : fromMsgPermissionStatus(d.permissions!),
+  visibleBeaconCount: d.visibleBeaconCount,
+  registeredBeaconCount: d.registeredBeaconCount,
+  lastPositionAge: _optionalDuration(d.lastPositionAgeSeconds),
+  lastPositionSource: d.lastPositionSource == null ? null : PositionSource.values.byName(d.lastPositionSource!.name),
+  pdrEnabled: d.pdrEnabled,
+  pdrRunning: d.pdrRunning,
+  visitorReportingEnabled: d.visitorReportingEnabled,
+  noPositionReason: d.noPositionReason,
+  summary: d.summary,
+  generatedAt: _time(d.generatedAtMs),
 );
