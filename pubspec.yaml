@@ -1,21 +1,21 @@
 name: flutter_proximiio
-description: Flutter plugin for Proximiio indoor positioning with support for beacons, geofencing, and floor detection
-version: 1.0.0
+description: Proximi.io indoor positioning for Flutter, a bridge over the native Proximi.io SDK v6 for iOS and Android.
+version: 6.0.0-beta.1
 homepage: https://github.com/proximiio/flutter-proximiio
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
-  flutter: ">=3.0.0"
+  sdk: ^3.7.0
+  flutter: ">=3.29.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  plugin_platform_interface: ^2.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
+  pigeon: ^26.3.4
 
 flutter:
   plugin:

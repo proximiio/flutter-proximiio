@@ -1,61 +1,76 @@
-group 'io.proximi.flutter_proximiio'
-version '1.0.0'
+group = "io.proximi.flutter_proximiio"
+version = "6.0.0-beta.1"
 
 buildscript {
-    ext.kotlin_version = '1.9.0'
+    ext.kotlin_version = "2.2.21"
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath("com.android.tools.build:gradle:8.13.2")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
     }
 }
 
-allprojects {
+// The Proximi.io SDK is published to its own Maven repository (public reads, no credentials).
+// Apps that declare repositories in settings.gradle(.kts) with
+// RepositoriesMode.FAIL_ON_PROJECT_REPOS must add this repository there themselves.
+rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://maven.proximi.io/repository/android-releases/" }
-        maven {
-            url "https://dl.cloudsmith.io/public/indooratlas/mvn-public/maven/"
-        }
-        maven {
-            url "https://api.mapbox.com/downloads/v2/releases/maven"
-        }
+        maven { url = uri("https://maven.eu.proximi.fi/releases/") }
     }
 }
 
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
 
 android {
-    namespace 'io.proximi.flutter_proximiio'
-    compileSdkVersion 33
+    namespace = "io.proximi.flutter_proximiio"
+
+    // The SDK's AndroidX and OkHttp dependencies require compiling against API 37.
+    compileSdk = 37
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = "17"
     }
 
     sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
+        main.java.srcDirs += "src/main/kotlin"
+        test.java.srcDirs += "src/test/kotlin"
     }
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 33
+        minSdk = 26
     }
 
     dependencies {
-        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-        implementation("io.proximi.library:core:5.1.16")
+        // Pinned exactly: each flutter_proximiio release is built and tested against one SDK release.
+        implementation("io.proximi.sdk:proximiio:6.0.0-beta.31")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+
+        testImplementation("org.jetbrains.kotlin:kotlin-test")
+        testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
+    }
+
+    testOptions {
+        unitTests {
+            returnDefaultValues = true
+            all {
+                useJUnitPlatform()
+                testLogging {
+                    events "passed", "skipped", "failed", "standardError"
+                    outputs.upToDateWhen { false }
+                }
+            }
+        }
     }
 }

@@ -4,6 +4,14 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Shows where you are inside the venue.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Keeps showing where you are inside the venue while the app is in the background.</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Uses Bluetooth beacons to find your position indoors.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Uses motion sensors to keep your indoor position steady between beacon updates.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Flutter Proximiio</string>
 	<key>CFBundleExecutable</key>

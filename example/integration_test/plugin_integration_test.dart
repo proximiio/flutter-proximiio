@@ -1,25 +1,37 @@
-// This is a basic Flutter integration test.
-//
-// Since integration tests run in a full Flutter application, they can interact
-// with the host side of a plugin implementation, unlike Dart unit tests.
-//
-// For more information about Flutter integration tests, please see
-// https://flutter.dev/to/integration-testing
-
-
+// Runs on a device against the real SDK:
+//   flutter test integration_test --dart-define-from-file=env.json
+import 'package:flutter_proximiio/flutter_proximiio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import 'package:flutter_proximiio/flutter_proximiio.dart';
+const _token = String.fromEnvironment('PROXIMIIO_TOKEN');
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('getPlatformVersion test', (WidgetTester tester) async {
-    final FlutterProximiio plugin = FlutterProximiio();
-    final String? version = await plugin.getPlatformVersion();
-    // The version string depends on the host platform running the test, so
-    // just assert that some non-empty string is returned.
-    expect(version?.isNotEmpty, true);
+  testWidgets('create and authenticate', (tester) async {
+    final sdk = await Proximiio.create(const ProximiioConfiguration(token: _token));
+    expect(await sdk.state(), ProximiioState.idle);
+
+    final application = await sdk.authenticate();
+
+    expect(application, isNotNull);
+    expect(await sdk.state(), ProximiioState.authenticated);
+    expect(await sdk.visitorId(), isNotEmpty);
+  }, skip: _token.isEmpty);
+
+  testWidgets('a bad token is reported as invalidToken', (tester) async {
+    final sdk = await Proximiio.create(const ProximiioConfiguration(token: 'not-a-token'));
+
+    await expectLater(
+      sdk.authenticate(),
+      throwsA(
+        isA<ProximiioException>().having(
+          (e) => e.code,
+          'code',
+          anyOf(ProximiioErrorCode.invalidToken, ProximiioErrorCode.api),
+        ),
+      ),
+    );
   });
 }

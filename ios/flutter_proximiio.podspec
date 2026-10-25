@@ -1,20 +1,29 @@
+#
+# CocoaPods spec for apps that build plugins through CocoaPods (Flutter's default).
+# Apps using Flutter's Swift Package Manager support use flutter_proximiio/Package.swift.
+#
+# The Proximi.io SDK pod is not on CocoaPods trunk. Add it to the app's ios/Podfile,
+# inside the Runner target, at the same version as below:
+#
+#   pod 'Proximiio', :podspec => 'https://raw.githubusercontent.com/proximiio/proximiio-sdk-ios-binary/6.0.0-beta.64/Proximiio.podspec'
+#
 Pod::Spec.new do |s|
   s.name             = 'flutter_proximiio'
-  s.version          = '1.0.0'
-  s.summary          = 'Flutter plugin for Proximiio indoor positioning'
+  s.version          = '6.0.0-beta.1'
+  s.summary          = 'Proximi.io indoor positioning for Flutter (bridge over the Proximi.io iOS SDK v6).'
   s.description      = <<-DESC
-Flutter plugin for Proximiio indoor positioning with support for beacons, geofencing, and floor detection.
+Flutter plugin bridging the Proximi.io iOS SDK v6: positioning, floors, geofences,
+privacy zones, venue data and wayfinding.
                        DESC
   s.homepage         = 'https://github.com/proximiio/flutter-proximiio'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Proximiio' => 'info@proximi.fi' }
+  s.author           = { 'Proximi.io' => 'support@proximi.io' }
   s.source           = { :path => '.' }
-  s.source_files     = 'Classes/**/*'
+  s.source_files     = 'flutter_proximiio/Sources/flutter_proximiio/**/*.swift'
+  s.resource_bundles = { 'flutter_proximiio_privacy' => ['flutter_proximiio/Sources/flutter_proximiio/PrivacyInfo.xcprivacy'] }
   s.dependency 'Flutter'
-  s.dependency 'Proximiio', '5.3.0'
-  s.platform = :ios, '13.0'
-
+  s.dependency 'Proximiio', '6.0.0-beta.64'
+  s.platform         = :ios, '15.0'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
-  s.swift_version = '5.0'
-  s.static_framework = true
+  s.swift_version    = '5.0'
 end
