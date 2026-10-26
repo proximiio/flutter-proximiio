@@ -308,11 +308,11 @@ Structure and quality:
 
 ### A2. `flutter_proximiio_map` (one file, 339 lines)
 
-The widget is a WebView loading an HTML page with an iframe onto **`https://maps.proximi.io/<customer>/`**,
-one customer's web map, hard-coded. Talking to it is `postMessage` both ways.
+The widget is a WebView loading an HTML page with an iframe onto one customer's web map, hard-coded.
+Talking to it is `postMessage` both ways.
 
-1. **The widget's parameters do nothing.** `token` and `mapDefaults` are never used; every app gets the
-   customer map.
+1. **The widget's parameters do nothing.** `token` and `mapDefaults` are never used; every app gets that
+   customer's map.
 2. **The public API cannot be called.** `setCenter`, `flyTo`, `setFloor`, `setRoute`, … are methods of the
    private `_ProximiioMapWidgetState`; there is no controller, so apps cannot reach them.
 3. **`dispose()` removes the app's own listeners.** It calls `FlutterProximiio.unsubscribeAll(positionUpdated)`
