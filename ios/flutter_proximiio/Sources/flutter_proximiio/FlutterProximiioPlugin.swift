@@ -46,10 +46,38 @@ private final class HostApi: ProximiioHostApi {
     }
   }
 
+  /// A lifecycle call: one at a time across all engines, on the instance current when its turn
+  /// comes. The new state is published before the call completes, as on Android.
+  private func runLifecycle<Value>(
+    _ completion: @escaping (Result<Value, Error>) -> Void,
+    _ body: @escaping @MainActor (Proximiio) async throws -> Value
+  ) {
+    Task { @MainActor in
+      do {
+        let value = try await ProximiioHub.shared.lifecycle {
+          guard let sdk = ProximiioHub.shared.sdk else { throw Mappers.notConfigured }
+          do {
+            let value = try await body(sdk)
+            await ProximiioHub.shared.publishState()
+            return value
+          } catch {
+            await ProximiioHub.shared.publishState()
+            throw error
+          }
+        }
+        completion(.success(value))
+      } catch {
+        completion(.failure(Mappers.flutterError(error)))
+      }
+    }
+  }
+
   func configure(configuration: MsgConfiguration, completion: @escaping (Result<Void, Error>) -> Void) {
     Task { @MainActor in
       do {
-        try await ProximiioHub.shared.configure(Mappers.configuration(configuration))
+        try await ProximiioHub.shared.lifecycle {
+          try await ProximiioHub.shared.configure(Mappers.configuration(configuration))
+        }
         completion(.success(()))
       } catch {
         completion(.failure(Mappers.flutterError(error)))
@@ -57,12 +85,29 @@ private final class HostApi: ProximiioHostApi {
     }
   }
 
+  func isConfigured() throws -> Bool {
+    MainActor.assumeIsolated { ProximiioHub.shared.sdk != nil }
+  }
+
   func state(completion: @escaping (Result<MsgSdkState, Error>) -> Void) {
     run(completion) { sdk in Mappers.state(await sdk.state) }
   }
 
+  /// Location through the SDK, then Bluetooth, which iOS would otherwise ask at the first `start()`.
+  /// Each request gives up once no system prompt is on screen (see ``SystemPrompt``), and the status
+  /// is read again at the end.
   func requestPermissions(always: Bool, completion: @escaping (Result<MsgPermissionStatus, Error>) -> Void) {
-    run(completion) { sdk in Mappers.permissionStatus(await sdk.requestPermissions(always: always)) }
+    run(completion) { sdk in
+      var status = await SystemPrompt.answer(
+        to: { await sdk.requestPermissions(always: always) },
+        orRead: { await sdk.requestPermissions(always: false) }
+      )
+      if ProximiioHub.shared.usesBluetooth, BluetoothPrompt.isNeeded {
+        await SystemPrompt.answer(to: { await BluetoothPrompt.show() }, orRead: {})
+        status = await sdk.requestPermissions(always: false)
+      }
+      return Mappers.permissionStatus(status)
+    }
   }
 
   func requestMotionPermission(completion: @escaping (Result<Bool, Error>) -> Void) {
@@ -70,31 +115,23 @@ private final class HostApi: ProximiioHostApi {
   }
 
   func authenticate(completion: @escaping (Result<MsgApplication?, Error>) -> Void) {
-    run(completion) { sdk in
-      defer { Task { await ProximiioHub.shared.publishState() } }
-      return try await sdk.authenticate().map(Mappers.application)
-    }
+    runLifecycle(completion) { sdk in try await sdk.authenticate().map(Mappers.application) }
   }
 
   func start(completion: @escaping (Result<Void, Error>) -> Void) {
-    run(completion) { sdk in
-      defer { Task { await ProximiioHub.shared.publishState() } }
+    runLifecycle(completion) { sdk in
+      await ProximiioHub.shared.ensureRunStreams()
       try await sdk.start()
-      await ProximiioHub.shared.subscribeRunStreams()
     }
   }
 
   func stop(completion: @escaping (Result<Void, Error>) -> Void) {
-    run(completion) { sdk in
-      await sdk.stop()
-      ProximiioHub.shared.cancelRunStreams()
-      await ProximiioHub.shared.publishState()
-    }
+    runLifecycle(completion) { sdk in await ProximiioHub.shared.stopAndDrain(sdk) }
   }
 
   func signOut(completion: @escaping (Result<Void, Error>) -> Void) {
-    run(completion) { sdk in
-      defer { Task { await ProximiioHub.shared.publishState() } }
+    runLifecycle(completion) { sdk in
+      await ProximiioHub.shared.stopAndDrain(sdk)
       try await sdk.signOut()
     }
   }
@@ -163,6 +200,7 @@ private final class HostApi: ProximiioHostApi {
     run(completion) { sdk in await sdk.setVisitorReportingConsent(granted) }
   }
 
+  /// The level gates the SDK's log sink; its unified-log output is the same at every level.
   func setLogLevel(level: MsgLogLevel) throws {
     Proximiio.logLevel = Mappers.logLevel(level)
   }
@@ -327,8 +365,7 @@ private final class HostApi: ProximiioHostApi {
     completion: @escaping (Result<MsgPositionUpdate?, Error>) -> Void
   ) {
     run(completion) { sdk in
-      var floor: ProximiioFloor?
-      if let floorId { floor = await sdk.floor(id: floorId) }
+      let floor = try await Self.knownFloor(floorId, in: sdk)
       return await sdk.setCustomPosition(RouteMappers.sdkCoordinate(coordinate), accuracy: accuracy, floor: floor)
         .map(Mappers.position)
     }
@@ -336,10 +373,18 @@ private final class HostApi: ProximiioHostApi {
 
   func setFloor(floorId: String?, completion: @escaping (Result<MsgFloorChange?, Error>) -> Void) {
     run(completion) { sdk in
-      var floor: ProximiioFloor?
-      if let floorId { floor = await sdk.floor(id: floorId) }
+      let floor = try await Self.knownFloor(floorId, in: sdk)
       return await sdk.setFloor(floor).map(Mappers.floorChange)
     }
+  }
+
+  /// The SDK reads a `nil` floor as "keep the current one" or "clear it", so an unknown id fails instead.
+  private static func knownFloor(_ id: String?, in sdk: Proximiio) async throws -> ProximiioFloor? {
+    guard let id else { return nil }
+    guard let floor = await sdk.floor(id: id) else {
+      throw Mappers.invalidArgument("No floor with id \(id) in the venue data.")
+    }
+    return floor
   }
 
   func enableRouteSnapping(thresholdMeters: Double?, completion: @escaping (Result<Void, Error>) -> Void) {

@@ -19,16 +19,27 @@ if (!status.isLocationAuthorized) {
   <thead><tr><th>Permission</th><th>iOS</th><th>Android</th></tr></thead>
   <tbody>
     <tr><td>Location</td><td>When in use; with <code>always: true</code> also always</td><td>Fine and coarse location; with <code>always: true</code> background location in a second prompt</td></tr>
-    <tr><td>Bluetooth</td><td>Asked by the SDK</td><td><code>BLUETOOTH_SCAN</code> and <code>BLUETOOTH_CONNECT</code> on Android 12 and newer, asked by the plugin</td></tr>
+    <tr><td>Bluetooth</td><td>Asked by the plugin unless the preset is <code>relayOnly</code>; needs <code>NSBluetoothAlwaysUsageDescription</code></td><td><code>BLUETOOTH_SCAN</code> and <code>BLUETOOTH_CONNECT</code> on Android 12 and newer, asked by the plugin unless the preset is <code>relayOnly</code></td></tr>
     <tr><td>Notifications</td><td>Not asked</td><td><code>POST_NOTIFICATIONS</code> on Android 13 and newer, when the configuration runs the foreground service (<code>android:</code> options with a mode other than <code>disabled</code>)</td></tr>
     <tr><td>Motion</td><td>Not asked; call <code>requestMotionPermission</code></td><td>Not asked; call <code>requestMotionPermission</code></td></tr>
   </tbody>
 </table>
 
 <p>
+  Each permission is asked once. A permission the user has answered is not asked again; to change it,
+  the user goes to the system settings.
+</p>
+
+<p>
   Motion is needed only for PDR (<code>enablePdr</code>) and, on iOS, for barometric floor changes.
   On Android, background location is a separate prompt because Android 11 and newer deny it when it
   is asked together with foreground location.
+</p>
+
+<p>
+  iOS shows the upgrade to background location ("Change to Always Allow") once per installation. When
+  it was used before, <code>requestPermissions(always: true)</code> returns the current status without
+  a prompt.
 </p>
 
 <h2>Reading the status</h2>
@@ -52,7 +63,10 @@ if (!status.isLocationAuthorized) {
 
 <h2>Changes made in the system settings</h2>
 
-<p><code>permissionUpdates</code> emits a new status whenever the user changes a permission, also outside the app.</p>
+<p>
+  <code>permissionUpdates</code> emits a new status whenever the user changes a permission, also in the
+  system settings. On Android the change is read when the app comes back to the foreground.
+</p>
 
 <pre><code class="language-dart">sdk.permissionUpdates.listen((status) {
   if (!status.isLocationAuthorized) {

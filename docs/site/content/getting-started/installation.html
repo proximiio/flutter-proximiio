@@ -60,17 +60,29 @@ end</code></pre>
 
 <h3>Info.plist</h3>
 
-<p>Add the usage descriptions for the permissions the app uses. A missing key makes that permission resolve as denied.</p>
+<p>
+  Add all six usage descriptions, also when the app does not use the feature. App Store validation
+  checks them against the APIs the SDK links and rejects an upload without them (ITMS-90683).
+</p>
 
 <table>
-  <thead><tr><th>Key</th><th>Needed for</th></tr></thead>
+  <thead><tr><th>Key</th><th>Shown when</th></tr></thead>
   <tbody>
-    <tr><td><code>NSLocationWhenInUseUsageDescription</code></td><td>Positioning</td></tr>
-    <tr><td><code>NSLocationAlwaysAndWhenInUseUsageDescription</code></td><td>Positioning in the background</td></tr>
-    <tr><td><code>NSBluetoothAlwaysUsageDescription</code></td><td>Beacon positioning</td></tr>
-    <tr><td><code>NSMotionUsageDescription</code></td><td>PDR and floor changes from the barometer</td></tr>
+    <tr><td><code>NSLocationWhenInUseUsageDescription</code></td><td>Positioning is asked</td></tr>
+    <tr><td><code>NSLocationAlwaysAndWhenInUseUsageDescription</code></td><td>Background positioning is asked (<code>always: true</code>)</td></tr>
+    <tr><td><code>NSBluetoothAlwaysUsageDescription</code></td><td>Beacon positioning is asked</td></tr>
+    <tr><td><code>NSMotionUsageDescription</code></td><td>PDR is asked; floor changes from the barometer</td></tr>
+    <tr><td><code>NSNearbyInteractionUsageDescription</code></td><td>UWB anchors are ranged</td></tr>
+    <tr><td><code>NSCameraUsageDescription</code></td><td>Camera-assisted UWB direction</td></tr>
   </tbody>
 </table>
+
+<p>
+  Without <code>NSBluetoothAlwaysUsageDescription</code>, iOS ends the app when the SDK starts scanning
+  for beacons. <code>Proximiio.create</code> therefore throws <code>invalidArgument</code> when the key is
+  missing and the preset scans beacons (every preset except <code>relayOnly</code>). A missing location
+  key makes the location permission resolve as denied.
+</p>
 
 <p>For background positioning also add <code>location</code> to <code>UIBackgroundModes</code>. See <a href="{{root}}guides/background.html">Background positioning</a>.</p>
 

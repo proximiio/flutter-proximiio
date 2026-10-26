@@ -45,6 +45,28 @@ void main() {
     );
     expect(diagnostics.isAuthenticated, isTrue);
     expect(style, contains('version'));
+
+    // Another handle reaches the running instance without reconfiguring it.
+    final shared = await Proximiio.shared();
+    expect(shared, isNotNull);
+    expect(await shared!.state(), ProximiioState.authenticated);
+
+    // The state is published before a lifecycle call completes; a second start() keeps running.
+    final states = <ProximiioState>[];
+    final subscription = sdk.stateChanges.listen(states.add);
+    await _logged('start', sdk.start);
+    await _logged('start again', shared.start);
+    await tester.pump();
+    expect(states.last, ProximiioState.running);
+    await sdk.stop();
+    await tester.pump();
+    expect(states.last, ProximiioState.authenticated);
+    await subscription.cancel();
+
+    await expectLater(
+      sdk.setFloor('no-such-floor'),
+      throwsA(isA<ProximiioException>().having((e) => e.code, 'code', ProximiioErrorCode.invalidArgument)),
+    );
   }, skip: _token.isEmpty);
 
   testWidgets('a bad token is reported as invalidToken', (tester) async {

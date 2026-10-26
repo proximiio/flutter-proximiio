@@ -50,14 +50,20 @@ end
 With Flutter's Swift Package Manager support turned on, nothing is needed in the Podfile: the plugin's
 `Package.swift` pulls `proximiio/proximiio-sdk-ios-binary` itself.
 
-`Info.plist` usage descriptions (a missing key makes that permission resolve as denied):
+`Info.plist` usage descriptions: add all six, also for features the app does not use. App Store
+validation checks them against the APIs the SDK links and rejects the upload without them (ITMS-90683).
 
-| Key | When |
+| Key | Shown when |
 |---|---|
-| `NSLocationWhenInUseUsageDescription` | always |
-| `NSLocationAlwaysAndWhenInUseUsageDescription` | background positioning |
-| `NSBluetoothAlwaysUsageDescription` | beacon positioning |
-| `NSMotionUsageDescription` | PDR, floor changes from the barometer |
+| `NSLocationWhenInUseUsageDescription` | positioning is asked |
+| `NSLocationAlwaysAndWhenInUseUsageDescription` | background positioning is asked |
+| `NSBluetoothAlwaysUsageDescription` | beacon positioning is asked |
+| `NSMotionUsageDescription` | PDR is asked; floor changes from the barometer |
+| `NSNearbyInteractionUsageDescription` | UWB anchors are ranged |
+| `NSCameraUsageDescription` | camera-assisted UWB direction |
+
+Without `NSBluetoothAlwaysUsageDescription` iOS ends the app when the SDK scans for beacons, so
+`Proximiio.create` throws `invalidArgument` for every preset except `relayOnly`.
 
 For background positioning also add `location` to `UIBackgroundModes` and set
 `allowsBackgroundLocationUpdates: true`.
@@ -85,7 +91,10 @@ The SDK's manifest brings the location, Bluetooth, foreground-service and notifi
 its foreground service. To keep an app foreground-only, remove background location:
 
 ```xml
-<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" tools:node="remove" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" tools:node="remove" />
+</manifest>
 ```
 
 ## Usage
@@ -125,7 +134,10 @@ await sdk.stop();
 ```
 
 - **One instance per process.** `Proximiio.create` makes it; calling it again stops and replaces it.
-  `flutter_proximiio_map` uses the same instance.
+  `Proximiio.shared()` returns the running instance without touching it (a second engine, another
+  screen). `flutter_proximiio_map` uses the same instance.
+- **Privacy zones**: positions inside them are withheld by default, as in 1.x
+  (`withholdsPositionsInPrivacyZones: false` to receive them; the native v6 default is `false`).
 - **Streams** can be listened to at any time and stay open across `stop()` / `start()`.
 - **Errors** are `ProximiioException`s; switch on `code` (`invalidToken`, `locationPermissionDenied`,
   `api`, …). `isRetryable` is true for network and server failures.

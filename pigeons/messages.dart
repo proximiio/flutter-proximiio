@@ -599,13 +599,16 @@ class MsgDiagnostics {
 ///
 /// Errors arrive as `ProximiioFlutterError` with `code` = the SDK's `ProximiioError`
 /// case name (`invalidToken`, `locationPermissionDenied`, …) or a bridge code
-/// (`notConfigured`, `noActivity`, `invalidArgument`, `unsupported`).
+/// (`notConfigured`, `invalidArgument`, `unsupported`).
 @HostApi()
 abstract class ProximiioHostApi {
   /// Creates the SDK instance (stopping and replacing an existing one) and
   /// stores it in `Proximiio.shared` for the map plugin.
   @async
   void configure(MsgConfiguration configuration);
+
+  /// Whether an SDK instance exists in this process (made by any engine).
+  bool isConfigured();
 
   @async
   MsgSdkState state();

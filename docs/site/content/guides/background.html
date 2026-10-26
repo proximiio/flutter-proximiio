@@ -55,10 +55,10 @@ await sdk.requestPermissions(always: true);</code></pre>
 <table>
   <thead><tr><th>Setting</th><th>Default</th><th>Purpose</th></tr></thead>
   <tbody>
-    <tr><td><code>mode</code></td><td><code>enabled</code></td><td><code>disabled</code>: no service; <code>required</code>: positioning does not start without it</td></tr>
+    <tr><td><code>mode</code></td><td><code>enabled</code></td><td><code>disabled</code>: no service; <code>required</code>: the same as <code>enabled</code>, kept for 1.x configurations</td></tr>
     <tr><td><code>notificationTitle</code></td><td>Indoor positioning</td><td>Notification title</td></tr>
     <tr><td><code>notificationText</code></td><td>Locating you inside this venue</td><td>Notification text</td></tr>
-    <tr><td><code>notificationIcon</code></td><td>The app icon</td><td>Name of a drawable in the app</td></tr>
+    <tr><td><code>notificationIcon</code></td><td>The app icon</td><td>Name of a drawable in the app; keep it in release builds (below)</td></tr>
     <tr><td><code>channelName</code></td><td>Indoor positioning</td><td>Notification channel shown in the system settings</td></tr>
     <tr><td><code>holdsWakeLock</code></td><td><code>false</code></td><td>Hold a partial wake lock while positioning</td></tr>
   </tbody>
@@ -72,9 +72,21 @@ await sdk.requestPermissions(always: true);</code></pre>
 await sdk.android.resetServiceNotification();</code></pre>
 
 <p>
-  <code>updateServiceNotification</code> returns <code>false</code> when the service is not running.
-  Both calls throw <code>ProximiioErrorCode.unsupported</code> on iOS.
+  Fields left out of <code>updateServiceNotification</code> keep the values from the configuration;
+  <code>mode</code>, the channel fields and <code>holdsWakeLock</code> apply only at
+  <code>Proximiio.create</code>. The notification is shown at once when the service runs and at every
+  later start of the service. The call returns <code>false</code> when the configuration runs no
+  service (no <code>android:</code> options, or <code>mode: disabled</code>). Both calls throw
+  <code>ProximiioErrorCode.unsupported</code> on iOS. A tap on the notification opens the app.
 </p>
+
+<p>
+  The icon is looked up by name, so the resource shrinker of a release build removes it. Keep it in
+  <code>android/app/src/main/res/raw/keep.xml</code>:
+</p>
+
+<pre><code class="language-xml">&lt;resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_stat_positioning" /&gt;</code></pre>
 
 <div class="doc-aside doc-aside-note"><p>
   When Android refuses to start the foreground service from the background, the SDK positions only

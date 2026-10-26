@@ -3187,7 +3187,7 @@ val MessagesPigeonMethodCodec = StandardMethodCodec(MessagesPigeonCodec())
  *
  * Errors arrive as `ProximiioFlutterError` with `code` = the SDK's `ProximiioError`
  * case name (`invalidToken`, `locationPermissionDenied`, …) or a bridge code
- * (`notConfigured`, `noActivity`, `invalidArgument`, `unsupported`).
+ * (`notConfigured`, `invalidArgument`, `unsupported`).
  *
  * Generated interface from Pigeon that represents a handler of messages from Flutter.
  */
@@ -3197,6 +3197,8 @@ interface ProximiioHostApi {
    * stores it in `Proximiio.shared` for the map plugin.
    */
   fun configure(configuration: MsgConfiguration, callback: (Result<Unit>) -> Unit)
+  /** Whether an SDK instance exists in this process (made by any engine). */
+  fun isConfigured(): Boolean
   fun state(callback: (Result<MsgSdkState>) -> Unit)
   fun requestPermissions(always: Boolean, callback: (Result<MsgPermissionStatus>) -> Unit)
   fun requestMotionPermission(callback: (Result<Boolean>) -> Unit)
@@ -3291,6 +3293,21 @@ interface ProximiioHostApi {
                 reply.reply(MessagesPigeonUtils.wrapResult(null))
               }
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.isConfigured$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              listOf(api.isConfigured())
+            } catch (exception: Throwable) {
+              MessagesPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

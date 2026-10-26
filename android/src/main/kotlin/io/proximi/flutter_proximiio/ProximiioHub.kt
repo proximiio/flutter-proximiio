@@ -1,11 +1,15 @@
 package io.proximi.flutter_proximiio
 
+import android.Manifest
 import android.content.Context
 import android.util.Log
 import io.flutter.plugin.common.BinaryMessenger
 import io.proximi.sdk.Proximiio
 import io.proximi.sdk.ProximiioConfiguration
 import io.proximi.sdk.beaconEvents
+import io.proximi.sdk.core.logging.ProximiioLogEntry
+import io.proximi.sdk.core.logging.ProximiioLogLevel
+import io.proximi.sdk.core.platform.PermissionStatus
 import io.proximi.sdk.floorChanges
 import io.proximi.sdk.syncEvents
 import io.proximi.sdk.venueDataChanges
@@ -13,6 +17,9 @@ import io.proximi.sdk.geofenceEvents
 import io.proximi.sdk.permissionUpdates
 import io.proximi.sdk.positions
 import io.proximi.sdk.privacyZoneStateChanges
+import io.proximi.sdk.refreshPermissions
+import io.proximi.sdk.service.NotificationMode
+import io.proximi.sdk.service.ProximiioServiceOptions
 import io.proximi.sdk.setPermissionLauncher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +27,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withTimeoutOrNull
 
 /** The current sink of one event channel; `null` while Dart is not listening. */
 internal class EventBox<T> {
@@ -119,46 +130,64 @@ internal class EngineStreams(messenger: BinaryMessenger) {
 internal object ProximiioHub {
   private const val TAG = "FlutterProximiio"
 
+  /** How long the forwarders get to deliver the exits `stop()` reports before they are cancelled. */
+  private const val STREAM_DRAIN_MS = 1_000L
+
   val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
   val permissionLauncher = FlutterPermissionLauncher()
+
+  /** Serialises configure, authenticate, start, stop and sign-out, which each engine may call. */
+  val lifecycle = Mutex()
 
   var sdk: Proximiio? = null
     private set
 
-  /**
-   * Whether the foreground service runs with its notification, so the plugin asks for POST_NOTIFICATIONS.
-   * The SDK runs no service at all without `serviceOptions`.
-   */
-  var wantsNotifications: Boolean = false
+  /** The configured foreground-service options; `null` when the SDK runs no service. */
+  var serviceOptions: ProximiioServiceOptions? = null
+    private set
+
+  /** Whether the service shows its notification, so the plugin asks for POST_NOTIFICATIONS. */
+  val wantsNotifications: Boolean
+    get() = serviceOptions.let { it != null && it.notificationMode != NotificationMode.DISABLED }
+
+  /** Whether the configuration scans BLE beacons or UWB anchors, so the plugin asks for Nearby devices. */
+  var usesBluetooth: Boolean = false
     private set
 
   private val engines = mutableListOf<EngineStreams>()
   private var permissionJob: Job? = null
   private var runJobs: List<Job> = emptyList()
+  private var prompts: PluginPrompts? = null
 
   fun attach(engine: EngineStreams) {
     engines += engine
   }
 
-  fun detach(engine: EngineStreams) {
+  /** Removes [engine]; `true` when no engine is left. */
+  fun detach(engine: EngineStreams): Boolean {
     engines -= engine
+    return engines.isEmpty()
   }
 
-  /** Creates the SDK instance, stopping and replacing the previous one. */
+  /**
+   * Creates the SDK instance and replaces the previous one. The previous instance is stopped first,
+   * with its streams still forwarded so the exits `stop()` reports reach Dart. When the new instance
+   * cannot be created, the previous one stays (stopped). Call it holding [lifecycle].
+   */
   suspend fun configure(context: Context, configuration: ProximiioConfiguration) {
-    sdk?.let { previous ->
-      cancelRunStreams()
-      permissionJob?.cancel()
-      previous.stop()
-    }
+    sdk?.let { previous -> stopAndDrain(previous) }
     val sdk = Proximiio(context.applicationContext, configuration)
+    cancelRunStreams()
+    permissionJob?.cancel()
     this.sdk = sdk
     Proximiio.shared = sdk
-    val serviceOptions = configuration.serviceOptions
-    wantsNotifications = serviceOptions != null &&
-      serviceOptions.notificationMode != io.proximi.sdk.service.NotificationMode.DISABLED
+    serviceOptions = configuration.serviceOptions
+    usesBluetooth = configuration.positioning.let {
+      it.iBeaconScanningEnabled || it.eddystoneScanningEnabled || it.trilateration.uwbEnabled
+    }
+    prompts = PluginPrompts(context)
     sdk.setPermissionLauncher(permissionLauncher)
-    permissionJob = forward(sdk.permissionUpdates(), Mappers::permissionStatus) { it.permissionUpdates.box }
+    permissionJob = forward(sdk.permissionUpdates().map(::permissionStatus)) { it.permissionUpdates.box }
     publishState()
   }
 
@@ -169,19 +198,37 @@ internal object ProximiioHub {
     engines.forEach { it.stateChanges.box.send(change) }
   }
 
-  /** The SDK's streams are run-scoped (they finish at `stop()`), so they are taken again after each `start()`. */
-  fun subscribeRunStreams() {
+  /**
+   * Takes the SDK's run-scoped streams unless they are still open. They are taken before `start()`,
+   * so the events `start()` itself emits are not missed, and they finish at `stop()`; a `start()` of a
+   * running SDK keeps the ones it has.
+   */
+  fun ensureRunStreams() {
     val sdk = sdk ?: return
+    if (runJobs.isNotEmpty() && runJobs.all { it.isActive }) return
     cancelRunStreams()
     runJobs = listOf(
-      forward(sdk.positions(), Mappers::position) { it.positions.box },
-      forward(sdk.floorChanges(), Mappers::floorChange) { it.floorChanges.box },
-      forward(sdk.geofenceEvents(), Mappers::geofenceEvent) { it.geofenceEvents.box },
-      forward(sdk.privacyZoneStateChanges(), Mappers::privacyZoneState) { it.privacyZoneStateChanges.box },
-      forward(sdk.venueDataChanges(), VenueMappers::venueDataChange) { it.venueDataChanges.box },
-      forward(sdk.syncEvents(), VenueMappers::syncEvent) { it.syncEvents.box },
-      forward(sdk.beaconEvents(), VenueMappers::beaconEvent) { it.beaconEvents.box },
+      forward(sdk.positions().map(Mappers::position)) { it.positions.box },
+      forward(sdk.floorChanges().map(Mappers::floorChange)) { it.floorChanges.box },
+      forward(sdk.geofenceEvents().map(Mappers::geofenceEvent)) { it.geofenceEvents.box },
+      forward(sdk.privacyZoneStateChanges().map(Mappers::privacyZoneState)) { it.privacyZoneStateChanges.box },
+      forward(sdk.venueDataChanges().map(VenueMappers::venueDataChange)) { it.venueDataChanges.box },
+      forward(sdk.syncEvents().map(VenueMappers::syncEvent)) { it.syncEvents.box },
+      forward(sdk.beaconEvents().map(VenueMappers::beaconEvent)) { it.beaconEvents.box },
     )
+  }
+
+  /**
+   * Stops [sdk]. When it was running, `stop()` completes its streams after the exits it reports, and
+   * the forwarders are given time to deliver them; the streams of an SDK that was not running stay
+   * open for its next start.
+   */
+  suspend fun stopAndDrain(sdk: Proximiio) {
+    val wasRunning = sdk.state().let { it == Proximiio.State.RUNNING || it == Proximiio.State.STARTING }
+    sdk.stop()
+    if (!wasRunning) return
+    withTimeoutOrNull(STREAM_DRAIN_MS) { runJobs.joinAll() }
+    cancelRunStreams()
   }
 
   fun cancelRunStreams() {
@@ -189,13 +236,71 @@ internal object ProximiioHub {
     runJobs = emptyList()
   }
 
-  private fun <T, M> forward(flow: Flow<T>, map: (T) -> M, box: (EngineStreams) -> EventBox<M>): Job =
+  /** The SDK's status, with Bluetooth read as denied once the plugin asked for it and got no grant. */
+  fun permissionStatus(status: PermissionStatus): MsgPermissionStatus {
+    val message = Mappers.permissionStatus(status)
+    val askedBluetooth = prompts?.wasAsked(Manifest.permission.BLUETOOTH_SCAN) == true
+    return if (message.bluetooth == MsgBluetoothAuthorization.NOT_DETERMINED && askedBluetooth) {
+      message.copy(bluetooth = MsgBluetoothAuthorization.DENIED)
+    } else {
+      message
+    }
+  }
+
+  /** Records that the plugin asked for [permissions] (the SDK keeps its own record for the ones it asks). */
+  fun markAsked(permissions: List<String>) {
+    prompts?.markAsked(permissions)
+  }
+
+  fun wasAsked(permission: String): Boolean = prompts?.wasAsked(permission) == true
+
+  /** Re-reads the permissions; Android reports no change made in the system settings by itself. */
+  fun refreshPermissions() {
+    val sdk = sdk ?: return
+    scope.launch { runCatching { sdk.refreshPermissions() } }
+  }
+
+  /** Writes SDK log entries to Logcat at [level] and above; the Android SDK writes none there itself. */
+  fun setLogLevel(level: ProximiioLogLevel) {
+    Proximiio.logLevel = level
+    if (Proximiio.logSink == null) Proximiio.logSink = logcat
+  }
+
+  private val logcat: (ProximiioLogEntry) -> Unit = { entry ->
+    val priority = when (entry.level) {
+      ProximiioLogLevel.DEBUG -> Log.DEBUG
+      ProximiioLogLevel.INFO, ProximiioLogLevel.NOTICE -> Log.INFO
+      ProximiioLogLevel.WARNING -> Log.WARN
+      ProximiioLogLevel.ERROR -> Log.ERROR
+    }
+    Log.println(priority, "Proximiio", "[${entry.category}] ${entry.message}")
+  }
+
+  private fun <M> forward(flow: Flow<M>, box: (EngineStreams) -> EventBox<M>): Job =
     scope.launch {
       flow
         .catch { error -> Log.w(TAG, "SDK stream failed", error) }
-        .collect { value ->
-          val message = map(value)
-          engines.forEach { box(it).send(message) }
-        }
+        .collect { message -> engines.forEach { box(it).send(message) } }
     }
+}
+
+/**
+ * The permissions the plugin asked for itself (Nearby devices, notifications). Android reports a
+ * permission that was never asked the same way as a denied one; the SDK keeps this record for the
+ * permissions it asks, and the plugin keeps it for the rest.
+ */
+internal class PluginPrompts(context: Context) {
+  private val preferences = context.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
+
+  fun wasAsked(permission: String): Boolean = preferences.getBoolean(permission, false)
+
+  fun markAsked(permissions: List<String>) {
+    val editor = preferences.edit()
+    permissions.forEach { editor.putBoolean(it, true) }
+    editor.apply()
+  }
+
+  private companion object {
+    const val FILE = "io.proximi.flutter_proximiio.permissions"
+  }
 }

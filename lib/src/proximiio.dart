@@ -18,7 +18,8 @@ import 'wayfinding.dart';
 /// The Proximi.io SDK: indoor positioning, floors, geofences, privacy zones and venue data.
 ///
 /// There is one SDK instance per app process. [create] makes it; calling [create] again stops and
-/// replaces it. The same instance drives `flutter_proximiio_map`.
+/// replaces it. [shared] returns the running instance without touching it, for a second Flutter
+/// engine or a screen that did not create it. The same instance drives `flutter_proximiio_map`.
 ///
 /// ```dart
 /// final sdk = await Proximiio.create(const ProximiioConfiguration(token: token));
@@ -33,10 +34,17 @@ import 'wayfinding.dart';
 ///
 /// Every method throws [ProximiioException] on failure.
 abstract interface class Proximiio {
-  /// Creates (or replaces) the process-wide SDK instance.
+  /// Creates (or replaces) the process-wide SDK instance. A running instance is stopped first.
   static Future<Proximiio> create(ProximiioConfiguration configuration) => BridgedProximiio.create(configuration);
 
-  /// Sets the minimum level of the native SDK's log output (process-wide).
+  /// The process-wide SDK instance, whichever engine created it; `null` before [create]. It does not
+  /// stop or reconfigure the instance.
+  static Future<Proximiio?> shared() => BridgedProximiio.shared();
+
+  /// Sets the minimum level of the SDK log entries the plugin writes to the platform log
+  /// (process-wide). On Android they go to Logcat with the tag `Proximiio`; the SDK writes nothing
+  /// there by itself. On iOS the SDK writes to the unified log (Xcode console, Console.app) on its
+  /// own, and this level does not change that output.
   static Future<void> setLogLevel(ProximiioLogLevel level) =>
       guarded(() => msg.ProximiioHostApi().setLogLevel(toMsgLogLevel(level)));
 
@@ -71,9 +79,14 @@ abstract interface class Proximiio {
   /// The current lifecycle state.
   Future<ProximiioState> state();
 
-  /// Asks for location (and, with [always], background location), Bluetooth and motion as needed,
-  /// and returns the resulting status. Missing usage descriptions (iOS) or manifest entries
-  /// (Android) resolve as denied.
+  /// Asks for location (and, with [always], background location) and, unless the configuration is
+  /// [ConfigurationPreset.relayOnly], Bluetooth; on Android 13+ also notifications while the
+  /// foreground service is configured. Returns the resulting status. Motion is asked by
+  /// [requestMotionPermission].
+  ///
+  /// Only what is not decided yet is asked; a missing location usage description (iOS) or manifest
+  /// entry (Android) resolves as denied. On Android nothing is asked while no activity is attached
+  /// (a background engine): the current status is returned unchanged.
   Future<PermissionStatus> requestPermissions({bool always = false});
 
   /// Asks for the motion / activity-recognition permission (needed for PDR).
@@ -230,11 +243,12 @@ abstract interface class Proximiio {
 
   // ── Positioning inputs ──
 
-  /// Sets a position from an outside source (a QR code, a relay, the app). [floorId] must be a floor
-  /// from [floors]; an unknown id means no floor.
+  /// Sets a position from an outside source (a QR code, a relay, the app) on the floor [floorId], a
+  /// floor from [floors]. Without [floorId] the position keeps the current floor. An unknown id throws
+  /// [ProximiioErrorCode.invalidArgument].
   Future<PositionUpdate?> setCustomPosition(Coordinate coordinate, {double accuracy = 5, String? floorId});
 
-  /// Sets the floor; `null` clears it.
+  /// Sets the floor; `null` clears it. An unknown id throws [ProximiioErrorCode.invalidArgument].
   Future<FloorChangeEvent?> setFloor(String? floorId);
 
   /// Snaps positions to the route network within [thresholdMeters] (SDK default 5 m).
@@ -272,7 +286,11 @@ abstract interface class Proximiio {
 
 /// Android-only parts of the SDK.
 abstract interface class ProximiioAndroid {
-  /// Replaces the foreground-service notification. `false` when the service is not running.
+  /// Replaces the foreground-service notification. Unset fields keep the values of
+  /// [ProximiioConfiguration.android]; [AndroidServiceOptions.mode], the channel fields and
+  /// [AndroidServiceOptions.holdsWakeLock] apply only at [Proximiio.create]. The notification is shown
+  /// now when the service runs, and at every later start of the service. `false` when no foreground
+  /// service is configured (no [ProximiioConfiguration.android], or [ServiceNotificationMode.disabled]).
   Future<bool> updateServiceNotification(AndroidServiceOptions options);
 
   /// Restores the notification from the configuration.
@@ -330,53 +348,50 @@ class BridgedProximiio implements Proximiio, ProximiioAndroid {
     return BridgedProximiio(hostApi, events);
   }
 
+  /// Wraps the native instance when there is one.
+  static Future<BridgedProximiio?> shared({
+    msg.ProximiioHostApi? api,
+    BridgeEvents events = const BridgeEvents(),
+  }) async {
+    final hostApi = api ?? msg.ProximiioHostApi();
+    return await guarded(hostApi.isConfigured) ? BridgedProximiio(hostApi, events) : null;
+  }
+
   final msg.ProximiioHostApi _api;
   final BridgeEvents _events;
 
-  // Each event channel has one native handler, so each is listened to through one shared
-  // broadcast stream; a second `receiveBroadcastStream` would take over the channel.
-  @override
-  late final Stream<ProximiioState> stateChanges = _bridge(_events.stateChanges(), (m) => fromMsgState(m.state));
+  /// One set of streams per [BridgeEvents], shared by every handle of the isolate (the native
+  /// instance is the same for all of them).
+  static final _streams = Expando<_BridgedStreams>();
+
+  _BridgedStreams get _shared => _streams[_events] ??= _BridgedStreams(_events);
 
   @override
-  late final Stream<PermissionStatus> permissionUpdates = _bridge(_events.permissionUpdates(), fromMsgPermissionStatus);
+  Stream<ProximiioState> get stateChanges => _shared.stateChanges;
 
   @override
-  late final Stream<PositionUpdate> positions = _bridge(_events.positions(), fromMsgPosition);
+  Stream<PermissionStatus> get permissionUpdates => _shared.permissionUpdates;
 
   @override
-  late final Stream<FloorChangeEvent> floorChanges = _bridge(_events.floorChanges(), fromMsgFloorChange);
+  Stream<PositionUpdate> get positions => _shared.positions;
 
   @override
-  late final Stream<GeofenceEvent> geofenceEvents = _bridge(_events.geofenceEvents(), fromMsgGeofenceEvent);
+  Stream<FloorChangeEvent> get floorChanges => _shared.floorChanges;
 
   @override
-  late final Stream<PrivacyZoneState> privacyZoneStateChanges = _bridge(
-    _events.privacyZoneStateChanges(),
-    fromMsgPrivacyZoneState,
-  );
+  Stream<GeofenceEvent> get geofenceEvents => _shared.geofenceEvents;
 
   @override
-  late final Stream<VenueDataChange> venueDataChanges = _bridge(_events.venueDataChanges(), fromMsgVenueDataChange);
+  Stream<PrivacyZoneState> get privacyZoneStateChanges => _shared.privacyZoneStateChanges;
 
   @override
-  late final Stream<SyncEvent> syncEvents = _bridge(_events.syncEvents(), fromMsgSyncEvent);
+  Stream<VenueDataChange> get venueDataChanges => _shared.venueDataChanges;
 
   @override
-  late final Stream<BeaconEvent> beaconEvents = _bridge(_events.beaconEvents(), fromMsgBeaconEvent);
+  Stream<SyncEvent> get syncEvents => _shared.syncEvents;
 
-  /// Both `map` and `fromHandlers` keep the channel's broadcast stream a broadcast stream.
-  static Stream<T> _bridge<M, T>(Stream<M> source, T Function(M) convert) => source
-      .map(convert)
-      .transform(
-        StreamTransformer<T, T>.fromHandlers(
-          handleError:
-              (error, stackTrace, sink) => sink.addError(
-                error is PlatformException ? ProximiioException.fromPlatform(error) : error,
-                stackTrace,
-              ),
-        ),
-      );
+  @override
+  Stream<BeaconEvent> get beaconEvents => _shared.beaconEvents;
 
   @override
   Future<ProximiioState> state() => guarded(() async => fromMsgState(await _api.state()));
@@ -516,8 +531,26 @@ class BridgedProximiio implements Proximiio, ProximiioAndroid {
 
   @override
   Future<Map<String, Object?>> mapStyle() => guarded(() async {
-    final decoded = jsonDecode(await _api.mapStyle());
-    return decoded is Map ? decoded.cast<String, Object?>() : <String, Object?>{};
+    final body = await _api.mapStyle();
+    Object? decoded;
+    try {
+      decoded = jsonDecode(body);
+    } on FormatException catch (error) {
+      throw ProximiioException(
+        ProximiioErrorCode.api,
+        message: 'The map style is not JSON.',
+        kind: 'decoding',
+        underlying: 'FormatException: ${error.message}',
+      );
+    }
+    if (decoded is! Map) {
+      throw const ProximiioException(
+        ProximiioErrorCode.api,
+        message: 'The map style is not a JSON object.',
+        kind: 'decoding',
+      );
+    }
+    return decoded.cast<String, Object?>();
   });
 
   @override
@@ -622,4 +655,49 @@ class BridgedProximiio implements Proximiio, ProximiioAndroid {
 
   @override
   Future<void> resetServiceNotification() => guarded(_api.resetServiceNotification);
+}
+
+/// The bridged event streams of one [BridgeEvents].
+///
+/// Each event channel has one native handler per isolate, so each is listened to through one shared
+/// broadcast stream; a second `receiveBroadcastStream` would take over the channel, and cancelling it
+/// would close the channel for every listener.
+final class _BridgedStreams {
+  _BridgedStreams(this._events);
+
+  final BridgeEvents _events;
+
+  late final Stream<ProximiioState> stateChanges = _bridge(_events.stateChanges(), (m) => fromMsgState(m.state));
+
+  late final Stream<PermissionStatus> permissionUpdates = _bridge(_events.permissionUpdates(), fromMsgPermissionStatus);
+
+  late final Stream<PositionUpdate> positions = _bridge(_events.positions(), fromMsgPosition);
+
+  late final Stream<FloorChangeEvent> floorChanges = _bridge(_events.floorChanges(), fromMsgFloorChange);
+
+  late final Stream<GeofenceEvent> geofenceEvents = _bridge(_events.geofenceEvents(), fromMsgGeofenceEvent);
+
+  late final Stream<PrivacyZoneState> privacyZoneStateChanges = _bridge(
+    _events.privacyZoneStateChanges(),
+    fromMsgPrivacyZoneState,
+  );
+
+  late final Stream<VenueDataChange> venueDataChanges = _bridge(_events.venueDataChanges(), fromMsgVenueDataChange);
+
+  late final Stream<SyncEvent> syncEvents = _bridge(_events.syncEvents(), fromMsgSyncEvent);
+
+  late final Stream<BeaconEvent> beaconEvents = _bridge(_events.beaconEvents(), fromMsgBeaconEvent);
+
+  /// Both `map` and `fromHandlers` keep the channel's broadcast stream a broadcast stream.
+  static Stream<T> _bridge<M, T>(Stream<M> source, T Function(M) convert) => source
+      .map(convert)
+      .transform(
+        StreamTransformer<T, T>.fromHandlers(
+          handleError:
+              (error, stackTrace, sink) => sink.addError(
+                error is PlatformException ? ProximiioException.fromPlatform(error) : error,
+                stackTrace,
+              ),
+        ),
+      );
 }

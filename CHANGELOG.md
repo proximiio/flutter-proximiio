@@ -8,10 +8,12 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 - `Proximiio.create(ProximiioConfiguration)`: one process-wide SDK instance, shared with
-  `flutter_proximiio_map`. Configuration presets (`standard`, `highAccuracy`, `lowPower`, `relayOnly`) with
-  overrides for API host, fallback hosts, sync interval, accuracy, background updates, visitor reporting,
-  geofence exit delay, privacy-zone withholding, custom iBeacon UUIDs, PDR fusion, barometer (iOS) and the
-  Android foreground-service notification.
+  `flutter_proximiio_map`. `Proximiio.shared()` returns it to another engine or screen without
+  reconfiguring it. Lifecycle calls from all engines run one at a time. Configuration presets
+  (`standard`, `highAccuracy`, `lowPower`, `relayOnly`) with overrides for API host, fallback hosts, sync
+  interval, accuracy, background updates, visitor reporting, geofence exit delay, privacy-zone
+  withholding, custom iBeacon UUIDs, PDR fusion, barometer (iOS) and the Android foreground-service
+  notification.
 - Lifecycle `requestPermissions`, `requestMotionPermission`, `authenticate`, `start`, `stop`, `signOut`, `sync`,
   `state`.
 - Typed streams `stateChanges`, `permissionUpdates`, `positions`, `floorChanges`, `geofenceEvents`
@@ -35,8 +37,11 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
 - Positioning inputs: `setCustomPosition`, `setFloor`, `enableRouteSnapping` / `disableRouteSnapping`,
   `enablePdr` / `disablePdr`, `setPositioningSourcePrivate`.
 - Diagnostics: `diagnostics`, `startDiagnosticsRecording`, `stopDiagnosticsRecording`, `prepareDiagnosticsReport`.
-- Android: `sdk.android.updateServiceNotification` / `resetServiceNotification`. Bluetooth and, when the
-  foreground service runs, notification permissions are asked by `requestPermissions`, as iOS does.
+- Android: `sdk.android.updateServiceNotification` / `resetServiceNotification`; unset fields keep the
+  configured ones, and a tap on the notification opens the app. `requestPermissions` asks Bluetooth
+  (both platforms, unless `relayOnly`) and, when the foreground service runs, notifications; each once.
+  Settings changes reach `permissionUpdates` when the app returns to the foreground.
+- `Proximiio.setLogLevel` writes the SDK log to Logcat (tag `Proximiio`) on Android.
 - `ProximiioException` with a `code` per SDK error case (`noRoute` with `noRouteReason`, `api` with `kind`, …),
   `isRetryable`, and `underlying` naming the system error behind a failure.
 - Swift Package Manager support on iOS next to CocoaPods.
@@ -47,6 +52,12 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
   `io.proximi.sdk:proximiio` 6.0.0-beta.31). The 1.x API (`FlutterProximiio.authorize`, `subscribe`,
   `ProximiioEvents`) is removed; see the migration guide (`docs/site/content/reference/migration.html`).
 - BREAKING: minimum platforms are iOS 15 and Android API 26.
+- BREAKING: iOS apps need all six usage descriptions (see README); without
+  `NSBluetoothAlwaysUsageDescription`, `Proximiio.create` throws `invalidArgument` unless the preset is
+  `relayOnly`.
+- `withholdsPositionsInPrivacyZones` defaults to `true`, as in 1.x (the native v6 default is `false`).
+- On Android the SDK keeps running after the last engine is destroyed only when a foreground service is
+  configured; 1.x always stopped it.
 
 ## [1.0.0]
 

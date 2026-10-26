@@ -12,7 +12,7 @@ enum RouteProfile {
   /// Avoids staircases and escalators.
   stroller,
 
-  /// Staff routes; paths marked for staff are allowed.
+  /// Reserved for staff-only paths; this SDK version routes it like [pedestrian].
   staff,
 }
 

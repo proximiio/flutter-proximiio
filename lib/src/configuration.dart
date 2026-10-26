@@ -42,11 +42,13 @@ enum ServiceNotificationMode {
   /// No foreground service; positioning stops with the app in the background.
   disabled,
 
-  /// Positioning does not start without the foreground service.
+  /// The same as [enabled] (Android 8 and newer always need the service); kept for 1.x
+  /// configurations.
   required,
 }
 
-/// Minimum level of the SDK's own log output.
+/// Minimum level of the SDK log entries the plugin writes to the platform log; see
+/// [Proximiio.setLogLevel].
 enum ProximiioLogLevel {
   /// Everything.
   debug,
@@ -86,7 +88,9 @@ class AndroidServiceOptions {
   final String? notificationText;
 
   /// Name of a drawable resource in the app, e.g. `ic_stat_positioning`. The app icon when unset
-  /// or not found.
+  /// or not found. The resource is looked up by name, so keep it in release builds with
+  /// `tools:keep="@drawable/ic_stat_positioning"` in `res/raw/keep.xml`; the resource shrinker removes it
+  /// otherwise.
   final String? notificationIcon;
 
   /// Name of the notification channel shown in the system settings.
@@ -116,7 +120,7 @@ class ProximiioConfiguration {
     this.allowsBackgroundLocationUpdates,
     this.visitorReportingEnabled,
     this.geofenceExitDelay,
-    this.withholdsPositionsInPrivacyZones,
+    this.withholdsPositionsInPrivacyZones = true,
     this.customIBeaconUuids = const [],
     this.pdrFusionEnabled,
     this.barometerEnabled,
@@ -157,8 +161,10 @@ class ProximiioConfiguration {
   /// How long a geofence exit waits for a re-entry before it is reported (SDK default: 3 s).
   final Duration? geofenceExitDelay;
 
-  /// Hold back positions while the visitor is inside a privacy zone.
-  final bool? withholdsPositionsInPrivacyZones;
+  /// Hold back positions while the visitor is inside a privacy zone: [Proximiio.positions] and
+  /// [Proximiio.lastPosition] get none there. `true` by default, as in 1.x; the native SDK v6 default
+  /// is `false`.
+  final bool withholdsPositionsInPrivacyZones;
 
   /// iBeacon UUIDs to scan for in addition to those of the venue data.
   final List<String> customIBeaconUuids;

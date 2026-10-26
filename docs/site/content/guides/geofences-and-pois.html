@@ -50,8 +50,9 @@ description: React to geofence entries and exits, read dwell time, handle privac
 });</code></pre>
 
 <p>
-  With <code>withholdsPositionsInPrivacyZones: true</code> the SDK does not emit positions inside a
-  privacy zone. <code>isPrivate</code> is also true when the positioning source marks the position
+  By default the SDK does not emit positions inside a privacy zone
+  (<code>withholdsPositionsInPrivacyZones</code> is <code>true</code>, as in 1.x; the native v6 default is
+  <code>false</code>). Set it to <code>false</code> to receive them. <code>isPrivate</code> is also true when the positioning source marks the position
   private (<code>setPositioningSourcePrivate</code>).
 </p>
 

@@ -2929,7 +2929,7 @@ const StandardMethodCodec pigeonMethodCodec = StandardMethodCodec(_PigeonCodec()
 ///
 /// Errors arrive as `ProximiioFlutterError` with `code` = the SDK's `ProximiioError`
 /// case name (`invalidToken`, `locationPermissionDenied`, …) or a bridge code
-/// (`notConfigured`, `noActivity`, `invalidArgument`, `unsupported`).
+/// (`notConfigured`, `invalidArgument`, `unsupported`).
 class ProximiioHostApi {
   /// Constructor for [ProximiioHostApi].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
@@ -2957,6 +2957,26 @@ class ProximiioHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(pigeonVar_replyList, pigeonVar_channelName, isNullValid: true);
+  }
+
+  /// Whether an SDK instance exists in this process (made by any engine).
+  Future<bool> isConfigured() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.isConfigured$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as bool;
   }
 
   Future<MsgSdkState> state() async {

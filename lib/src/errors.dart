@@ -43,7 +43,8 @@ enum ProximiioErrorCode {
   /// [Proximiio.create] has not been called.
   notConfigured,
 
-  /// A configuration value was rejected (a malformed URL or UUID).
+  /// A value was rejected: a malformed URL or UUID in the configuration, a missing
+  /// `NSBluetoothAlwaysUsageDescription` (iOS), or an unknown floor id.
   invalidArgument,
 
   /// The call does not exist on this platform.

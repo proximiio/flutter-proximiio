@@ -31,8 +31,19 @@ description: How flutter_proximiio bridges the native SDKs, why there is one SDK
 </p>
 
 <p>
-  Several Flutter engines in one process (add-to-app, a background engine) share the instance. Each
-  engine receives every event on its own streams.
+  Several Flutter engines in one process (add-to-app, a background engine) share the instance. The
+  engine that sets it up calls <code>Proximiio.create</code>; the others call
+  <code>Proximiio.shared()</code>, which returns the running instance without stopping it, or
+  <code>null</code> before <code>create</code>. Each engine receives every event on its own streams.
+  Lifecycle calls (<code>create</code>, <code>authenticate</code>, <code>start</code>, <code>stop</code>,
+  <code>signOut</code>) from all engines run one at a time.
+</p>
+
+<p>
+  When the last engine is destroyed on Android, the plugin stops the SDK unless the configuration runs
+  the foreground service (<code>android:</code> options). With the service the SDK keeps positioning,
+  reporting geofences and uploading visitor analytics for as long as Android keeps the service; the
+  next engine reaches it with <code>Proximiio.shared()</code> and can stop it.
 </p>
 
 <h2>The map plugin</h2>

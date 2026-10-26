@@ -46,7 +46,11 @@ description: Position sources, what a PositionUpdate contains, and how custom po
   floorId: groundFloor.id,
 );</code></pre>
 
-<p><code>floorId</code> must be the id of a floor from <code>floors()</code>; an unknown id sets no floor. To set only the floor, use <code>setFloor(floorId)</code>.</p>
+<p>
+  <code>floorId</code> must be the id of a floor from <code>floors()</code>; an unknown id throws
+  <code>invalidArgument</code>. Without <code>floorId</code> the position keeps the current floor. To set
+  only the floor, use <code>setFloor(floorId)</code>.
+</p>
 
 <h2>Pedestrian dead reckoning</h2>
 

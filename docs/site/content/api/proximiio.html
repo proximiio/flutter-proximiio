@@ -17,7 +17,8 @@ description: The Proximiio class — creation, lifecycle, venue data, wayfinding
   <thead><tr><th>Member</th><th>Purpose</th></tr></thead>
   <tbody>
     <tr><td><code>create(ProximiioConfiguration)</code></td><td>Create, or stop and replace, the process-wide instance</td></tr>
-    <tr><td><code>setLogLevel(ProximiioLogLevel)</code></td><td>Native log level, process-wide</td></tr>
+    <tr><td><code>shared()</code></td><td>The running instance, untouched; <code>null</code> before <code>create</code></td></tr>
+    <tr><td><code>setLogLevel(ProximiioLogLevel)</code></td><td>Level of SDK log entries written to Logcat (Android), process-wide</td></tr>
   </tbody>
 </table>
 
@@ -72,8 +73,8 @@ description: The Proximiio class — creation, lifecycle, venue data, wayfinding
 <table>
   <thead><tr><th>Method</th><th>Purpose</th></tr></thead>
   <tbody>
-    <tr><td><code>setCustomPosition(coordinate, {accuracy = 5, floorId})</code></td><td>A position from an outside source</td></tr>
-    <tr><td><code>setFloor(floorId)</code></td><td>Set or clear the floor</td></tr>
+    <tr><td><code>setCustomPosition(coordinate, {accuracy = 5, floorId})</code></td><td>A position from an outside source; an unknown <code>floorId</code> throws <code>invalidArgument</code></td></tr>
+    <tr><td><code>setFloor(floorId)</code></td><td>Set or clear the floor; an unknown id throws <code>invalidArgument</code></td></tr>
     <tr><td><code>enableRouteSnapping({thresholdMeters})</code>, <code>disableRouteSnapping()</code></td><td>Snap positions to paths</td></tr>
     <tr><td><code>enablePdr()</code>, <code>disablePdr()</code></td><td>Pedestrian dead reckoning</td></tr>
     <tr><td><code>setPositioningSourcePrivate(DateTime? since)</code></td><td>Mark relay positions private</td></tr>

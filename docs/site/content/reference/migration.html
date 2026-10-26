@@ -69,4 +69,16 @@ description: Move an app from flutter_proximiio 1.x (Proximi.io SDK 5.x) to 6.0 
   <li>A geofence exit is reported <code>geofenceExitDelay</code> (default 3 s) after the device leaves.</li>
   <li><code>stop()</code> reports an exit for every geofence the device is in.</li>
   <li>On Android, positioning in the background needs <code>android:</code> options (the foreground service).</li>
+  <li>
+    When the last Flutter engine is destroyed on Android, 1.x stopped the SDK. 6.0 stops it only when
+    no foreground service is configured; with the service it keeps positioning, and the next engine
+    reaches it with <code>Proximiio.shared()</code>.
+  </li>
+  <li>
+    Positions inside privacy zones stay withheld, as in 1.x: the plugin sets
+    <code>withholdsPositionsInPrivacyZones: true</code>, although the native v6 default is
+    <code>false</code>.
+  </li>
+  <li><code>ServiceNotificationMode.required</code> behaves like <code>enabled</code>.</li>
+  <li>The iOS app needs all six usage descriptions in <code>Info.plist</code>; see <a href="{{root}}getting-started/installation.html">Installation</a>.</li>
 </ul>

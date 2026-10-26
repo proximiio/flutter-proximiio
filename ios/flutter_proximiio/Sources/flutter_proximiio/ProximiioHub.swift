@@ -97,10 +97,21 @@ final class EngineStreams {
 final class ProximiioHub {
   static let shared = ProximiioHub()
 
+  /// How long the forwarders get to deliver the exits `stop()` reports before they are cancelled.
+  private static let streamDrainNanoseconds: UInt64 = 1_000_000_000
+  private static let drainPollNanoseconds: UInt64 = 20_000_000
+
   private(set) var sdk: Proximiio?
+
+  /// Whether the configuration scans BLE beacons or UWB anchors, so the plugin asks for Bluetooth.
+  private(set) var usesBluetooth = false
+
   private var engines: [EngineStreams] = []
   private var permissionTask: Task<Void, Never>?
   private var runTasks: [Task<Void, Never>] = []
+  /// Forwarders in `runTasks` whose stream has not finished.
+  private var openRunStreams = 0
+  private var lifecycleTail: Task<Void, Never>?
 
   func attach(_ engine: EngineStreams) {
     engines.append(engine)
@@ -110,15 +121,38 @@ final class ProximiioHub {
     engines.removeAll { $0 === engine }
   }
 
-  /// Creates the SDK instance, stopping and replacing the previous one.
-  func configure(_ configuration: ProximiioConfiguration) async throws {
-    if let previous = sdk {
-      cancelRunStreams()
-      permissionTask?.cancel()
-      await previous.stop()
+  /// Runs configure, authenticate, start, stop and sign-out one at a time across all engines, so
+  /// each runs on the instance current when its turn comes.
+  func lifecycle<Value>(_ body: @escaping @MainActor () async throws -> Value) async throws -> Value {
+    let previous = lifecycleTail
+    let task = Task { @MainActor () async throws -> Value in
+      await previous?.value
+      return try await body()
     }
+    lifecycleTail = Task { @MainActor in _ = try? await task.value }
+    return try await task.value
+  }
+
+  /// Creates the SDK instance and replaces the previous one. The previous instance is stopped first,
+  /// with its streams still forwarded so the exits `stop()` reports reach Dart. When the new instance
+  /// cannot be created, the previous one stays (stopped). Call it inside ``lifecycle(_:)``.
+  func configure(_ configuration: ProximiioConfiguration) async throws {
+    let usesBluetooth = configuration.positioning.iBeaconScanningEnabled
+      || configuration.positioning.eddystoneScanningEnabled
+      || configuration.positioning.trilateration.uwbEnabled
+    // CoreBluetooth ends the app when a central manager is made without this usage description.
+    if usesBluetooth, Bundle.main.object(forInfoDictionaryKey: "NSBluetoothAlwaysUsageDescription") == nil {
+      throw Mappers.invalidArgument(
+        "Info.plist has no NSBluetoothAlwaysUsageDescription; iOS would end the app when start() scans for beacons. "
+          + "Add it, or use ConfigurationPreset.relayOnly."
+      )
+    }
+    if let previous = sdk { await stopAndDrain(previous) }
     let sdk = try Proximiio(configuration: configuration)
+    cancelRunStreams()
+    permissionTask?.cancel()
     self.sdk = sdk
+    self.usesBluetooth = usesBluetooth
     Proximiio.shared = sdk
     let updates = await sdk.permissionUpdates()
     permissionTask = forward(updates, map: Mappers.permissionStatus) { $0.permissionUpdates.box }
@@ -134,9 +168,11 @@ final class ProximiioHub {
     }
   }
 
-  /// The SDK's streams are run-scoped (they finish at `stop()`), so they are taken again after each `start()`.
-  func subscribeRunStreams() async {
-    guard let sdk else { return }
+  /// Takes the SDK's run-scoped streams unless they are still open. They are taken before `start()`,
+  /// so the events `start()` itself emits are not missed, and they finish at `stop()`; a `start()` of a
+  /// running SDK keeps the ones it has.
+  func ensureRunStreams() async {
+    guard let sdk, runTasks.isEmpty || openRunStreams < runTasks.count else { return }
     cancelRunStreams()
     let positions = await sdk.positions()
     let floorChanges = await sdk.floorChanges()
@@ -145,25 +181,45 @@ final class ProximiioHub {
     let venueDataChanges = await sdk.venueDataChanges()
     let syncEvents = await sdk.syncEvents()
     let beaconEvents = await sdk.beaconEvents()
+    let finished = { @MainActor [weak self] () -> Void in self?.openRunStreams -= 1 }
     runTasks = [
-      forward(positions, map: Mappers.position) { $0.positions.box },
-      forward(floorChanges, map: Mappers.floorChange) { $0.floorChanges.box },
-      forward(geofenceEvents, map: Mappers.geofenceEvent) { $0.geofenceEvents.box },
-      forward(privacyZoneStates, map: Mappers.privacyZoneState) { $0.privacyZoneStateChanges.box },
-      forward(venueDataChanges, map: VenueMappers.venueDataChange) { $0.venueDataChanges.box },
-      forward(syncEvents, map: VenueMappers.syncEvent) { $0.syncEvents.box },
-      forward(beaconEvents, map: VenueMappers.beaconEvent) { $0.beaconEvents.box },
+      forward(positions, map: Mappers.position, onFinish: finished) { $0.positions.box },
+      forward(floorChanges, map: Mappers.floorChange, onFinish: finished) { $0.floorChanges.box },
+      forward(geofenceEvents, map: Mappers.geofenceEvent, onFinish: finished) { $0.geofenceEvents.box },
+      forward(privacyZoneStates, map: Mappers.privacyZoneState, onFinish: finished) { $0.privacyZoneStateChanges.box },
+      forward(venueDataChanges, map: VenueMappers.venueDataChange, onFinish: finished) { $0.venueDataChanges.box },
+      forward(syncEvents, map: VenueMappers.syncEvent, onFinish: finished) { $0.syncEvents.box },
+      forward(beaconEvents, map: VenueMappers.beaconEvent, onFinish: finished) { $0.beaconEvents.box },
     ]
+    openRunStreams = runTasks.count
+  }
+
+  /// Stops `sdk`. When it was running, `stop()` finishes its streams after the exits it reports, and
+  /// the forwarders are given time to deliver them; the streams of an SDK that was not running stay
+  /// open for its next start.
+  func stopAndDrain(_ sdk: Proximiio) async {
+    let state = await sdk.state
+    let wasRunning = state == .running || state == .starting
+    await sdk.stop()
+    guard wasRunning else { return }
+    var waited: UInt64 = 0
+    while openRunStreams > 0, waited < Self.streamDrainNanoseconds {
+      try? await Task.sleep(nanoseconds: Self.drainPollNanoseconds)
+      waited += Self.drainPollNanoseconds
+    }
+    cancelRunStreams()
   }
 
   func cancelRunStreams() {
     runTasks.forEach { $0.cancel() }
     runTasks = []
+    openRunStreams = 0
   }
 
   private func forward<Value, Message>(
     _ stream: AsyncStream<Value>,
     map: @escaping (Value) -> Message?,
+    onFinish: (@MainActor () -> Void)? = nil,
     to box: @escaping (EngineStreams) -> EventBox<Message>
   ) -> Task<Void, Never> {
     Task { [weak self] in
@@ -174,6 +230,7 @@ final class ProximiioHub {
           box(engine).send(message)
         }
       }
+      if !Task.isCancelled { onFinish?() }
     }
   }
 }

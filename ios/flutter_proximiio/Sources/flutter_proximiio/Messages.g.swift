@@ -2906,13 +2906,15 @@ var messagesPigeonMethodCodec = FlutterStandardMethodCodec(readerWriter: Message
 ///
 /// Errors arrive as `ProximiioFlutterError` with `code` = the SDK's `ProximiioError`
 /// case name (`invalidToken`, `locationPermissionDenied`, …) or a bridge code
-/// (`notConfigured`, `noActivity`, `invalidArgument`, `unsupported`).
+/// (`notConfigured`, `invalidArgument`, `unsupported`).
 ///
 /// Generated protocol from Pigeon that represents a handler of messages from Flutter.
 protocol ProximiioHostApi {
   /// Creates the SDK instance (stopping and replacing an existing one) and
   /// stores it in `Proximiio.shared` for the map plugin.
   func configure(configuration: MsgConfiguration, completion: @escaping (Result<Void, Error>) -> Void)
+  /// Whether an SDK instance exists in this process (made by any engine).
+  func isConfigured() throws -> Bool
   func state(completion: @escaping (Result<MsgSdkState, Error>) -> Void)
   func requestPermissions(always: Bool, completion: @escaping (Result<MsgPermissionStatus, Error>) -> Void)
   func requestMotionPermission(completion: @escaping (Result<Bool, Error>) -> Void)
@@ -3009,6 +3011,20 @@ class ProximiioHostApiSetup {
       }
     } else {
       configureChannel.setMessageHandler(nil)
+    }
+    /// Whether an SDK instance exists in this process (made by any engine).
+    let isConfiguredChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.isConfigured\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      isConfiguredChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.isConfigured()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      isConfiguredChannel.setMessageHandler(nil)
     }
     let stateChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.state\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

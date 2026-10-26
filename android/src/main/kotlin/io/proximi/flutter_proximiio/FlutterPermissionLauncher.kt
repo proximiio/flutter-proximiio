@@ -1,7 +1,10 @@
 package io.proximi.flutter_proximiio
 
+import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.PluginRegistry
 import io.proximi.sdk.core.platform.PermissionRequestLauncher
@@ -15,40 +18,61 @@ import kotlinx.coroutines.withContext
  * Shows runtime-permission prompts for the SDK through Flutter's activity binding.
  *
  * The SDK's own `ActivityResultPermissionLauncher` needs a `ComponentActivity`, and a plain
- * `FlutterActivity` is not one; this launcher works with any activity Flutter attaches.
- * Without an attached activity, a request resolves at once with nothing granted, and the SDK
- * re-reads the real state afterwards.
+ * `FlutterActivity` is not one; this launcher works with any activity Flutter attaches. It is
+ * process-wide like the SDK: every engine with an activity attaches it, and prompts go to the most
+ * recently attached one.
+ *
+ * The SDK records a permission as asked before it calls the launcher, so callers check [canPrompt]
+ * first: a request without an activity would read as a denial from then on.
  */
 internal class FlutterPermissionLauncher : PermissionRequestLauncher, PluginRegistry.RequestPermissionsResultListener {
-  private var binding: ActivityPluginBinding? = null
-  private var pending: CompletableDeferred<Map<String, Boolean>>? = null
+  private val bindings = mutableListOf<ActivityPluginBinding>()
+  private var pending: Pending? = null
   private val mutex = Mutex()
 
-  fun attach(binding: ActivityPluginBinding) {
-    this.binding?.removeRequestPermissionsResultListener(this)
-    this.binding = binding
-    binding.addRequestPermissionsResultListener(this)
+  /** A prompt on screen. [activity] is `null` between a configuration change and the reattach. */
+  private class Pending(val permissions: List<String>, var activity: Activity?) {
+    val result = CompletableDeferred<Map<String, Boolean>>()
   }
 
-  fun detach(binding: ActivityPluginBinding) {
-    if (this.binding !== binding) return
+  /** Whether an activity is attached to show a prompt on. */
+  val canPrompt: Boolean get() = bindings.isNotEmpty()
+
+  fun attach(binding: ActivityPluginBinding) {
+    if (binding in bindings) return
+    bindings += binding
+    binding.addRequestPermissionsResultListener(this)
+    pending?.let { if (it.activity == null) it.activity = binding.activity }
+  }
+
+  /**
+   * Removes [binding]. After a configuration change the recreated activity receives the result of a
+   * prompt still on screen, so it stays pending; otherwise the prompt is gone and it resolves with
+   * what is granted now.
+   */
+  fun detach(binding: ActivityPluginBinding, forConfigChange: Boolean) {
+    if (!bindings.remove(binding)) return
     binding.removeRequestPermissionsResultListener(this)
-    this.binding = null
+    val pending = pending?.takeIf { it.activity === binding.activity } ?: return
+    if (forConfigChange) {
+      pending.activity = null
+    } else {
+      pending.result.complete(grants(binding.activity, pending.permissions))
+    }
   }
 
   override suspend fun request(permissions: List<String>): Map<String, Boolean> {
     if (permissions.isEmpty()) return emptyMap()
     return mutex.withLock {
-      val deferred = CompletableDeferred<Map<String, Boolean>>()
       val shown = withContext(Dispatchers.Main) {
-        val activity = binding?.activity ?: return@withContext false
-        pending = deferred
-        ActivityCompat.requestPermissions(activity, permissions.toTypedArray(), REQUEST_CODE)
-        true
-      }
-      if (!shown) return@withLock permissions.associateWith { false }
+        val activity = bindings.lastOrNull()?.activity ?: return@withContext null
+        Pending(permissions, activity).also {
+          pending = it
+          ActivityCompat.requestPermissions(activity, permissions.toTypedArray(), REQUEST_CODE)
+        }
+      } ?: return@withLock permissions.associateWith { false }
       try {
-        deferred.await()
+        shown.result.await()
       } finally {
         pending = null
       }
@@ -61,12 +85,19 @@ internal class FlutterPermissionLauncher : PermissionRequestLauncher, PluginRegi
     grantResults: IntArray,
   ): Boolean {
     if (requestCode != REQUEST_CODE) return false
-    val result = permissions.indices.associate { index ->
+    val pending = pending ?: return true
+    // An interrupted prompt reports empty arrays; what is granted now is the answer then.
+    val context = pending.activity ?: bindings.lastOrNull()?.activity
+    val current = context?.let { grants(it, pending.permissions) } ?: pending.permissions.associateWith { false }
+    val result = current + permissions.indices.associate { index ->
       permissions[index] to (grantResults.getOrNull(index) == PackageManager.PERMISSION_GRANTED)
     }
-    pending?.complete(result)
+    pending.result.complete(result)
     return true
   }
+
+  private fun grants(context: Context, permissions: List<String>): Map<String, Boolean> =
+    permissions.associateWith { ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED }
 
   private companion object {
     /** Any 16-bit value distinct from other plugins' codes; the SDK's legacy 111…115 are left alone. */

@@ -106,7 +106,8 @@ print('${route.distanceMeters.round()} m, about ${route.duration.inMinutes} min'
 
 <pre><code class="language-dart">try {
   route = await sdk.computeRoute(from: start, fromLevel: 0, to: goal, options: wheelchair);
-} on ProximiioException catch (e) when (e.noRouteReason == NoRouteReason.noAccessibleRoute) {
+} on ProximiioException catch (e) {
+  if (e.noRouteReason != NoRouteReason.noAccessibleRoute) rethrow;
   showMessage('No step-free route. Blocked by: ${e.blockedBy.map((a) =&gt; a.name).join(', ')}');
 }</code></pre>
 

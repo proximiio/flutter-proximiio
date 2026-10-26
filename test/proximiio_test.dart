@@ -12,6 +12,8 @@ class FakeHostApi extends ProximiioHostApi {
   MsgConfiguration? configuration;
   PlatformException? failWith;
   List<MsgFloor> floorList = [];
+  bool configured = false;
+  String style = '{}';
 
   Future<T> _answer<T>(String name, T value) async {
     calls.add(name);
@@ -24,6 +26,12 @@ class FakeHostApi extends ProximiioHostApi {
     this.configuration = configuration;
     return _answer('configure', null);
   }
+
+  @override
+  Future<bool> isConfigured() => _answer('isConfigured', configured);
+
+  @override
+  Future<String> mapStyle() => _answer('mapStyle', style);
 
   @override
   Future<MsgApplication?> authenticate() => _answer('authenticate', MsgApplication(id: 'app', name: 'Demo'));
@@ -182,6 +190,55 @@ void main() {
     expect(second, [48]);
     await a.cancel();
     await b.cancel();
+  });
+
+  test('a second create shares the streams of the first handle', () async {
+    final first = await BridgedProximiio.create(const ProximiioConfiguration(token: 'a'), api: api, events: events);
+    final old = <double>[];
+    final oldSubscription = first.positions.listen((p) => old.add(p.coordinate.latitude));
+
+    final second = await BridgedProximiio.create(const ProximiioConfiguration(token: 'b'), api: api, events: events);
+    final current = <double>[];
+    final subscription = second.positions.listen((p) => current.add(p.coordinate.latitude));
+    events.positionsController.add(_position(48));
+    await pumpEventQueue();
+    // The old page goes away; the new one keeps its events.
+    await oldSubscription.cancel();
+    events.positionsController.add(_position(49));
+    await pumpEventQueue();
+
+    expect(events.positionsCalls, 1);
+    expect(old, [48]);
+    expect(current, [48, 49]);
+    await subscription.cancel();
+  });
+
+  test('shared returns the running instance without configuring it', () async {
+    expect(await BridgedProximiio.shared(api: api, events: events), isNull);
+
+    api.configured = true;
+    final sdk = await BridgedProximiio.shared(api: api, events: events);
+    await sdk!.start();
+
+    expect(api.calls, ['isConfigured', 'isConfigured', 'start']);
+  });
+
+  test('a map style that is not a JSON object is an api decoding error', () async {
+    final sdk = BridgedProximiio(api, events);
+
+    for (final body in ['<html>', '[]']) {
+      api.style = body;
+      await expectLater(
+        sdk.mapStyle(),
+        throwsA(
+          isA<ProximiioException>()
+              .having((e) => e.code, 'code', ProximiioErrorCode.api)
+              .having((e) => e.kind, 'kind', 'decoding'),
+        ),
+      );
+    }
+    api.style = '{"version": 8}';
+    expect(await sdk.mapStyle(), {'version': 8});
   });
 
   test('stream errors are converted too', () async {

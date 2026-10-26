@@ -20,6 +20,16 @@ void main() {
       expect(msg.android, isNull);
     });
 
+    test('positions in privacy zones are withheld unless turned off, as in 1.x', () {
+      expect(toMsgConfiguration(const ProximiioConfiguration(token: 't')).withholdsPositionsInPrivacyZones, isTrue);
+      expect(
+        toMsgConfiguration(
+          const ProximiioConfiguration(token: 't', withholdsPositionsInPrivacyZones: false),
+        ).withholdsPositionsInPrivacyZones,
+        isFalse,
+      );
+    });
+
     test('converts every override, durations to seconds', () {
       final msg = toMsgConfiguration(
         ProximiioConfiguration(

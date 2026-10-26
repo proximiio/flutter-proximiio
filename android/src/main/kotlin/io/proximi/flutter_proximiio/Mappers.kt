@@ -1,5 +1,6 @@
 package io.proximi.flutter_proximiio
 
+import android.app.PendingIntent
 import android.content.Context
 import io.proximi.sdk.PrivacyZoneState
 import io.proximi.sdk.Proximiio
@@ -30,6 +31,7 @@ import io.proximi.sdk.positioning.native.CoreLocationAccuracy
 import io.proximi.sdk.service.NotificationMode
 import io.proximi.sdk.service.ProximiioServiceOptions
 import java.net.URI
+import kotlin.math.abs
 import java.util.UUID
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -71,8 +73,12 @@ internal object Mappers {
     )
   }
 
-  fun serviceOptions(msg: MsgAndroidServiceOptions, context: Context): ProximiioServiceOptions {
-    val defaults = ProximiioServiceOptions()
+  /** [msg] over [defaults]; a tap on the notification opens the app unless [defaults] says otherwise. */
+  fun serviceOptions(
+    msg: MsgAndroidServiceOptions,
+    context: Context,
+    defaults: ProximiioServiceOptions = ProximiioServiceOptions(contentIntent = launchIntent(context)),
+  ): ProximiioServiceOptions {
     return defaults.copy(
       notificationMode = msg.mode?.let(::notificationMode) ?: defaults.notificationMode,
       notificationChannelName = msg.channelName ?: defaults.notificationChannelName,
@@ -83,6 +89,12 @@ internal object Mappers {
       holdsWakeLock = msg.holdsWakeLock ?: defaults.holdsWakeLock,
     )
   }
+
+  /** Opens the app's launcher activity, as the 1.x notification did. */
+  private fun launchIntent(context: Context): PendingIntent? =
+    context.packageManager.getLaunchIntentForPackage(context.packageName)?.let { intent ->
+      PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+    }
 
   /** A drawable of the host app by name, or the app icon when there is none by that name. */
   fun drawable(context: Context, name: String): Int {
@@ -138,11 +150,21 @@ internal object Mappers {
   fun jsonElement(value: JsonValue): JsonElement = when (value) {
     JsonValue.Null -> JsonNull
     is JsonValue.Bool -> JsonPrimitive(value.value)
-    is JsonValue.Number -> JsonPrimitive(value.value)
+    is JsonValue.Number -> JsonPrimitive(number(value.value))
     is JsonValue.String -> JsonPrimitive(value.value)
     is JsonValue.Array -> JsonArray(value.value.map(::jsonElement))
     is JsonValue.Object -> JsonObject(value.value.mapValues { jsonElement(it.value) })
   }
+
+  /**
+   * JSON numbers are doubles in the SDK. A whole number is written without a fraction (`3`, not
+   * `3.0`), as iOS writes it, so Dart decodes it as an `int` on both platforms.
+   */
+  private fun number(value: Double): Number =
+    if (value % 1.0 == 0.0 && abs(value) < MAX_EXACT_INTEGER) value.toLong() else value
+
+  /** 2^53: up to here a double holds every integer exactly. */
+  private const val MAX_EXACT_INTEGER = 9_007_199_254_740_992.0
 
   fun application(value: ProximiioApplication) = MsgApplication(id = value.id, name = value.name)
 
@@ -357,9 +379,12 @@ internal object Mappers {
     return ProximiioFlutterError(code, message, details)
   }
 
-  /** The subclass name of a sealed error, as the iOS case name (`ChecksumMismatch` → `checksumMismatch`). */
+  /**
+   * The subclass name of a sealed error, as the iOS case name (`ChecksumMismatch` → `checksumMismatch`).
+   * Swift spells the `Id` acronym `ID` (`InvalidId` → `invalidID`).
+   */
   private fun kindName(error: Throwable): String =
-    error::class.simpleName?.replaceFirstChar { it.lowercaseChar() } ?: "unknown"
+    error::class.simpleName?.replaceFirstChar { it.lowercaseChar() }?.replace(Regex("Id$"), "ID") ?: "unknown"
 
   /** `NOT_DETERMINED` → `notDetermined`, the iOS raw value. */
   internal fun Enum<*>.camelName(): String =

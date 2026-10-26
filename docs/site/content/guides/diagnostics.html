@@ -39,7 +39,13 @@ if (d.noPositionReason != null) print('No position: ${d.noPositionReason}');</co
 
 <pre><code class="language-dart">await Proximiio.setLogLevel(ProximiioLogLevel.debug);</code></pre>
 
-<p>The native SDK writes to the platform log (Xcode console, Logcat). The level is process-wide. Use <code>warning</code> or <code>error</code> in release builds.</p>
+<p>
+  On Android the plugin writes the SDK's log entries at this level and above to Logcat, with the tag
+  <code>Proximiio</code>; the Android SDK writes nothing there by itself. On iOS the SDK writes to the
+  unified log (Xcode console, Console.app) by itself, at every level, and this setting does not
+  change that output. The level is process-wide. Use <code>warning</code> or <code>error</code> in
+  release builds.
+</p>
 
 <h2>Support report</h2>
 

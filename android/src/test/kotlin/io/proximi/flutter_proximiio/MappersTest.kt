@@ -104,9 +104,18 @@ class MappersTest {
       ),
     )
 
-    assertEquals("""{"wing":"A","rooms":[1.0,true,null]}""", json)
+    assertEquals("""{"wing":"A","rooms":[1,true,null]}""", json)
     assertNull(Mappers.json(null))
     assertNull(Mappers.json(JsonValue.Null))
+  }
+
+  @Test
+  fun `whole numbers are written as iOS writes them, fractions stay`() {
+    val json = Mappers.json(
+      JsonValue.Array(listOf(JsonValue.Number(17.0), JsonValue.Number(48.25), JsonValue.Number(-3.0), JsonValue.Number(1e20))),
+    )
+
+    assertEquals("""[17,48.25,-3,1.0E20]""", json)
   }
 
   @Test
