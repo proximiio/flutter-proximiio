@@ -6,6 +6,8 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [6.0.0-beta.1] - 2026-10-26
+
 ### Added
 - `Proximiio.create(ProximiioConfiguration)`: one process-wide SDK instance, shared with
   `flutter_proximiio_map`. `Proximiio.shared()` returns it to another engine or screen without
@@ -59,6 +61,7 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
 - `withholdsPositionsInPrivacyZones` defaults to `true`, as in 1.x (the native v6 default is `false`).
 - On Android the SDK keeps running after the last engine is destroyed only when the foreground service
   runs (`android:` options, mode not `disabled`); 1.x always stopped it.
+- The example app uses Swift Package Manager and the UIScene lifecycle on iOS (Flutter 3.38 or newer).
 
 ## [1.0.0]
 

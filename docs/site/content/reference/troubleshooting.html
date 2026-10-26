@@ -52,7 +52,12 @@ description: Common integration problems and how to find their cause.
 
 <h2>iOS app does not launch on iOS 27</h2>
 
-<p>iOS 27 requires the UIScene life cycle. Migrate the Flutter app's <code>AppDelegate</code> to UIScene as described in the Flutter documentation; the plugin needs no change.</p>
+<p>
+  The crash log stops in <code>_UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption</code>: the
+  app has not adopted the UIScene lifecycle. See
+  <a href="{{root}}getting-started/installation.html">Installation › Scene lifecycle</a>. The plugin needs
+  no change.
+</p>
 
 <h2>iOS: pod 'Proximiio' not found</h2>
 

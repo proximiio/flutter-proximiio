@@ -86,6 +86,16 @@ end</code></pre>
 
 <p>For background positioning also add <code>location</code> to <code>UIBackgroundModes</code>. See <a href="{{root}}guides/background.html">Background positioning</a>.</p>
 
+<h3>Scene lifecycle</h3>
+
+<p>
+  An app built with Xcode 27 that has not adopted the UIScene lifecycle ends at launch on iOS 27.
+  Flutter 3.41 and newer migrate an unmodified <code>AppDelegate</code> and <code>Info.plist</code> on the
+  next build. For a custom <code>AppDelegate</code>, follow Flutter's
+  <a href="https://docs.flutter.dev/release/breaking-changes/uiscenedelegate">UIScene adoption</a> guide.
+  The plugin works with either lifecycle.
+</p>
+
 <h2>Android</h2>
 
 <h3>Repository</h3>

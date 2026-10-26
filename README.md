@@ -68,6 +68,11 @@ Without `NSBluetoothAlwaysUsageDescription` iOS ends the app when the SDK scans 
 For background positioning also add `location` to `UIBackgroundModes` and set
 `allowsBackgroundLocationUpdates: true`.
 
+An app built with Xcode 27 ends at launch on iOS 27 unless it uses the UIScene lifecycle. Flutter 3.41 and
+newer migrate an unmodified `AppDelegate` on the next build; see Flutter's
+[UIScene adoption](https://docs.flutter.dev/release/breaking-changes/uiscenedelegate) guide. The plugin works
+with either lifecycle.
+
 ### Android
 
 The SDK comes from `https://maven.eu.proximi.fi/releases/` (public, no credentials). The plugin adds the
@@ -152,6 +157,17 @@ cd example
 cp env.example.json env.json   # put your application token in env.json (gitignored)
 flutter run --dart-define-from-file=env.json
 ```
+
+The example uses Swift Package Manager and the UIScene lifecycle on iOS (Flutter 3.38 or newer). Clone the
+repository into a directory named `flutter_proximiio`:
+
+```sh
+git clone https://github.com/proximiio/flutter-proximiio flutter_proximiio
+```
+
+Flutter adds the plugin's Swift package to the example's Xcode project under the checkout's directory
+name. When that name differs from the package name, Xcode stops resolving packages with
+`unable to override package 'flutter_proximiio'` (seen with Flutter 3.47 and Xcode 27).
 
 ## Development
 

@@ -207,6 +207,16 @@ map.guidance.listen((RouteGuidance? g) => ...); // after map.setGuidanceRules(Ro
    remain the only v2 item.
 
 
+## Status update (2026-10-26, release)
+
+- **Tagged `6.0.0-beta.1`** in both repos; the map depends on `flutter_proximiio` at that tag (no path
+  override). The example app (`proximiio-flutter-example`) moved to v6 on `main`, pinned to both tags.
+- **Flutter 3.47.8 / Xcode 27:** the examples adopt the UIScene lifecycle (iOS 27 ends apps without it at
+  launch) and Swift Package Manager; the plugins need no change. A plugin's own example only resolves its
+  Swift packages when the checkout directory is named after the plugin (`flutter_proximiio`); see README.
+- Open: Partner Zone product ids; iOS answers on offline `authenticate` and the map podspec; CocoaPods path
+  not built (no CocoaPods on this machine).
+
 ## Status update (2026-10-25, later)
 
 - **P1 verified on a device:** iOS 26.3 simulator integration test passes against the live API (authenticate,
