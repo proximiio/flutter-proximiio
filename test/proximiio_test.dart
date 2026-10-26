@@ -105,14 +105,22 @@ void main() {
   tearDown(() => events.close());
 
   test('create configures the native instance once', () async {
-    await BridgedProximiio.create(const ProximiioConfiguration(token: 'tok'), api: api, events: events);
+    await BridgedProximiio.create(
+      const ProximiioConfiguration(token: 'tok'),
+      api: api,
+      events: events,
+    );
 
     expect(api.calls, ['configure']);
     expect(api.configuration?.token, 'tok');
   });
 
   test('lifecycle calls go through in order and convert results', () async {
-    final sdk = await BridgedProximiio.create(const ProximiioConfiguration(token: 't'), api: api, events: events);
+    final sdk = await BridgedProximiio.create(
+      const ProximiioConfiguration(token: 't'),
+      api: api,
+      events: events,
+    );
 
     final status = await sdk.requestPermissions(always: true);
     final app = await sdk.authenticate();
@@ -193,11 +201,19 @@ void main() {
   });
 
   test('a second create shares the streams of the first handle', () async {
-    final first = await BridgedProximiio.create(const ProximiioConfiguration(token: 'a'), api: api, events: events);
+    final first = await BridgedProximiio.create(
+      const ProximiioConfiguration(token: 'a'),
+      api: api,
+      events: events,
+    );
     final old = <double>[];
     final oldSubscription = first.positions.listen((p) => old.add(p.coordinate.latitude));
 
-    final second = await BridgedProximiio.create(const ProximiioConfiguration(token: 'b'), api: api, events: events);
+    final second = await BridgedProximiio.create(
+      const ProximiioConfiguration(token: 'b'),
+      api: api,
+      events: events,
+    );
     final current = <double>[];
     final subscription = second.positions.listen((p) => current.add(p.coordinate.latitude));
     events.positionsController.add(_position(48));

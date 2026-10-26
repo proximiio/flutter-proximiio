@@ -170,8 +170,9 @@ GeofenceEvent fromMsgGeofenceEvent(MsgGeofenceEvent e) => switch (e) {
 /// Transport → [PrivacyZoneState].
 PrivacyZoneState fromMsgPrivacyZoneState(MsgPrivacyZoneState s) => PrivacyZoneState(
   isInPrivacyZone: s.isInPrivacyZone,
-  positioningSourcePrivateSince:
-      s.positioningSourcePrivateSinceMs == null ? null : _time(s.positioningSourcePrivateSinceMs!),
+  positioningSourcePrivateSince: s.positioningSourcePrivateSinceMs == null
+      ? null
+      : _time(s.positioningSourcePrivateSinceMs!),
   isPrivate: s.isPrivate,
 );
 

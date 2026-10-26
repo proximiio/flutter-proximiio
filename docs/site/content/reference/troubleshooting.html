@@ -46,9 +46,22 @@ description: Common integration problems and how to find their cause.
 
 <p>Use the Android Gradle Plugin 8.13 or newer and Gradle 8.13 or newer; see <a href="{{root}}getting-started/installation.html">Installation</a>.</p>
 
+<h2>Android build: Dependency ':flutter_proximiio' requires … compileSdk of at least 37</h2>
+
+<p>
+  The SDK's AndroidX and OkHttp dependencies require compiling against API 37, and Flutter's default
+  <code>compileSdk</code> is lower. Set <code>compileSdk = 37</code> in
+  <code>android/app/build.gradle.kts</code>.
+</p>
+
 <h2>Android build fails with a Java version such as 25.0.2</h2>
 
-<p>Gradle 8 cannot run on JDK 25, which recent Android Studio versions bundle. Point Flutter at JDK 17 or 21: <code>flutter config --jdk-dir=&lt;path&gt;</code>.</p>
+<p>
+  Gradle versions before 9.1 cannot run on JDK 25, which recent Android Studio versions bundle. Update
+  <code>distributionUrl</code> in <code>android/gradle/wrapper/gradle-wrapper.properties</code> to Gradle
+  9.1 or newer, as projects created with Flutter 3.44 or newer use, or point Flutter at JDK 17 or 21:
+  <code>flutter config --jdk-dir=&lt;path&gt;</code>.
+</p>
 
 <h2>iOS app does not launch on iOS 27</h2>
 

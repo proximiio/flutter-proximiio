@@ -6,6 +6,17 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [6.0.0-beta.2] - 2026-10-26
+
+### Changed
+- BREAKING: the minimum is Flutter 3.44 / Dart 3.12.
+- The Android plugin migrates to the Android Gradle Plugin's built-in Kotlin, as Flutter requires of
+  plugins. Apps build with and without built-in Kotlin, on the Android Gradle Plugin 8.13 or newer;
+  a project created with Flutter 3.44 or newer only sets `minSdk = 26` and `compileSdk = 37`.
+- The Android build files use the Kotlin DSL.
+- The example app uses the Android toolchain of the current Flutter template (Gradle 9.3, Android
+  Gradle Plugin 9.1, Kotlin 2.4) with built-in Kotlin, and builds on the JDK Android Studio bundles.
+
 ## [6.0.0-beta.1] - 2026-10-26
 
 ### Added

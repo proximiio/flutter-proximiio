@@ -695,11 +695,8 @@ final class _BridgedStreams {
       .map(convert)
       .transform(
         StreamTransformer<T, T>.fromHandlers(
-          handleError:
-              (error, stackTrace, sink) => sink.addError(
-                error is PlatformException ? ProximiioException.fromPlatform(error) : error,
-                stackTrace,
-              ),
+          handleError: (error, stackTrace, sink) =>
+              sink.addError(error is PlatformException ? ProximiioException.fromPlatform(error) : error, stackTrace),
         ),
       );
 }

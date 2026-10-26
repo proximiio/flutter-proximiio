@@ -207,6 +207,16 @@ map.guidance.listen((RouteGuidance? g) => ...); // after map.setGuidanceRules(Ro
    remain the only v2 item.
 
 
+## Status update (2026-10-26, 6.0.0-beta.2)
+
+- **Today's Flutter Android standard:** both plugins migrate to AGP built-in Kotlin (Flutter's guide for
+  plugin authors), Kotlin DSL build files, AGP 9.1 in the plugin buildscript; minimum Flutter 3.44 / Dart
+  3.12. Checked: plugin examples with `android.builtInKotlin=true` (Gradle 9.3.1, AGP 9.1.0, Kotlin 2.4.0),
+  the example app as `flutter create` makes it (built-in Kotlin off), and an AGP 8.13.2 / Gradle 8.14.3
+  app with `kotlin-android`; all on the JDK Android Studio bundles (25) where Gradle allows.
+- compileSdk 37 stays: the Android SDK's OkHttp 5.5 / AndroidX 1.12 require it, while Flutter's default
+  is 36.
+
 ## Status update (2026-10-26, release)
 
 - **Tagged `6.0.0-beta.1`** in both repos; the map depends on `flutter_proximiio` at that tag (no path

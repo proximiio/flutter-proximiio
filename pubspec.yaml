@@ -1,11 +1,11 @@
 name: flutter_proximiio
 description: Proximi.io indoor positioning for Flutter, a bridge over the native Proximi.io SDK v6 for iOS and Android.
-version: 6.0.0-beta.1
+version: 6.0.0-beta.2
 homepage: https://github.com/proximiio/flutter-proximiio
 
 environment:
-  sdk: ^3.7.0
-  flutter: ">=3.29.0"
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
 
 dependencies:
   flutter:

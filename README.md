@@ -12,15 +12,16 @@ Each release pins exact native SDK versions; they are built and tested together.
 
 | flutter_proximiio | iOS SDK (`Proximiio`) | Android SDK (`io.proximi.sdk:proximiio`) |
 |---|---|---|
+| 6.0.0-beta.2 | 6.0.0-beta.64 | 6.0.0-beta.31 |
 | 6.0.0-beta.1 | 6.0.0-beta.64 | 6.0.0-beta.31 |
 
 ## Requirements
 
 | | Minimum |
 |---|---|
-| Flutter / Dart | 3.29 / 3.7 |
+| Flutter / Dart | 3.44 / 3.12 |
 | iOS | 15.0, Xcode 16 |
-| Android | minSdk 26, compileSdk 37, Android Gradle Plugin 8.13, Gradle 8.13, Kotlin 2.2, JDK 17 |
+| Android | minSdk 26, compileSdk 37, Android Gradle Plugin 8.13, JDK 17 |
 
 ## Installation
 
@@ -29,7 +30,7 @@ dependencies:
   flutter_proximiio:
     git:
       url: https://github.com/proximiio/flutter-proximiio
-      ref: 6.0.0-beta.1
+      ref: 6.0.0-beta.2
 ```
 
 ### iOS
@@ -89,8 +90,10 @@ dependencyResolutionManagement {
 }
 ```
 
-In `android/app/build.gradle.kts` set `minSdk = 26` and `compileSdk = 37`; in `settings.gradle.kts` use
-the Android Gradle Plugin 8.13 or newer and Kotlin 2.2 or newer.
+In `android/app/build.gradle.kts` set `minSdk = 26` and `compileSdk = 37`. A project created with Flutter
+3.44 or newer needs nothing else: its Android Gradle Plugin 9 and Gradle 9 run on the JDK that Android
+Studio bundles, with or without built-in Kotlin. An older project needs the Android Gradle Plugin 8.13 or
+newer; Gradle before 9.1 does not run on JDK 25.
 
 The SDK's manifest brings the location, Bluetooth, foreground-service and notification permissions and
 its foreground service. To keep an app foreground-only, remove background location:
@@ -158,7 +161,8 @@ cp env.example.json env.json   # put your application token in env.json (gitigno
 flutter run --dart-define-from-file=env.json
 ```
 
-The example uses Swift Package Manager and the UIScene lifecycle on iOS (Flutter 3.38 or newer). Clone the
+The example uses Swift Package Manager and the UIScene lifecycle on iOS and built-in Kotlin on Android
+(Flutter 3.47 or newer). Clone the
 repository into a directory named `flutter_proximiio`:
 
 ```sh

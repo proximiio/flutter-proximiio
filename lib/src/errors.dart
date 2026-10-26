@@ -91,13 +91,12 @@ class ProximiioException implements Exception {
       statusCode: int.tryParse(details['statusCode'] ?? ''),
       noRouteReason: NoRouteReason.values.where((reason) => reason.name == details['reason']).firstOrNull,
       nearestDistanceMeters: double.tryParse(details['nearestDistanceMeters'] ?? ''),
-      blockedBy:
-          blockedBy == null || blockedBy.isEmpty
-              ? const {}
-              : {
-                for (final name in blockedBy.split(','))
-                  ...RouteAvoidance.values.where((avoidance) => avoidance.name == name),
-              },
+      blockedBy: blockedBy == null || blockedBy.isEmpty
+          ? const {}
+          : {
+              for (final name in blockedBy.split(','))
+                ...RouteAvoidance.values.where((avoidance) => avoidance.name == name),
+            },
       underlying: details['underlying'],
       domain: details['domain'],
       failureCode: int.tryParse(details['failureCode'] ?? ''),
