@@ -6,7 +6,8 @@ description: The Proximiio class — creation, lifecycle, venue data, wayfinding
 <p>
   <code>Proximiio</code> is the entry point. <code>Proximiio.create</code> makes the process-wide SDK
   instance; every method returns a <code>Future</code> and throws <code>ProximiioException</code> on
-  failure. <code>Proximiio</code> is an interface, so tests can replace it with a fake.
+  failure. The Errors column lists the codes specific to a call. <code>Proximiio</code> is an interface,
+  so tests can replace it with a fake.
 </p>
 
 <pre><code class="language-dart">final Proximiio sdk = await Proximiio.create(const ProximiioConfiguration(token: token));</code></pre>
@@ -14,101 +15,135 @@ description: The Proximiio class — creation, lifecycle, venue data, wayfinding
 <h2>Static</h2>
 
 <table>
-  <thead><tr><th>Member</th><th>Purpose</th></tr></thead>
+  <thead><tr><th>Declaration</th><th>Purpose</th><th>Errors</th></tr></thead>
   <tbody>
-    <tr><td><code>create(ProximiioConfiguration)</code></td><td>Create, or stop and replace, the process-wide instance</td></tr>
-    <tr><td><code>shared()</code></td><td>The running instance, untouched; <code>null</code> before <code>create</code></td></tr>
-    <tr><td><code>setLogLevel(ProximiioLogLevel)</code></td><td>Level of SDK log entries written to Logcat (Android), process-wide</td></tr>
+    <tr><td><code>static Future&lt;Proximiio&gt; create(ProximiioConfiguration configuration)</code></td><td>Create, or stop and replace, the process-wide instance</td><td><code>invalidArgument</code></td></tr>
+    <tr><td><code>static Future&lt;Proximiio?&gt; shared()</code></td><td>The running instance, untouched; <code>null</code> before <code>create</code></td><td></td></tr>
+    <tr><td><code>static Future&lt;void&gt; setLogLevel(ProximiioLogLevel level)</code></td><td>Level of SDK log entries written to Logcat (Android), process-wide</td><td></td></tr>
   </tbody>
 </table>
 
 <h2>Lifecycle</h2>
 
 <table>
-  <thead><tr><th>Method</th><th>Returns</th><th>Notes</th></tr></thead>
+  <thead><tr><th>Declaration</th><th>Purpose</th><th>Errors</th></tr></thead>
   <tbody>
-    <tr><td><code>requestPermissions({bool always = false})</code></td><td><code>PermissionStatus</code></td><td><a href="{{root}}getting-started/permissions.html">Permissions</a></td></tr>
-    <tr><td><code>requestMotionPermission()</code></td><td><code>bool</code></td><td>For PDR</td></tr>
-    <tr><td><code>authenticate()</code></td><td><code>ProximiioApplication?</code></td><td>Needs a connection</td></tr>
-    <tr><td><code>start()</code></td><td></td><td>Throws <code>notAuthenticated</code> before <code>authenticate</code></td></tr>
-    <tr><td><code>stop()</code></td><td></td><td>Reports exits for entered geofences</td></tr>
-    <tr><td><code>signOut()</code></td><td></td><td>Forgets the token and the stored data</td></tr>
-    <tr><td><code>sync()</code></td><td><code>int</code></td><td>Changed records</td></tr>
-    <tr><td><code>state()</code></td><td><code>ProximiioState</code></td><td></td></tr>
+    <tr><td><code>Future&lt;PermissionStatus&gt; requestPermissions({bool always = false})</code></td><td><a href="{{root}}getting-started/permissions.html">Permissions</a></td><td></td></tr>
+    <tr><td><code>Future&lt;bool&gt; requestMotionPermission()</code></td><td>Motion, for PDR</td><td></td></tr>
+    <tr><td><code>Future&lt;ProximiioApplication?&gt; authenticate()</code></td><td>Validate the token; needs a connection</td><td><code>invalidToken</code>, <code>api</code></td></tr>
+    <tr><td><code>Future&lt;void&gt; start()</code></td><td>Start positioning</td><td><code>notAuthenticated</code></td></tr>
+    <tr><td><code>Future&lt;void&gt; stop()</code></td><td>Stop; reports exits for entered geofences</td><td></td></tr>
+    <tr><td><code>Future&lt;void&gt; signOut()</code></td><td>Stop, forget the token and the stored data</td><td></td></tr>
+    <tr><td><code>Future&lt;int&gt; sync()</code></td><td>Synchronise venue data; changed records</td><td><code>api</code></td></tr>
+    <tr><td><code>Future&lt;ProximiioState&gt; state()</code></td><td>Lifecycle state</td><td></td></tr>
   </tbody>
 </table>
 
 <h2>Venue data</h2>
 
 <table>
-  <thead><tr><th>Method</th><th>Returns</th></tr></thead>
+  <thead><tr><th>Declaration</th><th>Errors</th></tr></thead>
   <tbody>
-    <tr><td><code>application()</code></td><td><code>ProximiioApplication?</code></td></tr>
-    <tr><td><code>places()</code>, <code>place(id)</code></td><td><code>List&lt;ProximiioPlace&gt;</code>, <code>ProximiioPlace?</code></td></tr>
-    <tr><td><code>floors()</code>, <code>floor(id)</code>, <code>currentFloor()</code></td><td><code>List&lt;ProximiioFloor&gt;</code>, <code>ProximiioFloor?</code></td></tr>
-    <tr><td><code>geofences()</code>, <code>privacyZones()</code></td><td><code>List&lt;ProximiioGeofence&gt;</code>, <code>List&lt;ProximiioPrivacyZone&gt;</code></td></tr>
-    <tr><td><code>departments()</code></td><td><code>List&lt;ProximiioDepartment&gt;</code></td></tr>
-    <tr><td><code>features()</code></td><td><code>List&lt;ProximiioFeature&gt;</code> stored by <code>loadRouteNetwork</code></td></tr>
-    <tr><td><code>amenities()</code></td><td><code>List&lt;ProximiioAmenity&gt;</code></td></tr>
-    <tr><td><code>journeys()</code>, <code>journey(id)</code></td><td><code>List&lt;ProximiioJourney&gt;</code>, <code>ProximiioJourney</code></td></tr>
-    <tr><td><code>mapStyle()</code></td><td><code>Map&lt;String, Object?&gt;</code>, the MapLibre style</td></tr>
-    <tr><td><code>lastPosition()</code></td><td><code>PositionUpdate?</code></td></tr>
-    <tr><td><code>enteredGeofenceIds()</code>, <code>isInPrivacyZone()</code></td><td><code>Set&lt;String&gt;</code>, <code>bool</code></td></tr>
+    <tr><td><code>Future&lt;ProximiioApplication?&gt; application()</code></td><td></td></tr>
+    <tr><td><code>Future&lt;List&lt;ProximiioPlace&gt;&gt; places()</code>, <code>Future&lt;ProximiioPlace?&gt; place(String id)</code></td><td></td></tr>
+    <tr><td><code>Future&lt;List&lt;ProximiioFloor&gt;&gt; floors()</code>, <code>Future&lt;ProximiioFloor?&gt; floor(String id)</code>, <code>Future&lt;ProximiioFloor?&gt; currentFloor()</code></td><td></td></tr>
+    <tr><td><code>Future&lt;List&lt;ProximiioGeofence&gt;&gt; geofences()</code>, <code>Future&lt;List&lt;ProximiioPrivacyZone&gt;&gt; privacyZones()</code></td><td></td></tr>
+    <tr><td><code>Future&lt;List&lt;ProximiioDepartment&gt;&gt; departments()</code></td><td></td></tr>
+    <tr><td><code>Future&lt;List&lt;ProximiioFeature&gt;&gt; features()</code>: the features stored by <code>loadRouteNetwork</code></td><td></td></tr>
+    <tr><td><code>Future&lt;List&lt;ProximiioAmenity&gt;&gt; amenities()</code></td><td><code>api</code></td></tr>
+    <tr><td><code>Future&lt;List&lt;ProximiioJourney&gt;&gt; journeys()</code>, <code>Future&lt;ProximiioJourney&gt; journey(String id)</code></td><td><code>api</code>, <code>journey</code></td></tr>
+    <tr><td><code>Future&lt;Map&lt;String, Object?&gt;&gt; mapStyle()</code>: the MapLibre style</td><td><code>api</code> (<code>kind: decoding</code> for a body that is not a JSON object)</td></tr>
+    <tr><td><code>Future&lt;PositionUpdate?&gt; lastPosition()</code></td><td></td></tr>
+    <tr><td><code>Future&lt;Set&lt;String&gt;&gt; enteredGeofenceIds()</code>, <code>Future&lt;bool&gt; isInPrivacyZone()</code></td><td></td></tr>
   </tbody>
 </table>
 
 <h2>Wayfinding</h2>
 
 <table>
-  <thead><tr><th>Method</th><th>Returns</th></tr></thead>
+  <thead><tr><th>Declaration</th><th>Errors</th></tr></thead>
   <tbody>
-    <tr><td><code>loadRouteNetwork()</code>, <code>loadCachedRouteNetwork()</code></td><td><code>int</code> routable paths</td></tr>
-    <tr><td><code>computeRoute({from, fromLevel, to, toLevel, options})</code></td><td><code>ComputedRoute</code></td></tr>
-    <tr><td><code>routeDurations(points, {options})</code></td><td><code>List&lt;List&lt;Duration?&gt;&gt;</code></td></tr>
+    <tr><td><code>Future&lt;int&gt; loadRouteNetwork()</code>: routable paths installed; needs a connection</td><td><code>api</code>; <code>underlying</code> when building the network fails (Android)</td></tr>
+    <tr><td><code>Future&lt;int&gt; loadCachedRouteNetwork()</code>: routable paths installed from the stored features, <code>0</code> when none</td><td></td></tr>
+    <tr><td><code>Future&lt;ComputedRoute&gt; computeRoute({required Coordinate from, required double fromLevel, required Coordinate to, double? toLevel, RouteOptions options = const RouteOptions()})</code>; <code>toLevel</code> defaults to <code>fromLevel</code></td><td><code>noRoute</code></td></tr>
+    <tr><td><code>Future&lt;List&lt;List&lt;Duration?&gt;&gt;&gt; routeDurations(List&lt;RoutePoint&gt; points, {RouteOptions options = const RouteOptions()})</code>: <code>null</code> where no route exists</td><td></td></tr>
   </tbody>
 </table>
 
 <h2>Positioning inputs</h2>
 
 <table>
-  <thead><tr><th>Method</th><th>Purpose</th></tr></thead>
+  <thead><tr><th>Declaration</th><th>Errors</th></tr></thead>
   <tbody>
-    <tr><td><code>setCustomPosition(coordinate, {accuracy = 5, floorId})</code></td><td>A position from an outside source; an unknown <code>floorId</code> throws <code>invalidArgument</code></td></tr>
-    <tr><td><code>setFloor(floorId)</code></td><td>Set or clear the floor; an unknown id throws <code>invalidArgument</code></td></tr>
-    <tr><td><code>enableRouteSnapping({thresholdMeters})</code>, <code>disableRouteSnapping()</code></td><td>Snap positions to paths</td></tr>
-    <tr><td><code>enablePdr()</code>, <code>disablePdr()</code></td><td>Pedestrian dead reckoning</td></tr>
-    <tr><td><code>setPositioningSourcePrivate(DateTime? since)</code></td><td>Mark relay positions private</td></tr>
+    <tr><td><code>Future&lt;PositionUpdate?&gt; setCustomPosition(Coordinate coordinate, {double accuracy = 5, String? floorId})</code>: accuracy in metres; without <code>floorId</code> the current floor</td><td><code>invalidArgument</code> for an unknown <code>floorId</code></td></tr>
+    <tr><td><code>Future&lt;FloorChangeEvent?&gt; setFloor(String? floorId)</code>: <code>null</code> clears the floor</td><td><code>invalidArgument</code> for an unknown id</td></tr>
+    <tr><td><code>Future&lt;void&gt; enableRouteSnapping({double? thresholdMeters})</code> (SDK default 5 m), <code>Future&lt;void&gt; disableRouteSnapping()</code></td><td></td></tr>
+    <tr><td><code>Future&lt;void&gt; enablePdr()</code>, <code>Future&lt;void&gt; disablePdr()</code></td><td></td></tr>
+    <tr><td><code>Future&lt;void&gt; setPositioningSourcePrivate(DateTime? since)</code>: relay positions private since <code>since</code>; <code>null</code> clears</td><td></td></tr>
   </tbody>
 </table>
 
 <h2>Offline packages</h2>
 
 <table>
-  <thead><tr><th>Method</th><th>Returns</th></tr></thead>
+  <thead><tr><th>Declaration</th><th>Errors</th></tr></thead>
   <tbody>
-    <tr><td><code>syncOfflinePackage(id, {place, allowsCellular = true})</code></td><td><code>PackageState</code></td></tr>
-    <tr><td><code>offlinePackageState(id)</code></td><td><code>PackageState</code></td></tr>
-    <tr><td><code>installOfflineSeed(id, directory)</code></td><td></td></tr>
-    <tr><td><code>offlinePackageDiskUsage(id)</code></td><td><code>int</code> bytes</td></tr>
-    <tr><td><code>removeOfflinePackage(id)</code></td><td></td></tr>
+    <tr><td><code>Future&lt;PackageState&gt; syncOfflinePackage(String packageId, {String? place, bool allowsCellular = true})</code></td><td><code>offlinePackage</code>, <code>api</code></td></tr>
+    <tr><td><code>Future&lt;PackageState&gt; offlinePackageState(String packageId)</code></td><td></td></tr>
+    <tr><td><code>Future&lt;void&gt; installOfflineSeed(String packageId, String directory)</code></td><td><code>offlinePackage</code></td></tr>
+    <tr><td><code>Future&lt;int&gt; offlinePackageDiskUsage(String packageId)</code>: bytes</td><td></td></tr>
+    <tr><td><code>Future&lt;void&gt; removeOfflinePackage(String packageId)</code></td><td></td></tr>
   </tbody>
 </table>
 
 <h2>Simulation</h2>
 
-<p><code>simulatePosition(coordinate, {level = 0, accuracy = 5})</code>, <code>startSimulation(SimulatedRoute)</code>, <code>pauseSimulation()</code>, <code>resumeSimulation()</code>, <code>stopSimulation()</code>, <code>jumpToWaypoint(index)</code>, <code>simulationState()</code>. See <a href="{{root}}guides/simulator.html">Simulator and dev mode</a>.</p>
+<table>
+  <thead><tr><th>Declaration</th></tr></thead>
+  <tbody>
+    <tr><td><code>Future&lt;PositionUpdate?&gt; simulatePosition(Coordinate coordinate, {int level = 0, double accuracy = 5})</code></td></tr>
+    <tr><td><code>Future&lt;void&gt; startSimulation(SimulatedRoute route)</code>: needs a running SDK</td></tr>
+    <tr><td><code>Future&lt;void&gt; pauseSimulation()</code>, <code>resumeSimulation()</code>, <code>stopSimulation()</code>, <code>jumpToWaypoint(int index)</code></td></tr>
+    <tr><td><code>Future&lt;SimulationState&gt; simulationState()</code></td></tr>
+  </tbody>
+</table>
+
+<p>See <a href="{{root}}guides/simulator.html">Simulator and dev mode</a>.</p>
 
 <h2>Visitor analytics</h2>
 
-<p><code>visitorId()</code>, <code>resetVisitorId()</code>, <code>visitorReportingConsent()</code>, <code>setVisitorReportingConsent(bool)</code>. See <a href="{{root}}guides/analytics.html">Visitor analytics</a>.</p>
+<table>
+  <thead><tr><th>Declaration</th></tr></thead>
+  <tbody>
+    <tr><td><code>Future&lt;String&gt; visitorId()</code>, <code>Future&lt;String&gt; resetVisitorId()</code></td></tr>
+    <tr><td><code>Future&lt;bool&gt; visitorReportingConsent()</code>, <code>Future&lt;void&gt; setVisitorReportingConsent(bool granted)</code></td></tr>
+  </tbody>
+</table>
+
+<p>See <a href="{{root}}guides/analytics.html">Visitor analytics</a>.</p>
 
 <h2>Diagnostics</h2>
 
-<p><code>diagnostics()</code>, <code>startDiagnosticsRecording()</code>, <code>stopDiagnosticsRecording()</code>, <code>prepareDiagnosticsReport()</code> (path of the zip). See <a href="{{root}}guides/diagnostics.html">Diagnostics and logging</a>.</p>
+<table>
+  <thead><tr><th>Declaration</th></tr></thead>
+  <tbody>
+    <tr><td><code>Future&lt;ProximiioDiagnostics&gt; diagnostics()</code></td></tr>
+    <tr><td><code>Future&lt;void&gt; startDiagnosticsRecording()</code>, <code>Future&lt;void&gt; stopDiagnosticsRecording()</code></td></tr>
+    <tr><td><code>Future&lt;String&gt; prepareDiagnosticsReport()</code>: path of the zip</td></tr>
+  </tbody>
+</table>
+
+<p>See <a href="{{root}}guides/diagnostics.html">Diagnostics and logging</a>.</p>
 
 <h2>Android</h2>
 
-<p><code>sdk.android.updateServiceNotification(AndroidServiceOptions)</code> (<code>bool</code>) and <code>sdk.android.resetServiceNotification()</code>. They throw <code>unsupported</code> on iOS.</p>
+<table>
+  <thead><tr><th>Declaration</th><th>Errors</th></tr></thead>
+  <tbody>
+    <tr><td><code>Future&lt;bool&gt; sdk.android.updateServiceNotification(AndroidServiceOptions options)</code></td><td><code>unsupported</code> on iOS</td></tr>
+    <tr><td><code>Future&lt;void&gt; sdk.android.resetServiceNotification()</code></td><td><code>unsupported</code> on iOS</td></tr>
+  </tbody>
+</table>
 
 <h2>Streams</h2>
 

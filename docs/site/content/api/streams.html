@@ -5,7 +5,7 @@ description: Every stream of Proximiio, its event type, and when it delivers eve
 
 <p>
   All streams are broadcast streams that stay open for the life of the app. They deliver events while
-  the SDK runs (the first two always) and survive <code>stop</code> and <code>start</code>. A stream
+  the SDK runs (<code>stateChanges</code> and <code>permissionUpdates</code> also while stopped) and survive <code>stop</code> and <code>start</code>. A stream
   error is a <code>ProximiioException</code>.
 </p>
 

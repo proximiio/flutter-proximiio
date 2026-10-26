@@ -15,7 +15,8 @@ enum ConfigurationPreset {
 
 /// Accuracy asked of the platform location service (GPS / fused location).
 enum DesiredAccuracy {
-  /// Highest accuracy plus sensor fusion (the default).
+  /// Highest accuracy plus sensor fusion (the default of every preset except
+  /// [ConfigurationPreset.lowPower], which uses [hundredMeters]).
   bestForNavigation,
 
   /// Highest accuracy.
@@ -144,7 +145,8 @@ class ProximiioConfiguration {
   /// Hosts tried in order when [apiBaseUrl] cannot be reached.
   final List<Uri> fallbackApiBaseUrls;
 
-  /// How often venue data is synchronised while running (SDK default: 5 minutes).
+  /// How often venue data is synchronised while running (preset default: 5 minutes, 10 with
+  /// [ConfigurationPreset.lowPower]).
   final Duration? syncInterval;
 
   /// Accuracy asked of the platform location service.

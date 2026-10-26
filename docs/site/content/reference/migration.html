@@ -71,7 +71,7 @@ description: Move an app from flutter_proximiio 1.x (Proximi.io SDK 5.x) to 6.0 
   <li>On Android, positioning in the background needs <code>android:</code> options (the foreground service).</li>
   <li>
     When the last Flutter engine is destroyed on Android, 1.x stopped the SDK. 6.0 stops it only when
-    no foreground service is configured; with the service it keeps positioning, and the next engine
+    no foreground service runs (no <code>android:</code> options, or <code>mode: disabled</code>); with the service it keeps positioning, and the next engine
     reaches it with <code>Proximiio.shared()</code>.
   </li>
   <li>

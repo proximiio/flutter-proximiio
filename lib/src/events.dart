@@ -33,7 +33,7 @@ enum PositionSource {
   /// Pedestrian dead reckoning fused with other sources.
   pdrFusion,
 
-  /// Ultra-wideband anchors.
+  /// Phone-native UWB: the phone's UWB radio ranges compatible anchors (not BlueIoT UWB).
   uwb,
 
   /// A source added to the SDK after this plugin release.

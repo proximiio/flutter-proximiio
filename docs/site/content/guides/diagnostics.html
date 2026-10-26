@@ -29,7 +29,7 @@ if (d.noPositionReason != null) print('No position: ${d.noPositionReason}');</co
   <thead><tr><th><code>noPositionReason</code></th><th>Check</th></tr></thead>
   <tbody>
     <tr><td><code>notStarted</code></td><td>Call <code>start</code>.</td></tr>
-    <tr><td><code>noViablePositioningInputs</code></td><td>Location or Bluetooth is denied or off, or the venue has no beacons.</td></tr>
+    <tr><td><code>noViablePositioningInputs</code></td><td>Location and Bluetooth are both denied or restricted, and no relay or other position provider feeds the SDK.</td></tr>
     <tr><td><code>awaitingFirstFix</code></td><td>Started, no position yet. Wait, or check that the device is inside the venue.</td></tr>
     <tr><td><code>privacyZone</code></td><td>Positions are withheld inside a privacy zone.</td></tr>
   </tbody>
@@ -58,7 +58,7 @@ final zipPath = await sdk.prepareDiagnosticsReport();</code></pre>
 
 <h2>Errors</h2>
 
-<p><code>ProximiioException.underlying</code> names the system error behind a failure, for example <code>UnknownHostException: Unable to resolve host "api.proximi.fi"</code>. Log it with the <code>code</code>.</p>
+<p><code>ProximiioException.underlying</code> names the system error behind a failure, for example on Android <code>UnknownHostException: Unable to resolve host "api.proximi.fi"</code>. Log it with the <code>code</code>.</p>
 
 <h2>Related documentation</h2>
 

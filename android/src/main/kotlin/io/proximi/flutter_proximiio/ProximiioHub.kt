@@ -146,8 +146,11 @@ internal object ProximiioHub {
   var serviceOptions: ProximiioServiceOptions? = null
     private set
 
-  /** Whether the service shows its notification, so the plugin asks for POST_NOTIFICATIONS. */
-  val wantsNotifications: Boolean
+  /**
+   * Whether the SDK runs its foreground service (and shows its notification, so the plugin asks for
+   * POST_NOTIFICATIONS); `mode: disabled` runs none.
+   */
+  val runsService: Boolean
     get() = serviceOptions.let { it != null && it.notificationMode != NotificationMode.DISABLED }
 
   /** Whether the configuration scans BLE beacons or UWB anchors, so the plugin asks for Nearby devices. */

@@ -33,7 +33,7 @@ class FlutterProximiioPlugin : FlutterPlugin, ActivityAware {
     ProximiioHostApi.setUp(binding.binaryMessenger, null)
     val streams = streams ?: return
     this.streams = null
-    if (ProximiioHub.detach(streams) && ProximiioHub.serviceOptions == null) {
+    if (ProximiioHub.detach(streams) && !ProximiioHub.runsService) {
       ProximiioHub.scope.launch {
         ProximiioHub.lifecycle.withLock { ProximiioHub.sdk?.let { ProximiioHub.stopAndDrain(it) } }
       }

@@ -22,7 +22,12 @@ description: What the SDK reports for visitor analytics, the default, and how to
 <pre><code class="language-dart">await sdk.setVisitorReportingConsent(userAgreed);
 final granted = await sdk.visitorReportingConsent();</code></pre>
 
-<p><code>setVisitorReportingConsent(false)</code> stops all reporting.</p>
+<p>
+  <code>setVisitorReportingConsent(false)</code> stops reporting and discards data not yet uploaded. The
+  consent is not stored: each <code>Proximiio.create</code> starts from <code>visitorReportingEnabled</code>.
+  Store the visitor's choice and call <code>setVisitorReportingConsent</code> after every
+  <code>create</code>.
+</p>
 
 <h2>Visitor id</h2>
 

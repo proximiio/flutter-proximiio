@@ -125,7 +125,7 @@ internal class HostApi(private val context: Context) : ProximiioHostApi {
           add(Manifest.permission.BLUETOOTH_SCAN)
           add(Manifest.permission.BLUETOOTH_CONNECT)
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ProximiioHub.wantsNotifications) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ProximiioHub.runsService) {
           add(Manifest.permission.POST_NOTIFICATIONS)
         }
       }.filter {

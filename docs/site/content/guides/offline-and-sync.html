@@ -7,7 +7,7 @@ description: How venue data is synchronised, how to follow changes, and how to i
 
 <p>
   <code>authenticate</code> downloads the venue data and stores it on the device. While running, the
-  SDK synchronises changes every <code>syncInterval</code> (default 5 minutes). <code>sync()</code>
+  SDK synchronises changes every <code>syncInterval</code> (5 minutes; 10 minutes with <code>lowPower</code>). <code>sync()</code>
   synchronises now and returns the number of changed records.
 </p>
 
@@ -31,7 +31,8 @@ description: How venue data is synchronised, how to follow changes, and how to i
 <p>
   Stored venue data stays available offline. <code>authenticate</code> validates the token with the
   Proximi.io API and throws <code>ProximiioErrorCode.api</code> (<code>kind: network</code>) without a
-  connection.
+  connection. <code>start</code> throws <code>notAuthenticated</code> until <code>authenticate</code> succeeds,
+  so an app started without a connection does not position until it is online.
 </p>
 
 <h2>Offline packages</h2>

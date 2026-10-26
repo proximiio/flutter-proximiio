@@ -289,7 +289,9 @@ abstract interface class ProximiioAndroid {
   /// Replaces the foreground-service notification. Unset fields keep the values of
   /// [ProximiioConfiguration.android]; [AndroidServiceOptions.mode], the channel fields and
   /// [AndroidServiceOptions.holdsWakeLock] apply only at [Proximiio.create]. The notification is shown
-  /// now when the service runs, and at every later start of the service. `false` when no foreground
+  /// now when the service runs and stays until [resetServiceNotification] or [Proximiio.stop]; the next
+  /// start shows the configured one. On Android 13+ it is not shown without the notification permission,
+  /// and the call still returns `true`. `false` when no foreground
   /// service is configured (no [ProximiioConfiguration.android], or [ServiceNotificationMode.disabled]).
   Future<bool> updateServiceNotification(AndroidServiceOptions options);
 

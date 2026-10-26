@@ -8,16 +8,19 @@ description: Where iOS and Android behave differently behind the same Dart API.
 <table>
   <thead><tr><th>Area</th><th>iOS</th><th>Android</th></tr></thead>
   <tbody>
-    <tr><td>Bluetooth permission</td><td>Asked by the SDK</td><td>Asked by the plugin in <code>requestPermissions</code> (Android 12+)</td></tr>
-    <tr><td>Notification permission</td><td>Not asked</td><td>Asked when the foreground service runs (Android 13+)</td></tr>
-    <tr><td>Background location prompt</td><td>One prompt</td><td>A second, separate prompt</td></tr>
+    <tr><td>Bluetooth permission</td><td>Asked by the plugin in <code>requestPermissions</code>, unless the preset is <code>relayOnly</code></td><td>Asked by the plugin in <code>requestPermissions</code> (Android 12+), unless the preset is <code>relayOnly</code></td></tr>
+    <tr><td>Notification permission</td><td>Not asked</td><td>Asked by <code>requestPermissions</code> when <code>android:</code> options are set with a mode other than <code>disabled</code> (Android 13+)</td></tr>
+    <tr><td>Background location prompt</td><td>The when-in-use prompt, then the Always upgrade, which iOS shows once per installation</td><td>A second, separate prompt</td></tr>
+    <tr><td>Missing Bluetooth usage description</td><td><code>Proximiio.create</code> throws <code>invalidArgument</code> unless the preset is <code>relayOnly</code></td><td>Not applicable</td></tr>
+    <tr><td>Permission changed in the system settings</td><td>A location change is reported at once</td><td>Reported when the app comes back to the foreground</td></tr>
+    <tr><td><code>requestPermissions</code> without an activity</td><td>Not applicable</td><td>Nothing is asked; returns the current status</td></tr>
     <tr><td>Background positioning</td><td><code>UIBackgroundModes</code> <code>location</code> and <code>allowsBackgroundLocationUpdates</code></td><td>Foreground service, only with <code>android:</code> options</td></tr>
     <tr><td><code>barometerEnabled</code></td><td>Applies</td><td>Ignored; the barometer is used when present</td></tr>
     <tr><td><code>relayRunsInBackground</code></td><td>Applies to <code>relayOnly</code></td><td>Ignored; the foreground service keeps the relay</td></tr>
     <tr><td><code>DesiredAccuracy.threeKilometers</code></td><td>Applies</td><td>Same as <code>kilometer</code></td></tr>
     <tr><td><code>sdk.android.*</code></td><td>Throws <code>unsupported</code></td><td>Applies</td></tr>
-    <tr><td>Beacon UUIDs</td><td>Upper case</td><td>Converted to upper case by the plugin</td></tr>
-    <tr><td>Simulator / emulator</td><td>No Bluetooth</td><td>No Bluetooth</td></tr>
+    <tr><td><code>setLogLevel</code></td><td>No effect on the unified log, which the SDK writes at every level</td><td>SDK log entries at the level and above go to Logcat, tag <code>Proximiio</code></td></tr>
+    <tr><td>Last Flutter engine destroyed</td><td>The SDK keeps running with the process</td><td>The SDK is stopped unless the foreground service runs (<code>android:</code> options, mode other than <code>disabled</code>)</td></tr>
   </tbody>
 </table>
 

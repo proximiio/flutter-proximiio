@@ -26,8 +26,8 @@ description: Every setting of ProximiioConfiguration and AndroidServiceOptions, 
     <tr><td><code>preset</code></td><td><code>standard</code></td><td><code>standard</code>, <code>highAccuracy</code>, <code>lowPower</code>, <code>relayOnly</code></td></tr>
     <tr><td><code>apiBaseUrl</code></td><td><code>https://api.proximi.fi</code></td><td>API host of the residency group or installation</td></tr>
     <tr><td><code>fallbackApiBaseUrls</code></td><td>none</td><td>Hosts tried in order when <code>apiBaseUrl</code> fails</td></tr>
-    <tr><td><code>syncInterval</code></td><td>5 min</td><td>Venue data sync while running</td></tr>
-    <tr><td><code>desiredAccuracy</code></td><td><code>bestForNavigation</code></td><td>Platform location accuracy; <code>threeKilometers</code> is <code>kilometer</code> on Android</td></tr>
+    <tr><td><code>syncInterval</code></td><td>preset: 5 min; <code>lowPower</code> 10 min</td><td>Venue data sync while running</td></tr>
+    <tr><td><code>desiredAccuracy</code></td><td>preset: <code>bestForNavigation</code>; <code>lowPower</code> <code>hundredMeters</code></td><td>Platform location accuracy; <code>threeKilometers</code> is <code>kilometer</code> on Android</td></tr>
     <tr><td><code>allowsBackgroundLocationUpdates</code></td><td><code>false</code></td><td>Keep positioning in the background (iOS)</td></tr>
     <tr><td><code>visitorReportingEnabled</code></td><td><code>true</code></td><td>Visitor analytics</td></tr>
     <tr><td><code>geofenceExitDelay</code></td><td>3 s</td><td>Wait before reporting a geofence exit</td></tr>
@@ -57,7 +57,11 @@ description: Every setting of ProximiioConfiguration and AndroidServiceOptions, 
 
 <h2>Validation</h2>
 
-<p><code>Proximiio.create</code> throws <code>invalidArgument</code> for a URL that is not absolute or a UUID that does not parse.</p>
+<p>
+  <code>Proximiio.create</code> throws <code>invalidArgument</code> for a URL that is not absolute or a UUID
+  that does not parse. On iOS it also throws <code>invalidArgument</code> when <code>Info.plist</code> has no
+  <code>NSBluetoothAlwaysUsageDescription</code> and the preset is not <code>relayOnly</code>.
+</p>
 
 <h2>Related documentation</h2>
 

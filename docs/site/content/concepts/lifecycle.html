@@ -57,8 +57,7 @@ sdk.stateChanges.listen((state) =&gt; print('SDK is ${state.name}'));</code></pr
 </table>
 
 <p>
-  The native SDK streams end at <code>stop</code> and are taken again by the plugin after each
-  <code>start</code>. The Dart streams do not end: listen once, at any time, and keep the
+  The Dart streams do not end: listen once, at any time, and keep the
   subscription across <code>stop</code> and <code>start</code>. Events emitted before the listener
   subscribes are not replayed; read the current values with <code>lastPosition</code>,
   <code>currentFloor</code> or <code>enteredGeofenceIds</code>.

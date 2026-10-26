@@ -39,7 +39,8 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
 - Diagnostics: `diagnostics`, `startDiagnosticsRecording`, `stopDiagnosticsRecording`, `prepareDiagnosticsReport`.
 - Android: `sdk.android.updateServiceNotification` / `resetServiceNotification`; unset fields keep the
   configured ones, and a tap on the notification opens the app. `requestPermissions` asks Bluetooth
-  (both platforms, unless `relayOnly`) and, when the foreground service runs, notifications; each once.
+  (both platforms, unless `relayOnly`) and, with `android:` options whose mode is not `disabled`,
+  notifications; each once.
   Settings changes reach `permissionUpdates` when the app returns to the foreground.
 - `Proximiio.setLogLevel` writes the SDK log to Logcat (tag `Proximiio`) on Android.
 - `ProximiioException` with a `code` per SDK error case (`noRoute` with `noRouteReason`, `api` with `kind`, …),
@@ -56,8 +57,8 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
   `NSBluetoothAlwaysUsageDescription`, `Proximiio.create` throws `invalidArgument` unless the preset is
   `relayOnly`.
 - `withholdsPositionsInPrivacyZones` defaults to `true`, as in 1.x (the native v6 default is `false`).
-- On Android the SDK keeps running after the last engine is destroyed only when a foreground service is
-  configured; 1.x always stopped it.
+- On Android the SDK keeps running after the last engine is destroyed only when the foreground service
+  runs (`android:` options, mode not `disabled`); 1.x always stopped it.
 
 ## [1.0.0]
 

@@ -5,8 +5,8 @@ description: How flutter_proximiio bridges the native SDKs, why there is one SDK
 
 <p>
   <code>flutter_proximiio</code> contains no positioning code. Each call goes to the native
-  Proximi.io SDK v6 of the platform: the Swift SDK on iOS, the Kotlin SDK on Android. The native SDKs
-  implement the same API; iOS is the reference, Android follows its names and behaviour.
+  Proximi.io SDK v6 of the platform: the Swift SDK on iOS, the Kotlin SDK on Android. Both native SDKs
+  implement the same API.
 </p>
 
 <h2>Layers</h2>
@@ -15,7 +15,7 @@ description: How flutter_proximiio bridges the native SDKs, why there is one SDK
   <thead><tr><th>Layer</th><th>What it does</th></tr></thead>
   <tbody>
     <tr><td>Dart API (<code>Proximiio</code>, models)</td><td>Typed Dart classes, <code>Future</code>s and <code>Stream</code>s with the native names.</td></tr>
-    <tr><td>Bridge (generated)</td><td>Typed platform channels generated with Pigeon from one schema; no hand-written maps.</td></tr>
+    <tr><td>Bridge (generated)</td><td>Typed platform channels generated with Pigeon from one schema.</td></tr>
     <tr><td>Native bridge</td><td>Swift and Kotlin code that calls the SDK, converts the results and forwards the SDK streams.</td></tr>
     <tr><td>Proximi.io SDK v6</td><td>Positioning, venue data sync, geofencing, wayfinding.</td></tr>
   </tbody>
@@ -41,7 +41,7 @@ description: How flutter_proximiio bridges the native SDKs, why there is one SDK
 
 <p>
   When the last engine is destroyed on Android, the plugin stops the SDK unless the configuration runs
-  the foreground service (<code>android:</code> options). With the service the SDK keeps positioning,
+  the foreground service (<code>android:</code> options with a mode other than <code>disabled</code>). With the service the SDK keeps positioning,
   reporting geofences and uploading visitor analytics for as long as Android keeps the service; the
   next engine reaches it with <code>Proximiio.shared()</code> and can stop it.
 </p>
@@ -52,14 +52,6 @@ description: How flutter_proximiio bridges the native SDKs, why there is one SDK
   <code>flutter_proximiio_map</code> reads the same process-wide instance. Create the SDK with
   <code>Proximiio.create</code> before showing a map; the map then shows the position, floor and
   routes of that instance.
-</p>
-
-<h2>Threads</h2>
-
-<p>
-  Dart calls arrive on the platform's main thread. The native bridge awaits the SDK (an actor on iOS,
-  a single-threaded dispatcher on Android) and replies on the main thread. Events reach Dart on the
-  main thread. Long work, such as computing a route on Android, runs on a background thread.
 </p>
 
 <h2>Versions</h2>

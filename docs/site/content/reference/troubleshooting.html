@@ -14,7 +14,7 @@ description: Common integration problems and how to find their cause.
 
 <ul>
   <li>Check the device connection and that <code>apiBaseUrl</code> is the host of your installation.</li>
-  <li>Recent Android versions block the network of apps that are not in the foreground (seen on Android 17). An app, or an integration test, started on a locked and dozing device cannot resolve hosts (<code>UnknownHostException</code>). Unlock the device.</li>
+  <li>A device in Doze blocks the network of apps in the background; an app started on a locked device cannot resolve hosts (<code>UnknownHostException</code>). Unlock the device.</li>
 </ul>
 
 <h2>No positions</h2>
@@ -36,7 +36,7 @@ description: Common integration problems and how to find their cause.
 
 <h2>features() is empty</h2>
 
-<p><code>features()</code> returns the features stored by <code>loadRouteNetwork()</code>. Call it once after <code>authenticate</code>.</p>
+<p>Call <code>loadRouteNetwork()</code> once after <code>authenticate</code>; <code>features()</code> returns the features it stores.</p>
 
 <h2>Positioning stops in the background on Android</h2>
 

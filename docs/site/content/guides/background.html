@@ -11,7 +11,7 @@ description: Keep positioning with the app in the background on iOS (background 
 <h2>Prerequisites</h2>
 
 <ul>
-  <li>The always location permission: <code>requestPermissions(always: true)</code>.</li>
+  <li>iOS: location <code>whenInUse</code> or <code>always</code>. Android: <code>android:</code> options and a location or Bluetooth grant.</li>
   <li>A reason the user accepts. Both stores review background location use.</li>
 </ul>
 
@@ -35,7 +35,6 @@ await sdk.requestPermissions(always: true);</code></pre>
 <ol>
   <li>Add <code>location</code> to <code>UIBackgroundModes</code> in <code>Info.plist</code>.</li>
   <li>Add <code>NSLocationAlwaysAndWhenInUseUsageDescription</code>.</li>
-  <li>Set <code>allowsBackgroundLocationUpdates: true</code>.</li>
 </ol>
 
 <pre><code class="language-xml">&lt;key&gt;UIBackgroundModes&lt;/key&gt;
@@ -74,10 +73,13 @@ await sdk.android.resetServiceNotification();</code></pre>
 <p>
   Fields left out of <code>updateServiceNotification</code> keep the values from the configuration;
   <code>mode</code>, the channel fields and <code>holdsWakeLock</code> apply only at
-  <code>Proximiio.create</code>. The notification is shown at once when the service runs and at every
-  later start of the service. The call returns <code>false</code> when the configuration runs no
-  service (no <code>android:</code> options, or <code>mode: disabled</code>). Both calls throw
-  <code>ProximiioErrorCode.unsupported</code> on iOS. A tap on the notification opens the app.
+  <code>Proximiio.create</code>. The notification is shown at once when the service runs. It stays
+  until <code>resetServiceNotification</code> or <code>stop</code>; the next <code>start</code> shows the
+  notification from the configuration. On Android 13 and newer it is not shown without the
+  notification permission, and the call still returns <code>true</code>. The call returns
+  <code>false</code> when the configuration runs no service (no <code>android:</code> options, or
+  <code>mode: disabled</code>). Both calls throw <code>ProximiioErrorCode.unsupported</code> on iOS. A tap
+  on the notification opens the app.
 </p>
 
 <p>

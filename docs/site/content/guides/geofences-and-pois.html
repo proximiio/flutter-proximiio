@@ -4,8 +4,9 @@ description: React to geofence entries and exits, read dwell time, handle privac
 -->
 
 <p>
-  Geofences are circles or polygons defined in the Proximi.io Portal. The SDK checks every position
-  against them and reports entries and exits on <code>geofenceEvents</code>.
+  Geofences are circles or polygons defined in the Proximi.io Portal. The SDK evaluates every published
+  position (BLE, phone-native UWB, relay and custom positions) against them, on the resolved floor of
+  the position, and reports entries and exits on <code>geofenceEvents</code>.
 </p>
 
 <h2>Entries and exits</h2>
@@ -58,7 +59,7 @@ description: React to geofence entries and exits, read dwell time, handle privac
 
 <h2>Points of interest</h2>
 
-<p>POIs are GeoJSON features with <code>properties.type</code> <code>poi</code>. Their amenity links to an icon and a category. <code>features()</code> returns the features stored by <code>loadRouteNetwork()</code>; call it once after <code>authenticate</code>.</p>
+<p>POIs are GeoJSON features with <code>properties.type</code> <code>poi</code>. Their amenity links to an icon and a category. Call <code>loadRouteNetwork()</code> once after <code>authenticate</code>; <code>features()</code> returns the features it stores.</p>
 
 <pre><code class="language-dart">final amenities = {for (final a in await sdk.amenities()) a.id: a};
 final pois = (await sdk.features()).where((f) =&gt; f.propertyType == 'poi');

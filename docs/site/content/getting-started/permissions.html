@@ -4,8 +4,8 @@ description: What requestPermissions asks for on iOS and Android, and how to rea
 -->
 
 <p>
-  <code>requestPermissions</code> asks for everything positioning needs and returns a
-  <code>PermissionStatus</code>. Call it from the foreground, before <code>start</code>.
+  <code>requestPermissions</code> asks for location, Bluetooth and, on Android, notifications, and
+  returns a <code>PermissionStatus</code>. Call it from the foreground, before <code>start</code>.
 </p>
 
 <pre><code class="language-dart">final status = await sdk.requestPermissions(always: false);
@@ -21,7 +21,7 @@ if (!status.isLocationAuthorized) {
     <tr><td>Location</td><td>When in use; with <code>always: true</code> also always</td><td>Fine and coarse location; with <code>always: true</code> background location in a second prompt</td></tr>
     <tr><td>Bluetooth</td><td>Asked by the plugin unless the preset is <code>relayOnly</code>; needs <code>NSBluetoothAlwaysUsageDescription</code></td><td><code>BLUETOOTH_SCAN</code> and <code>BLUETOOTH_CONNECT</code> on Android 12 and newer, asked by the plugin unless the preset is <code>relayOnly</code></td></tr>
     <tr><td>Notifications</td><td>Not asked</td><td><code>POST_NOTIFICATIONS</code> on Android 13 and newer, when the configuration runs the foreground service (<code>android:</code> options with a mode other than <code>disabled</code>)</td></tr>
-    <tr><td>Motion</td><td>Not asked; call <code>requestMotionPermission</code></td><td>Not asked; call <code>requestMotionPermission</code></td></tr>
+    <tr><td>Motion</td><td>Not asked by <code>requestPermissions</code>; <code>start</code> shows the prompt for the barometer unless <code>barometerEnabled: false</code>; for PDR call <code>requestMotionPermission</code></td><td>Not asked; call <code>requestMotionPermission</code></td></tr>
   </tbody>
 </table>
 

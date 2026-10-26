@@ -28,7 +28,7 @@ description: The venue data the SDK stores on the device and how to read it from
 <h2>Metadata</h2>
 
 <p>
-  Custom metadata set in the Portal is decoded JSON in <code>metadata</code>: a <code>Map</code>,
+  Custom metadata set in the Proximi.io Portal is decoded JSON in <code>metadata</code>: a <code>Map</code>,
   <code>List</code>, <code>String</code>, <code>num</code> or <code>bool</code>. Feature
   <code>geometry</code> and <code>properties</code> are decoded GeoJSON maps.
 </p>
@@ -49,7 +49,7 @@ for (final poi in pois) {
 
 <pre><code class="language-dart">sdk.venueDataChanges.listen((change) async {
   if (change.contains(VenueDataKind.features)) {
-    pois = await sdk.features();
+    pois = (await sdk.features()).where((f) =&gt; f.propertyType == 'poi').toList();
   }
 });</code></pre>
 
