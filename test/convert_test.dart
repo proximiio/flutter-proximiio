@@ -17,6 +17,8 @@ void main() {
       expect(msg.geofenceExitDelaySeconds, isNull);
       expect(msg.fallbackApiBaseUrls, isEmpty);
       expect(msg.customIBeaconUuids, isEmpty);
+      expect(msg.bleEvaluationIntervalSeconds, isNull);
+      expect(msg.distanceFilter, isNull);
       expect(msg.android, isNull);
     });
 
@@ -47,6 +49,8 @@ void main() {
           customIBeaconUuids: const ['F7826DA6-4FA2-4E98-8024-BC5B71E0893E'],
           pdrFusionEnabled: true,
           barometerEnabled: false,
+          bleEvaluationInterval: const Duration(milliseconds: 500),
+          distanceFilter: const DistanceFilter(minimumDisplacement: 0.4),
           android: const AndroidServiceOptions(
             notificationTitle: 'Title',
             notificationIcon: 'ic_stat',
@@ -68,6 +72,9 @@ void main() {
       expect(msg.customIBeaconUuids, ['F7826DA6-4FA2-4E98-8024-BC5B71E0893E']);
       expect(msg.pdrFusionEnabled, isTrue);
       expect(msg.barometerEnabled, isFalse);
+      expect(msg.bleEvaluationIntervalSeconds, 0.5);
+      expect(msg.distanceFilter?.minimumDisplacement, 0.4);
+      expect(msg.distanceFilter?.accuracyDisplacementFactor, isNull);
       expect(msg.android?.notificationTitle, 'Title');
       expect(msg.android?.notificationIcon, 'ic_stat');
       expect(msg.android?.mode, MsgServiceNotificationMode.required);

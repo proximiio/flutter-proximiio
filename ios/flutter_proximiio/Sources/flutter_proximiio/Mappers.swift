@@ -33,7 +33,24 @@ enum Mappers {
     }
     if let value = msg.pdrFusionEnabled { config.pdrFusionEnabled = value }
     if let value = msg.barometerEnabled { config.barometerEnabled = value }
+    if let value = msg.bleEvaluationIntervalSeconds {
+      guard value.isFinite, value > 0 else { throw invalidArgument("bleEvaluationInterval must be positive: \(value)") }
+      config.bleEvaluationInterval = value
+    }
+    if let filter = msg.distanceFilter {
+      if let value = filter.minimumDisplacement {
+        config.positioning.distanceFilter.minimumDisplacement = try nonNegative(value, "minimumDisplacement")
+      }
+      if let value = filter.accuracyDisplacementFactor {
+        config.positioning.distanceFilter.accuracyDisplacementFactor = try nonNegative(value, "accuracyDisplacementFactor")
+      }
+    }
     return config
+  }
+
+  private static func nonNegative(_ value: Double, _ name: String) throws -> Double {
+    guard value.isFinite, value >= 0 else { throw invalidArgument("\(name) must be at least 0: \(value)") }
+    return value
   }
 
   private static func url(_ value: String) throws -> URL {

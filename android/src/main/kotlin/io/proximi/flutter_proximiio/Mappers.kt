@@ -22,6 +22,7 @@ import io.proximi.sdk.geofencing.GeofenceEvent
 import io.proximi.sdk.journey.ProximiioJourneyError
 import io.proximi.sdk.offline.OfflinePackageError
 import io.proximi.sdk.wayfinding.WayfindingRoutingError
+import io.proximi.sdk.positioning.engine.PositioningEngine
 import io.proximi.sdk.positioning.engine.PositionSource
 import io.proximi.sdk.positioning.engine.PositionUpdate
 import io.proximi.sdk.positioning.floor.FloorChangeDirection
@@ -66,11 +67,34 @@ internal object Mappers {
       desiredAccuracy = msg.desiredAccuracy?.let(::desiredAccuracy) ?: preset.desiredAccuracy,
       allowsBackgroundLocationUpdates = msg.allowsBackgroundLocationUpdates ?: preset.allowsBackgroundLocationUpdates,
       visitorReportingEnabled = msg.visitorReportingEnabled ?: preset.visitorReportingEnabled,
-      positioning = msg.pdrFusionEnabled?.let { preset.positioning.copy(pdrFusionEnabled = it) } ?: preset.positioning,
+      positioning = positioning(msg, preset.positioning),
       serviceOptions = service ?: preset.serviceOptions,
       geofenceExitDelay = msg.geofenceExitDelaySeconds ?: preset.geofenceExitDelay,
       withholdsPositionsInPrivacyZones = msg.withholdsPositionsInPrivacyZones ?: preset.withholdsPositionsInPrivacyZones,
     )
+  }
+
+  private fun positioning(msg: MsgConfiguration, preset: PositioningEngine.Configuration): PositioningEngine.Configuration {
+    val interval = msg.bleEvaluationIntervalSeconds
+    if (interval != null && !(interval.isFinite() && interval > 0)) {
+      throw invalidArgument("bleEvaluationInterval must be positive: $interval")
+    }
+    val filter = msg.distanceFilter
+    return preset.copy(
+      pdrFusionEnabled = msg.pdrFusionEnabled ?: preset.pdrFusionEnabled,
+      bleEvaluationInterval = interval ?: preset.bleEvaluationInterval,
+      distanceFilter = preset.distanceFilter.copy(
+        minimumDisplacement = filter?.minimumDisplacement?.let { nonNegative(it, "minimumDisplacement") }
+          ?: preset.distanceFilter.minimumDisplacement,
+        accuracyDisplacementFactor = filter?.accuracyDisplacementFactor?.let { nonNegative(it, "accuracyDisplacementFactor") }
+          ?: preset.distanceFilter.accuracyDisplacementFactor,
+      ),
+    )
+  }
+
+  private fun nonNegative(value: Double, name: String): Double {
+    if (!(value.isFinite() && value >= 0)) throw invalidArgument("$name must be at least 0: $value")
+    return value
   }
 
   /** [msg] over [defaults]; a tap on the notification opens the app unless [defaults] says otherwise. */

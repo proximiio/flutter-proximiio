@@ -505,6 +505,49 @@ data class MsgAndroidServiceOptions (
 }
 
 /**
+ * The SDK's emission gate (`positioning.distanceFilter`); unset fields keep the SDK's values.
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class MsgDistanceFilter (
+  /** Metres. */
+  val minimumDisplacement: Double? = null,
+  val accuracyDisplacementFactor: Double? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgDistanceFilter {
+      val minimumDisplacement = pigeonVar_list[0] as Double?
+      val accuracyDisplacementFactor = pigeonVar_list[1] as Double?
+      return MsgDistanceFilter(minimumDisplacement, accuracyDisplacementFactor)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      minimumDisplacement,
+      accuracyDisplacementFactor,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgDistanceFilter
+    return MessagesPigeonUtils.deepEquals(this.minimumDisplacement, other.minimumDisplacement) && MessagesPigeonUtils.deepEquals(this.accuracyDisplacementFactor, other.accuracyDisplacementFactor)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.minimumDisplacement)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.accuracyDisplacementFactor)
+    return result
+  }
+}
+
+/**
  * Starts from [preset]; every non-null field overrides the preset's value.
  *
  * Generated class from Pigeon that represents data sent in messages.
@@ -524,6 +567,8 @@ data class MsgConfiguration (
   val customIBeaconUuids: List<String>,
   val pdrFusionEnabled: Boolean? = null,
   val barometerEnabled: Boolean? = null,
+  val bleEvaluationIntervalSeconds: Double? = null,
+  val distanceFilter: MsgDistanceFilter? = null,
   val android: MsgAndroidServiceOptions? = null
 )
  {
@@ -543,8 +588,10 @@ data class MsgConfiguration (
       val customIBeaconUuids = pigeonVar_list[11] as List<String>
       val pdrFusionEnabled = pigeonVar_list[12] as Boolean?
       val barometerEnabled = pigeonVar_list[13] as Boolean?
-      val android = pigeonVar_list[14] as MsgAndroidServiceOptions?
-      return MsgConfiguration(token, preset, relayRunsInBackground, apiBaseUrl, fallbackApiBaseUrls, syncIntervalSeconds, desiredAccuracy, allowsBackgroundLocationUpdates, visitorReportingEnabled, geofenceExitDelaySeconds, withholdsPositionsInPrivacyZones, customIBeaconUuids, pdrFusionEnabled, barometerEnabled, android)
+      val bleEvaluationIntervalSeconds = pigeonVar_list[14] as Double?
+      val distanceFilter = pigeonVar_list[15] as MsgDistanceFilter?
+      val android = pigeonVar_list[16] as MsgAndroidServiceOptions?
+      return MsgConfiguration(token, preset, relayRunsInBackground, apiBaseUrl, fallbackApiBaseUrls, syncIntervalSeconds, desiredAccuracy, allowsBackgroundLocationUpdates, visitorReportingEnabled, geofenceExitDelaySeconds, withholdsPositionsInPrivacyZones, customIBeaconUuids, pdrFusionEnabled, barometerEnabled, bleEvaluationIntervalSeconds, distanceFilter, android)
     }
   }
   fun toList(): List<Any?> {
@@ -563,6 +610,8 @@ data class MsgConfiguration (
       customIBeaconUuids,
       pdrFusionEnabled,
       barometerEnabled,
+      bleEvaluationIntervalSeconds,
+      distanceFilter,
       android,
     )
   }
@@ -574,7 +623,7 @@ data class MsgConfiguration (
       return true
     }
     val other = other as MsgConfiguration
-    return MessagesPigeonUtils.deepEquals(this.token, other.token) && MessagesPigeonUtils.deepEquals(this.preset, other.preset) && MessagesPigeonUtils.deepEquals(this.relayRunsInBackground, other.relayRunsInBackground) && MessagesPigeonUtils.deepEquals(this.apiBaseUrl, other.apiBaseUrl) && MessagesPigeonUtils.deepEquals(this.fallbackApiBaseUrls, other.fallbackApiBaseUrls) && MessagesPigeonUtils.deepEquals(this.syncIntervalSeconds, other.syncIntervalSeconds) && MessagesPigeonUtils.deepEquals(this.desiredAccuracy, other.desiredAccuracy) && MessagesPigeonUtils.deepEquals(this.allowsBackgroundLocationUpdates, other.allowsBackgroundLocationUpdates) && MessagesPigeonUtils.deepEquals(this.visitorReportingEnabled, other.visitorReportingEnabled) && MessagesPigeonUtils.deepEquals(this.geofenceExitDelaySeconds, other.geofenceExitDelaySeconds) && MessagesPigeonUtils.deepEquals(this.withholdsPositionsInPrivacyZones, other.withholdsPositionsInPrivacyZones) && MessagesPigeonUtils.deepEquals(this.customIBeaconUuids, other.customIBeaconUuids) && MessagesPigeonUtils.deepEquals(this.pdrFusionEnabled, other.pdrFusionEnabled) && MessagesPigeonUtils.deepEquals(this.barometerEnabled, other.barometerEnabled) && MessagesPigeonUtils.deepEquals(this.android, other.android)
+    return MessagesPigeonUtils.deepEquals(this.token, other.token) && MessagesPigeonUtils.deepEquals(this.preset, other.preset) && MessagesPigeonUtils.deepEquals(this.relayRunsInBackground, other.relayRunsInBackground) && MessagesPigeonUtils.deepEquals(this.apiBaseUrl, other.apiBaseUrl) && MessagesPigeonUtils.deepEquals(this.fallbackApiBaseUrls, other.fallbackApiBaseUrls) && MessagesPigeonUtils.deepEquals(this.syncIntervalSeconds, other.syncIntervalSeconds) && MessagesPigeonUtils.deepEquals(this.desiredAccuracy, other.desiredAccuracy) && MessagesPigeonUtils.deepEquals(this.allowsBackgroundLocationUpdates, other.allowsBackgroundLocationUpdates) && MessagesPigeonUtils.deepEquals(this.visitorReportingEnabled, other.visitorReportingEnabled) && MessagesPigeonUtils.deepEquals(this.geofenceExitDelaySeconds, other.geofenceExitDelaySeconds) && MessagesPigeonUtils.deepEquals(this.withholdsPositionsInPrivacyZones, other.withholdsPositionsInPrivacyZones) && MessagesPigeonUtils.deepEquals(this.customIBeaconUuids, other.customIBeaconUuids) && MessagesPigeonUtils.deepEquals(this.pdrFusionEnabled, other.pdrFusionEnabled) && MessagesPigeonUtils.deepEquals(this.barometerEnabled, other.barometerEnabled) && MessagesPigeonUtils.deepEquals(this.bleEvaluationIntervalSeconds, other.bleEvaluationIntervalSeconds) && MessagesPigeonUtils.deepEquals(this.distanceFilter, other.distanceFilter) && MessagesPigeonUtils.deepEquals(this.android, other.android)
   }
 
   override fun hashCode(): Int {
@@ -593,6 +642,8 @@ data class MsgConfiguration (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.customIBeaconUuids)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.pdrFusionEnabled)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.barometerEnabled)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.bleEvaluationIntervalSeconds)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.distanceFilter)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.android)
     return result
   }
@@ -2699,220 +2750,225 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       148.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgConfiguration.fromList(it)
+          MsgDistanceFilter.fromList(it)
         }
       }
       149.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgCoordinate.fromList(it)
+          MsgConfiguration.fromList(it)
         }
       }
       150.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgApplication.fromList(it)
+          MsgCoordinate.fromList(it)
         }
       }
       151.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPlace.fromList(it)
+          MsgApplication.fromList(it)
         }
       }
       152.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgFloor.fromList(it)
+          MsgPlace.fromList(it)
         }
       }
       153.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgZone.fromList(it)
+          MsgFloor.fromList(it)
         }
       }
       154.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPermissionStatus.fromList(it)
+          MsgZone.fromList(it)
         }
       }
       155.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgStateChange.fromList(it)
+          MsgPermissionStatus.fromList(it)
         }
       }
       156.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPositionUpdate.fromList(it)
+          MsgStateChange.fromList(it)
         }
       }
       157.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgFloorChange.fromList(it)
+          MsgPositionUpdate.fromList(it)
         }
       }
       158.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgGeofenceEntered.fromList(it)
+          MsgFloorChange.fromList(it)
         }
       }
       159.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgGeofenceExited.fromList(it)
+          MsgGeofenceEntered.fromList(it)
         }
       }
       160.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPrivacyZoneEntered.fromList(it)
+          MsgGeofenceExited.fromList(it)
         }
       }
       161.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPrivacyZoneExited.fromList(it)
+          MsgPrivacyZoneEntered.fromList(it)
         }
       }
       162.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPrivacyZoneState.fromList(it)
+          MsgPrivacyZoneExited.fromList(it)
         }
       }
       163.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgRouteOptions.fromList(it)
+          MsgPrivacyZoneState.fromList(it)
         }
       }
       164.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgRoutePoint.fromList(it)
+          MsgRouteOptions.fromList(it)
         }
       }
       165.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgLevelChange.fromList(it)
+          MsgRoutePoint.fromList(it)
         }
       }
       166.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgRouteSegment.fromList(it)
+          MsgLevelChange.fromList(it)
         }
       }
       167.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgRouteInstruction.fromList(it)
+          MsgRouteSegment.fromList(it)
         }
       }
       168.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgComputedRoute.fromList(it)
+          MsgRouteInstruction.fromList(it)
         }
       }
       169.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgDurationRow.fromList(it)
+          MsgComputedRoute.fromList(it)
         }
       }
       170.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgAmenity.fromList(it)
+          MsgDurationRow.fromList(it)
         }
       }
       171.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgFeature.fromList(it)
+          MsgAmenity.fromList(it)
         }
       }
       172.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgDepartment.fromList(it)
+          MsgFeature.fromList(it)
         }
       }
       173.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgJourneyWaypoint.fromList(it)
+          MsgDepartment.fromList(it)
         }
       }
       174.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgJourney.fromList(it)
+          MsgJourneyWaypoint.fromList(it)
         }
       }
       175.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgVenueDataChange.fromList(it)
+          MsgJourney.fromList(it)
         }
       }
       176.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgSyncUpdated.fromList(it)
+          MsgVenueDataChange.fromList(it)
         }
       }
       177.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgSyncDeleted.fromList(it)
+          MsgSyncUpdated.fromList(it)
         }
       }
       178.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgSyncCompleted.fromList(it)
+          MsgSyncDeleted.fromList(it)
         }
       }
       179.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgSyncFailed.fromList(it)
+          MsgSyncCompleted.fromList(it)
         }
       }
       180.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgStoreRecreated.fromList(it)
+          MsgSyncFailed.fromList(it)
         }
       }
       181.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconIdentifier.fromList(it)
+          MsgStoreRecreated.fromList(it)
         }
       }
       182.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconObservation.fromList(it)
+          MsgBeaconIdentifier.fromList(it)
         }
       }
       183.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconTelemetry.fromList(it)
+          MsgBeaconObservation.fromList(it)
         }
       }
       184.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconFound.fromList(it)
+          MsgBeaconTelemetry.fromList(it)
         }
       }
       185.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconUpdated.fromList(it)
+          MsgBeaconFound.fromList(it)
         }
       }
       186.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconLost.fromList(it)
+          MsgBeaconUpdated.fromList(it)
         }
       }
       187.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconTelemetryReceived.fromList(it)
+          MsgBeaconLost.fromList(it)
         }
       }
       188.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPackageState.fromList(it)
+          MsgBeaconTelemetryReceived.fromList(it)
         }
       }
       189.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgSimulatedWaypoint.fromList(it)
+          MsgPackageState.fromList(it)
         }
       }
       190.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgSimulatedRoute.fromList(it)
+          MsgSimulatedWaypoint.fromList(it)
         }
       }
       191.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgSimulatedRoute.fromList(it)
+        }
+      }
+      192.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           MsgDiagnostics.fromList(it)
         }
@@ -2998,180 +3054,184 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is MsgConfiguration -> {
+      is MsgDistanceFilter -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is MsgCoordinate -> {
+      is MsgConfiguration -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is MsgApplication -> {
+      is MsgCoordinate -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is MsgPlace -> {
+      is MsgApplication -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is MsgFloor -> {
+      is MsgPlace -> {
         stream.write(152)
         writeValue(stream, value.toList())
       }
-      is MsgZone -> {
+      is MsgFloor -> {
         stream.write(153)
         writeValue(stream, value.toList())
       }
-      is MsgPermissionStatus -> {
+      is MsgZone -> {
         stream.write(154)
         writeValue(stream, value.toList())
       }
-      is MsgStateChange -> {
+      is MsgPermissionStatus -> {
         stream.write(155)
         writeValue(stream, value.toList())
       }
-      is MsgPositionUpdate -> {
+      is MsgStateChange -> {
         stream.write(156)
         writeValue(stream, value.toList())
       }
-      is MsgFloorChange -> {
+      is MsgPositionUpdate -> {
         stream.write(157)
         writeValue(stream, value.toList())
       }
-      is MsgGeofenceEntered -> {
+      is MsgFloorChange -> {
         stream.write(158)
         writeValue(stream, value.toList())
       }
-      is MsgGeofenceExited -> {
+      is MsgGeofenceEntered -> {
         stream.write(159)
         writeValue(stream, value.toList())
       }
-      is MsgPrivacyZoneEntered -> {
+      is MsgGeofenceExited -> {
         stream.write(160)
         writeValue(stream, value.toList())
       }
-      is MsgPrivacyZoneExited -> {
+      is MsgPrivacyZoneEntered -> {
         stream.write(161)
         writeValue(stream, value.toList())
       }
-      is MsgPrivacyZoneState -> {
+      is MsgPrivacyZoneExited -> {
         stream.write(162)
         writeValue(stream, value.toList())
       }
-      is MsgRouteOptions -> {
+      is MsgPrivacyZoneState -> {
         stream.write(163)
         writeValue(stream, value.toList())
       }
-      is MsgRoutePoint -> {
+      is MsgRouteOptions -> {
         stream.write(164)
         writeValue(stream, value.toList())
       }
-      is MsgLevelChange -> {
+      is MsgRoutePoint -> {
         stream.write(165)
         writeValue(stream, value.toList())
       }
-      is MsgRouteSegment -> {
+      is MsgLevelChange -> {
         stream.write(166)
         writeValue(stream, value.toList())
       }
-      is MsgRouteInstruction -> {
+      is MsgRouteSegment -> {
         stream.write(167)
         writeValue(stream, value.toList())
       }
-      is MsgComputedRoute -> {
+      is MsgRouteInstruction -> {
         stream.write(168)
         writeValue(stream, value.toList())
       }
-      is MsgDurationRow -> {
+      is MsgComputedRoute -> {
         stream.write(169)
         writeValue(stream, value.toList())
       }
-      is MsgAmenity -> {
+      is MsgDurationRow -> {
         stream.write(170)
         writeValue(stream, value.toList())
       }
-      is MsgFeature -> {
+      is MsgAmenity -> {
         stream.write(171)
         writeValue(stream, value.toList())
       }
-      is MsgDepartment -> {
+      is MsgFeature -> {
         stream.write(172)
         writeValue(stream, value.toList())
       }
-      is MsgJourneyWaypoint -> {
+      is MsgDepartment -> {
         stream.write(173)
         writeValue(stream, value.toList())
       }
-      is MsgJourney -> {
+      is MsgJourneyWaypoint -> {
         stream.write(174)
         writeValue(stream, value.toList())
       }
-      is MsgVenueDataChange -> {
+      is MsgJourney -> {
         stream.write(175)
         writeValue(stream, value.toList())
       }
-      is MsgSyncUpdated -> {
+      is MsgVenueDataChange -> {
         stream.write(176)
         writeValue(stream, value.toList())
       }
-      is MsgSyncDeleted -> {
+      is MsgSyncUpdated -> {
         stream.write(177)
         writeValue(stream, value.toList())
       }
-      is MsgSyncCompleted -> {
+      is MsgSyncDeleted -> {
         stream.write(178)
         writeValue(stream, value.toList())
       }
-      is MsgSyncFailed -> {
+      is MsgSyncCompleted -> {
         stream.write(179)
         writeValue(stream, value.toList())
       }
-      is MsgStoreRecreated -> {
+      is MsgSyncFailed -> {
         stream.write(180)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconIdentifier -> {
+      is MsgStoreRecreated -> {
         stream.write(181)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconObservation -> {
+      is MsgBeaconIdentifier -> {
         stream.write(182)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconTelemetry -> {
+      is MsgBeaconObservation -> {
         stream.write(183)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconFound -> {
+      is MsgBeaconTelemetry -> {
         stream.write(184)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconUpdated -> {
+      is MsgBeaconFound -> {
         stream.write(185)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconLost -> {
+      is MsgBeaconUpdated -> {
         stream.write(186)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconTelemetryReceived -> {
+      is MsgBeaconLost -> {
         stream.write(187)
         writeValue(stream, value.toList())
       }
-      is MsgPackageState -> {
+      is MsgBeaconTelemetryReceived -> {
         stream.write(188)
         writeValue(stream, value.toList())
       }
-      is MsgSimulatedWaypoint -> {
+      is MsgPackageState -> {
         stream.write(189)
         writeValue(stream, value.toList())
       }
-      is MsgSimulatedRoute -> {
+      is MsgSimulatedWaypoint -> {
         stream.write(190)
         writeValue(stream, value.toList())
       }
-      is MsgDiagnostics -> {
+      is MsgSimulatedRoute -> {
         stream.write(191)
+        writeValue(stream, value.toList())
+      }
+      is MsgDiagnostics -> {
+        stream.write(192)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)

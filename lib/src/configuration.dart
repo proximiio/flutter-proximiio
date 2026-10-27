@@ -107,6 +107,23 @@ class AndroidServiceOptions {
   final bool? holdsWakeLock;
 }
 
+/// When the SDK publishes a new position: only after it moved at least
+/// `max(minimumDisplacement, accuracyDisplacementFactor × accuracy)` from the last published one,
+/// where `accuracy` is the smaller `horizontalAccuracy` of the two. A stationary visitor gets no new
+/// positions. With PDR fusion, a detected step publishes a position without this check.
+///
+/// Unset fields keep the SDK's defaults.
+class DistanceFilter {
+  /// Creates a distance filter; every field is optional.
+  const DistanceFilter({this.minimumDisplacement, this.accuracyDisplacementFactor});
+
+  /// Smallest movement that publishes a position, in metres (SDK default: 1.33). At least 0.
+  final double? minimumDisplacement;
+
+  /// Share of the accuracy the movement must also reach (SDK default: 0.5). At least 0.
+  final double? accuracyDisplacementFactor;
+}
+
 /// How the SDK is set up. Starts from [preset]; every non-null field overrides it.
 class ProximiioConfiguration {
   /// Creates a configuration for the application [token].
@@ -125,6 +142,8 @@ class ProximiioConfiguration {
     this.customIBeaconUuids = const [],
     this.pdrFusionEnabled,
     this.barometerEnabled,
+    this.bleEvaluationInterval,
+    this.distanceFilter,
     this.android,
   });
 
@@ -176,6 +195,14 @@ class ProximiioConfiguration {
 
   /// Use the barometer for floor changes. iOS only; Android always uses it when present.
   final bool? barometerEnabled;
+
+  /// How often the SDK computes a position from the beacons (preset default: 2.5 s; 1 s with
+  /// [ConfigurationPreset.highAccuracy], 5 s with [ConfigurationPreset.lowPower]). Must be positive.
+  /// Positions arrive at most this often, and only when they pass [distanceFilter].
+  final Duration? bleEvaluationInterval;
+
+  /// When a new position is published; see [DistanceFilter].
+  final DistanceFilter? distanceFilter;
 
   /// Android foreground service and its notification. Without it the Android SDK runs no foreground
   /// service, and positioning stops once Android freezes the backgrounded app. Ignored on iOS.

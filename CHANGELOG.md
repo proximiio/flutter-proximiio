@@ -6,6 +6,14 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+- `ProximiioConfiguration.bleEvaluationInterval`: how often the SDK computes a position from the
+  beacons (preset default 2.5 s; 1 s with `highAccuracy`, 5 s with `lowPower`).
+- `ProximiioConfiguration.distanceFilter` (`DistanceFilter`): how far a position must move before the
+  SDK publishes it (`minimumDisplacement`, default 1.33 m; `accuracyDisplacementFactor`, default 0.5).
+- `Proximiio.create` throws `invalidArgument` when `bleEvaluationInterval` is not positive, or a
+  `DistanceFilter` value is negative or not finite.
+
 ## [6.0.0-beta.2] - 2026-10-26
 
 ### Changed

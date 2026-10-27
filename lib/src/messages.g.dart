@@ -222,6 +222,49 @@ class MsgAndroidServiceOptions {
   int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
 }
 
+/// The SDK's emission gate (`positioning.distanceFilter`); unset fields keep the SDK's values.
+class MsgDistanceFilter {
+  MsgDistanceFilter({this.minimumDisplacement, this.accuracyDisplacementFactor});
+
+  /// Metres.
+  double? minimumDisplacement;
+
+  double? accuracyDisplacementFactor;
+
+  List<Object?> _toList() {
+    return <Object?>[minimumDisplacement, accuracyDisplacementFactor];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgDistanceFilter decode(Object result) {
+    result as List<Object?>;
+    return MsgDistanceFilter(
+      minimumDisplacement: result[0] as double?,
+      accuracyDisplacementFactor: result[1] as double?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgDistanceFilter || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(minimumDisplacement, other.minimumDisplacement) &&
+        _deepEquals(accuracyDisplacementFactor, other.accuracyDisplacementFactor);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
 /// Starts from [preset]; every non-null field overrides the preset's value.
 class MsgConfiguration {
   MsgConfiguration({
@@ -239,6 +282,8 @@ class MsgConfiguration {
     required this.customIBeaconUuids,
     this.pdrFusionEnabled,
     this.barometerEnabled,
+    this.bleEvaluationIntervalSeconds,
+    this.distanceFilter,
     this.android,
   });
 
@@ -270,6 +315,10 @@ class MsgConfiguration {
 
   bool? barometerEnabled;
 
+  double? bleEvaluationIntervalSeconds;
+
+  MsgDistanceFilter? distanceFilter;
+
   MsgAndroidServiceOptions? android;
 
   List<Object?> _toList() {
@@ -288,6 +337,8 @@ class MsgConfiguration {
       customIBeaconUuids,
       pdrFusionEnabled,
       barometerEnabled,
+      bleEvaluationIntervalSeconds,
+      distanceFilter,
       android,
     ];
   }
@@ -313,7 +364,9 @@ class MsgConfiguration {
       customIBeaconUuids: (result[11]! as List<Object?>).cast<String>(),
       pdrFusionEnabled: result[12] as bool?,
       barometerEnabled: result[13] as bool?,
-      android: result[14] as MsgAndroidServiceOptions?,
+      bleEvaluationIntervalSeconds: result[14] as double?,
+      distanceFilter: result[15] as MsgDistanceFilter?,
+      android: result[16] as MsgAndroidServiceOptions?,
     );
   }
 
@@ -340,6 +393,8 @@ class MsgConfiguration {
         _deepEquals(customIBeaconUuids, other.customIBeaconUuids) &&
         _deepEquals(pdrFusionEnabled, other.pdrFusionEnabled) &&
         _deepEquals(barometerEnabled, other.barometerEnabled) &&
+        _deepEquals(bleEvaluationIntervalSeconds, other.bleEvaluationIntervalSeconds) &&
+        _deepEquals(distanceFilter, other.distanceFilter) &&
         _deepEquals(android, other.android);
   }
 
@@ -2633,137 +2688,140 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is MsgAndroidServiceOptions) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    } else if (value is MsgConfiguration) {
+    } else if (value is MsgDistanceFilter) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    } else if (value is MsgCoordinate) {
+    } else if (value is MsgConfiguration) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    } else if (value is MsgApplication) {
+    } else if (value is MsgCoordinate) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPlace) {
+    } else if (value is MsgApplication) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    } else if (value is MsgFloor) {
+    } else if (value is MsgPlace) {
       buffer.putUint8(152);
       writeValue(buffer, value.encode());
-    } else if (value is MsgZone) {
+    } else if (value is MsgFloor) {
       buffer.putUint8(153);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPermissionStatus) {
+    } else if (value is MsgZone) {
       buffer.putUint8(154);
       writeValue(buffer, value.encode());
-    } else if (value is MsgStateChange) {
+    } else if (value is MsgPermissionStatus) {
       buffer.putUint8(155);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPositionUpdate) {
+    } else if (value is MsgStateChange) {
       buffer.putUint8(156);
       writeValue(buffer, value.encode());
-    } else if (value is MsgFloorChange) {
+    } else if (value is MsgPositionUpdate) {
       buffer.putUint8(157);
       writeValue(buffer, value.encode());
-    } else if (value is MsgGeofenceEntered) {
+    } else if (value is MsgFloorChange) {
       buffer.putUint8(158);
       writeValue(buffer, value.encode());
-    } else if (value is MsgGeofenceExited) {
+    } else if (value is MsgGeofenceEntered) {
       buffer.putUint8(159);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPrivacyZoneEntered) {
+    } else if (value is MsgGeofenceExited) {
       buffer.putUint8(160);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPrivacyZoneExited) {
+    } else if (value is MsgPrivacyZoneEntered) {
       buffer.putUint8(161);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPrivacyZoneState) {
+    } else if (value is MsgPrivacyZoneExited) {
       buffer.putUint8(162);
       writeValue(buffer, value.encode());
-    } else if (value is MsgRouteOptions) {
+    } else if (value is MsgPrivacyZoneState) {
       buffer.putUint8(163);
       writeValue(buffer, value.encode());
-    } else if (value is MsgRoutePoint) {
+    } else if (value is MsgRouteOptions) {
       buffer.putUint8(164);
       writeValue(buffer, value.encode());
-    } else if (value is MsgLevelChange) {
+    } else if (value is MsgRoutePoint) {
       buffer.putUint8(165);
       writeValue(buffer, value.encode());
-    } else if (value is MsgRouteSegment) {
+    } else if (value is MsgLevelChange) {
       buffer.putUint8(166);
       writeValue(buffer, value.encode());
-    } else if (value is MsgRouteInstruction) {
+    } else if (value is MsgRouteSegment) {
       buffer.putUint8(167);
       writeValue(buffer, value.encode());
-    } else if (value is MsgComputedRoute) {
+    } else if (value is MsgRouteInstruction) {
       buffer.putUint8(168);
       writeValue(buffer, value.encode());
-    } else if (value is MsgDurationRow) {
+    } else if (value is MsgComputedRoute) {
       buffer.putUint8(169);
       writeValue(buffer, value.encode());
-    } else if (value is MsgAmenity) {
+    } else if (value is MsgDurationRow) {
       buffer.putUint8(170);
       writeValue(buffer, value.encode());
-    } else if (value is MsgFeature) {
+    } else if (value is MsgAmenity) {
       buffer.putUint8(171);
       writeValue(buffer, value.encode());
-    } else if (value is MsgDepartment) {
+    } else if (value is MsgFeature) {
       buffer.putUint8(172);
       writeValue(buffer, value.encode());
-    } else if (value is MsgJourneyWaypoint) {
+    } else if (value is MsgDepartment) {
       buffer.putUint8(173);
       writeValue(buffer, value.encode());
-    } else if (value is MsgJourney) {
+    } else if (value is MsgJourneyWaypoint) {
       buffer.putUint8(174);
       writeValue(buffer, value.encode());
-    } else if (value is MsgVenueDataChange) {
+    } else if (value is MsgJourney) {
       buffer.putUint8(175);
       writeValue(buffer, value.encode());
-    } else if (value is MsgSyncUpdated) {
+    } else if (value is MsgVenueDataChange) {
       buffer.putUint8(176);
       writeValue(buffer, value.encode());
-    } else if (value is MsgSyncDeleted) {
+    } else if (value is MsgSyncUpdated) {
       buffer.putUint8(177);
       writeValue(buffer, value.encode());
-    } else if (value is MsgSyncCompleted) {
+    } else if (value is MsgSyncDeleted) {
       buffer.putUint8(178);
       writeValue(buffer, value.encode());
-    } else if (value is MsgSyncFailed) {
+    } else if (value is MsgSyncCompleted) {
       buffer.putUint8(179);
       writeValue(buffer, value.encode());
-    } else if (value is MsgStoreRecreated) {
+    } else if (value is MsgSyncFailed) {
       buffer.putUint8(180);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconIdentifier) {
+    } else if (value is MsgStoreRecreated) {
       buffer.putUint8(181);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconObservation) {
+    } else if (value is MsgBeaconIdentifier) {
       buffer.putUint8(182);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconTelemetry) {
+    } else if (value is MsgBeaconObservation) {
       buffer.putUint8(183);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconFound) {
+    } else if (value is MsgBeaconTelemetry) {
       buffer.putUint8(184);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconUpdated) {
+    } else if (value is MsgBeaconFound) {
       buffer.putUint8(185);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconLost) {
+    } else if (value is MsgBeaconUpdated) {
       buffer.putUint8(186);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconTelemetryReceived) {
+    } else if (value is MsgBeaconLost) {
       buffer.putUint8(187);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPackageState) {
+    } else if (value is MsgBeaconTelemetryReceived) {
       buffer.putUint8(188);
       writeValue(buffer, value.encode());
-    } else if (value is MsgSimulatedWaypoint) {
+    } else if (value is MsgPackageState) {
       buffer.putUint8(189);
       writeValue(buffer, value.encode());
-    } else if (value is MsgSimulatedRoute) {
+    } else if (value is MsgSimulatedWaypoint) {
       buffer.putUint8(190);
       writeValue(buffer, value.encode());
-    } else if (value is MsgDiagnostics) {
+    } else if (value is MsgSimulatedRoute) {
       buffer.putUint8(191);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgDiagnostics) {
+      buffer.putUint8(192);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -2830,92 +2888,94 @@ class _PigeonCodec extends StandardMessageCodec {
       case 147:
         return MsgAndroidServiceOptions.decode(readValue(buffer)!);
       case 148:
-        return MsgConfiguration.decode(readValue(buffer)!);
+        return MsgDistanceFilter.decode(readValue(buffer)!);
       case 149:
-        return MsgCoordinate.decode(readValue(buffer)!);
+        return MsgConfiguration.decode(readValue(buffer)!);
       case 150:
-        return MsgApplication.decode(readValue(buffer)!);
+        return MsgCoordinate.decode(readValue(buffer)!);
       case 151:
-        return MsgPlace.decode(readValue(buffer)!);
+        return MsgApplication.decode(readValue(buffer)!);
       case 152:
-        return MsgFloor.decode(readValue(buffer)!);
+        return MsgPlace.decode(readValue(buffer)!);
       case 153:
-        return MsgZone.decode(readValue(buffer)!);
+        return MsgFloor.decode(readValue(buffer)!);
       case 154:
-        return MsgPermissionStatus.decode(readValue(buffer)!);
+        return MsgZone.decode(readValue(buffer)!);
       case 155:
-        return MsgStateChange.decode(readValue(buffer)!);
+        return MsgPermissionStatus.decode(readValue(buffer)!);
       case 156:
-        return MsgPositionUpdate.decode(readValue(buffer)!);
+        return MsgStateChange.decode(readValue(buffer)!);
       case 157:
-        return MsgFloorChange.decode(readValue(buffer)!);
+        return MsgPositionUpdate.decode(readValue(buffer)!);
       case 158:
-        return MsgGeofenceEntered.decode(readValue(buffer)!);
+        return MsgFloorChange.decode(readValue(buffer)!);
       case 159:
-        return MsgGeofenceExited.decode(readValue(buffer)!);
+        return MsgGeofenceEntered.decode(readValue(buffer)!);
       case 160:
-        return MsgPrivacyZoneEntered.decode(readValue(buffer)!);
+        return MsgGeofenceExited.decode(readValue(buffer)!);
       case 161:
-        return MsgPrivacyZoneExited.decode(readValue(buffer)!);
+        return MsgPrivacyZoneEntered.decode(readValue(buffer)!);
       case 162:
-        return MsgPrivacyZoneState.decode(readValue(buffer)!);
+        return MsgPrivacyZoneExited.decode(readValue(buffer)!);
       case 163:
-        return MsgRouteOptions.decode(readValue(buffer)!);
+        return MsgPrivacyZoneState.decode(readValue(buffer)!);
       case 164:
-        return MsgRoutePoint.decode(readValue(buffer)!);
+        return MsgRouteOptions.decode(readValue(buffer)!);
       case 165:
-        return MsgLevelChange.decode(readValue(buffer)!);
+        return MsgRoutePoint.decode(readValue(buffer)!);
       case 166:
-        return MsgRouteSegment.decode(readValue(buffer)!);
+        return MsgLevelChange.decode(readValue(buffer)!);
       case 167:
-        return MsgRouteInstruction.decode(readValue(buffer)!);
+        return MsgRouteSegment.decode(readValue(buffer)!);
       case 168:
-        return MsgComputedRoute.decode(readValue(buffer)!);
+        return MsgRouteInstruction.decode(readValue(buffer)!);
       case 169:
-        return MsgDurationRow.decode(readValue(buffer)!);
+        return MsgComputedRoute.decode(readValue(buffer)!);
       case 170:
-        return MsgAmenity.decode(readValue(buffer)!);
+        return MsgDurationRow.decode(readValue(buffer)!);
       case 171:
-        return MsgFeature.decode(readValue(buffer)!);
+        return MsgAmenity.decode(readValue(buffer)!);
       case 172:
-        return MsgDepartment.decode(readValue(buffer)!);
+        return MsgFeature.decode(readValue(buffer)!);
       case 173:
-        return MsgJourneyWaypoint.decode(readValue(buffer)!);
+        return MsgDepartment.decode(readValue(buffer)!);
       case 174:
-        return MsgJourney.decode(readValue(buffer)!);
+        return MsgJourneyWaypoint.decode(readValue(buffer)!);
       case 175:
-        return MsgVenueDataChange.decode(readValue(buffer)!);
+        return MsgJourney.decode(readValue(buffer)!);
       case 176:
-        return MsgSyncUpdated.decode(readValue(buffer)!);
+        return MsgVenueDataChange.decode(readValue(buffer)!);
       case 177:
-        return MsgSyncDeleted.decode(readValue(buffer)!);
+        return MsgSyncUpdated.decode(readValue(buffer)!);
       case 178:
-        return MsgSyncCompleted.decode(readValue(buffer)!);
+        return MsgSyncDeleted.decode(readValue(buffer)!);
       case 179:
-        return MsgSyncFailed.decode(readValue(buffer)!);
+        return MsgSyncCompleted.decode(readValue(buffer)!);
       case 180:
-        return MsgStoreRecreated.decode(readValue(buffer)!);
+        return MsgSyncFailed.decode(readValue(buffer)!);
       case 181:
-        return MsgBeaconIdentifier.decode(readValue(buffer)!);
+        return MsgStoreRecreated.decode(readValue(buffer)!);
       case 182:
-        return MsgBeaconObservation.decode(readValue(buffer)!);
+        return MsgBeaconIdentifier.decode(readValue(buffer)!);
       case 183:
-        return MsgBeaconTelemetry.decode(readValue(buffer)!);
+        return MsgBeaconObservation.decode(readValue(buffer)!);
       case 184:
-        return MsgBeaconFound.decode(readValue(buffer)!);
+        return MsgBeaconTelemetry.decode(readValue(buffer)!);
       case 185:
-        return MsgBeaconUpdated.decode(readValue(buffer)!);
+        return MsgBeaconFound.decode(readValue(buffer)!);
       case 186:
-        return MsgBeaconLost.decode(readValue(buffer)!);
+        return MsgBeaconUpdated.decode(readValue(buffer)!);
       case 187:
-        return MsgBeaconTelemetryReceived.decode(readValue(buffer)!);
+        return MsgBeaconLost.decode(readValue(buffer)!);
       case 188:
-        return MsgPackageState.decode(readValue(buffer)!);
+        return MsgBeaconTelemetryReceived.decode(readValue(buffer)!);
       case 189:
-        return MsgSimulatedWaypoint.decode(readValue(buffer)!);
+        return MsgPackageState.decode(readValue(buffer)!);
       case 190:
-        return MsgSimulatedRoute.decode(readValue(buffer)!);
+        return MsgSimulatedWaypoint.decode(readValue(buffer)!);
       case 191:
+        return MsgSimulatedRoute.decode(readValue(buffer)!);
+      case 192:
         return MsgDiagnostics.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);

@@ -26,6 +26,9 @@ class MappersTest {
     visitorReportingEnabled: Boolean? = null,
     geofenceExitDelaySeconds: Double? = null,
     customIBeaconUuids: List<String> = emptyList(),
+    pdrFusionEnabled: Boolean? = null,
+    bleEvaluationIntervalSeconds: Double? = null,
+    distanceFilter: MsgDistanceFilter? = null,
   ) = MsgConfiguration(
     token = "token",
     preset = preset,
@@ -35,6 +38,9 @@ class MappersTest {
     visitorReportingEnabled = visitorReportingEnabled,
     geofenceExitDelaySeconds = geofenceExitDelaySeconds,
     customIBeaconUuids = customIBeaconUuids,
+    pdrFusionEnabled = pdrFusionEnabled,
+    bleEvaluationIntervalSeconds = bleEvaluationIntervalSeconds,
+    distanceFilter = distanceFilter,
   )
 
   @Test
@@ -66,6 +72,28 @@ class MappersTest {
   }
 
   @Test
+  fun `positioning overrides replace only the values that are set`() {
+    val preset = io.proximi.sdk.ProximiioConfiguration.highAccuracy("token").positioning
+    val result = Mappers.configuration(
+      config(
+        preset = MsgConfigurationPreset.HIGH_ACCURACY,
+        bleEvaluationIntervalSeconds = 0.5,
+        distanceFilter = MsgDistanceFilter(minimumDisplacement = 0.4),
+      ),
+      context,
+    ).positioning
+
+    assertEquals(0.5, result.bleEvaluationInterval)
+    assertEquals(0.4, result.distanceFilter.minimumDisplacement)
+    assertEquals(preset.distanceFilter.accuracyDisplacementFactor, result.distanceFilter.accuracyDisplacementFactor)
+    assertEquals(preset.pdrFusionEnabled, result.pdrFusionEnabled)
+
+    val pdrOff = Mappers.configuration(config(pdrFusionEnabled = false, distanceFilter = MsgDistanceFilter()), context)
+    assertEquals(false, pdrOff.positioning.pdrFusionEnabled)
+    assertEquals(io.proximi.sdk.ProximiioConfiguration.default("token").positioning.distanceFilter, pdrOff.positioning.distanceFilter)
+  }
+
+  @Test
   fun `malformed values are rejected as invalidArgument`() {
     val badUrl = assertFailsWith<ProximiioFlutterError> { Mappers.configuration(config(apiBaseUrl = "not a url"), context) }
     assertEquals("invalidArgument", badUrl.code)
@@ -74,6 +102,23 @@ class MappersTest {
       Mappers.configuration(config(customIBeaconUuids = listOf("nope")), context)
     }
     assertEquals("invalidArgument", badUuid.code)
+
+    for (interval in listOf(0.0, -1.0, Double.NaN, Double.POSITIVE_INFINITY)) {
+      val badInterval = assertFailsWith<ProximiioFlutterError> {
+        Mappers.configuration(config(bleEvaluationIntervalSeconds = interval), context)
+      }
+      assertEquals("invalidArgument", badInterval.code)
+    }
+
+    val badDisplacement = assertFailsWith<ProximiioFlutterError> {
+      Mappers.configuration(config(distanceFilter = MsgDistanceFilter(minimumDisplacement = -0.1)), context)
+    }
+    assertEquals("invalidArgument", badDisplacement.code)
+
+    val badFactor = assertFailsWith<ProximiioFlutterError> {
+      Mappers.configuration(config(distanceFilter = MsgDistanceFilter(accuracyDisplacementFactor = Double.NaN)), context)
+    }
+    assertEquals("invalidArgument", badFactor.code)
   }
 
   @Test

@@ -26,6 +26,13 @@ MsgConfiguration toMsgConfiguration(ProximiioConfiguration c) => MsgConfiguratio
   customIBeaconUuids: c.customIBeaconUuids,
   pdrFusionEnabled: c.pdrFusionEnabled,
   barometerEnabled: c.barometerEnabled,
+  bleEvaluationIntervalSeconds: _seconds(c.bleEvaluationInterval),
+  distanceFilter: c.distanceFilter == null
+      ? null
+      : MsgDistanceFilter(
+          minimumDisplacement: c.distanceFilter!.minimumDisplacement,
+          accuracyDisplacementFactor: c.distanceFilter!.accuracyDisplacementFactor,
+        ),
   android: c.android == null ? null : toMsgServiceOptions(c.android!),
 );
 

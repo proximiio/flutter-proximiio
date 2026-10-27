@@ -35,6 +35,8 @@ description: Every setting of ProximiioConfiguration and AndroidServiceOptions, 
     <tr><td><code>customIBeaconUuids</code></td><td>none</td><td>Extra iBeacon UUIDs to scan for</td></tr>
     <tr><td><code>pdrFusionEnabled</code></td><td>preset</td><td>Fuse PDR into positions</td></tr>
     <tr><td><code>barometerEnabled</code></td><td><code>true</code></td><td>iOS only; Android always uses the barometer when present</td></tr>
+    <tr><td><code>bleEvaluationInterval</code></td><td>preset: 2.5 s; <code>highAccuracy</code> 1 s; <code>lowPower</code> 5 s</td><td>How often a position is computed from the beacons; must be positive</td></tr>
+    <tr><td><code>distanceFilter</code></td><td>SDK defaults</td><td>Movement needed before a new position is published; see <a href="#distancefilter">DistanceFilter</a></td></tr>
     <tr><td><code>relayRunsInBackground</code></td><td><code>false</code></td><td>iOS, <code>relayOnly</code>: keep receiving relay positions in the background</td></tr>
     <tr><td><code>android</code></td><td>none</td><td>Android foreground service; without it no service runs</td></tr>
   </tbody>
@@ -55,11 +57,30 @@ description: Every setting of ProximiioConfiguration and AndroidServiceOptions, 
   </tbody>
 </table>
 
+<h2 id="distancefilter">DistanceFilter</h2>
+
+<p>
+  The SDK publishes a position only after it moved at least
+  <code>max(minimumDisplacement, accuracyDisplacementFactor × accuracy)</code> from the last published
+  position. <code>accuracy</code> is the smaller <code>horizontalAccuracy</code> of the two positions. A
+  stationary visitor gets no new positions. With PDR fusion, a detected step publishes a position without
+  this check.
+</p>
+
+<table>
+  <thead><tr><th>Property</th><th>Default</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>minimumDisplacement</code></td><td>1.33 m</td><td>Smallest movement that publishes a position; at least 0</td></tr>
+    <tr><td><code>accuracyDisplacementFactor</code></td><td>0.5</td><td>Share of the accuracy the movement must also reach; at least 0</td></tr>
+  </tbody>
+</table>
+
 <h2>Validation</h2>
 
 <p>
-  <code>Proximiio.create</code> throws <code>invalidArgument</code> for a URL that is not absolute or a UUID
-  that does not parse. On iOS it also throws <code>invalidArgument</code> when <code>Info.plist</code> has no
+  <code>Proximiio.create</code> throws <code>invalidArgument</code> for a URL that is not absolute, a UUID
+  that does not parse, a <code>bleEvaluationInterval</code> that is not positive, or a
+  <code>DistanceFilter</code> value that is negative or not finite. On iOS it also throws <code>invalidArgument</code> when <code>Info.plist</code> has no
   <code>NSBluetoothAlwaysUsageDescription</code> and the preset is not <code>relayOnly</code>.
 </p>
 

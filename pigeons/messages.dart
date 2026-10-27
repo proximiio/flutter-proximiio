@@ -61,6 +61,13 @@ class MsgAndroidServiceOptions {
   bool? holdsWakeLock;
 }
 
+/// The SDK's emission gate (`positioning.distanceFilter`); unset fields keep the SDK's values.
+class MsgDistanceFilter {
+  /// Metres.
+  double? minimumDisplacement;
+  double? accuracyDisplacementFactor;
+}
+
 /// Starts from [preset]; every non-null field overrides the preset's value.
 class MsgConfiguration {
   MsgConfiguration({
@@ -84,6 +91,8 @@ class MsgConfiguration {
   List<String> customIBeaconUuids;
   bool? pdrFusionEnabled;
   bool? barometerEnabled;
+  double? bleEvaluationIntervalSeconds;
+  MsgDistanceFilter? distanceFilter;
   MsgAndroidServiceOptions? android;
 }
 

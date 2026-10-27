@@ -41,6 +41,25 @@ description: Select an SDK configuration preset and override supported settings.
   positions in the background. On Android the foreground service does this.
 </p>
 
+<h2>Position update rate</h2>
+
+<p>
+  With beacons, positions arrive at most once per <code>bleEvaluationInterval</code>, and only after the
+  position moved enough to pass <code>distanceFilter</code>. Under the <code>standard</code> preset a walking
+  visitor can wait several intervals for the next position. <code>highAccuracy</code> computes a position every
+  second and fuses PDR, so each detected step publishes a position. PDR needs the motion permission.
+</p>
+
+<pre><code class="language-dart">final configuration = ProximiioConfiguration(
+  token: token,
+  preset: ConfigurationPreset.highAccuracy,
+  distanceFilter: const DistanceFilter(minimumDisplacement: 0.5),
+);</code></pre>
+
+<p>
+  A shorter interval and a smaller filter use more battery and show more of the beacon signal's noise.
+</p>
+
 <h2>Applying changes</h2>
 
 <p>
