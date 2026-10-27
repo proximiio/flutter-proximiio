@@ -59,6 +59,7 @@ internal object Mappers {
       MsgConfigurationPreset.RELAY_ONLY -> ProximiioConfiguration.relayOnly(msg.token, serviceOptions = service)
     }
     // barometerEnabled has no Android counterpart; the Android SDK always uses the barometer when present.
+    // allowsOfflineStart has none either: the Android SDK's authenticate() always asks the API.
     return preset.copy(
       apiBaseURL = msg.apiBaseUrl?.let(::uri) ?: preset.apiBaseURL,
       fallbackAPIBaseURLs = msg.fallbackApiBaseUrls.takeIf { it.isNotEmpty() }?.map(::uri) ?: preset.fallbackAPIBaseURLs,

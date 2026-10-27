@@ -45,6 +45,7 @@ enum Mappers {
         config.positioning.distanceFilter.accuracyDisplacementFactor = try nonNegative(value, "accuracyDisplacementFactor")
       }
     }
+    if let value = msg.allowsOfflineStart { config.allowsOfflineStart = value }
     return config
   }
 
@@ -211,6 +212,15 @@ enum Mappers {
     case .running: return .running
     case .stopping: return .stopping
     @unknown default: return .idle
+    }
+  }
+
+  static func tokenStatus(_ value: Proximiio.TokenStatus) -> MsgTokenStatus {
+    switch value {
+    case .verified: return .verified
+    case .unverified: return .unverified
+    case .rejected: return .rejected
+    @unknown default: return .unverified
     }
   }
 

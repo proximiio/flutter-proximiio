@@ -144,6 +144,7 @@ class ProximiioConfiguration {
     this.barometerEnabled,
     this.bleEvaluationInterval,
     this.distanceFilter,
+    this.allowsOfflineStart,
     this.android,
   });
 
@@ -203,6 +204,12 @@ class ProximiioConfiguration {
 
   /// When a new position is published; see [DistanceFilter].
   final DistanceFilter? distanceFilter;
+
+  /// iOS only. Lets [Proximiio.authenticate] succeed without a connection when the API accepted this
+  /// token on this phone before (SDK default: `true`); [Proximiio.tokenStatus] is then
+  /// [TokenStatus.unverified]. With `false`, [Proximiio.authenticate] waits for the API and throws
+  /// without it. On Android [Proximiio.authenticate] always needs the API.
+  final bool? allowsOfflineStart;
 
   /// Android foreground service and its notification. Without it the Android SDK runs no foreground
   /// service, and positioning stops once Android freezes the backgrounded app. Ignored on iOS.

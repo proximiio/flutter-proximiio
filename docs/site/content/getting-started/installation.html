@@ -78,10 +78,9 @@ end</code></pre>
 </table>
 
 <p>
-  Without <code>NSBluetoothAlwaysUsageDescription</code>, iOS ends the app when the SDK starts scanning
-  for beacons. <code>Proximiio.create</code> therefore throws <code>invalidArgument</code> when the key is
-  missing and the preset scans beacons (every preset except <code>relayOnly</code>). A missing location
-  key makes the location permission resolve as denied.
+  A missing key turns its input off: the SDK logs an error naming the key and reports that permission as
+  denied. Without <code>NSBluetoothAlwaysUsageDescription</code> no beacons are scanned; without a location
+  key the location permission resolves as denied.
 </p>
 
 <p>For background positioning also add <code>location</code> to <code>UIBackgroundModes</code>. See <a href="{{root}}guides/background.html">Background positioning</a>.</p>

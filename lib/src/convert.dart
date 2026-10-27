@@ -33,6 +33,7 @@ MsgConfiguration toMsgConfiguration(ProximiioConfiguration c) => MsgConfiguratio
           minimumDisplacement: c.distanceFilter!.minimumDisplacement,
           accuracyDisplacementFactor: c.distanceFilter!.accuracyDisplacementFactor,
         ),
+  allowsOfflineStart: c.allowsOfflineStart,
   android: c.android == null ? null : toMsgServiceOptions(c.android!),
 );
 
@@ -142,6 +143,9 @@ PermissionStatus fromMsgPermissionStatus(MsgPermissionStatus s) => PermissionSta
 
 /// Transport → [ProximiioState].
 ProximiioState fromMsgState(MsgSdkState s) => ProximiioState.values.byName(s.name);
+
+/// Transport → [TokenStatus].
+TokenStatus fromMsgTokenStatus(MsgTokenStatus s) => TokenStatus.values.byName(s.name);
 
 /// Transport → [PositionUpdate].
 PositionUpdate fromMsgPosition(MsgPositionUpdate p) => PositionUpdate(

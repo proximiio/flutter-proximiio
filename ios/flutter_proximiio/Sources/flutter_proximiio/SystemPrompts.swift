@@ -3,10 +3,8 @@ import UIKit
 
 /// Waits for the answer to a system permission prompt, without waiting for one that never shows.
 ///
-/// iOS shows the "Change to Always Allow" upgrade once per install; afterwards
-/// `requestAlwaysAuthorization` shows nothing and reports nothing, and a request that waits for the
-/// report waits forever. A system prompt makes the app inactive, so a request is given up once the
-/// app has been active, with nothing in front of it, for a moment; the status is read again then.
+/// A system prompt makes the app inactive, so a request is given up once the app has been active,
+/// with nothing in front of it, for a moment; the status is read again then.
 @MainActor
 enum SystemPrompt {
   /// How long the app stays active before no prompt is assumed.

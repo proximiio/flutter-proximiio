@@ -13,6 +13,21 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
   SDK publishes it (`minimumDisplacement`, default 1.33 m; `accuracyDisplacementFactor`, default 0.5).
 - `Proximiio.create` throws `invalidArgument` when `bleEvaluationInterval` is not positive, or a
   `DistanceFilter` value is negative or not finite.
+- iOS: `ProximiioConfiguration.allowsOfflineStart` (default `true`) and `Proximiio.tokenStatus()`
+  (`TokenStatus.verified`, `unverified`, `rejected`). `tokenStatus()` throws `unsupported` on Android.
+
+### Changed
+- iOS: the plugin builds on the Proximi.io iOS SDK 6.0.0-beta.66 (was 6.0.0-beta.64).
+- iOS: `authenticate` succeeds without a connection when the API accepted the token on this phone
+  before; `tokenStatus()` is then `unverified` until the SDK checks the token online. It gives up
+  after 30 s on a network that does not answer.
+- iOS: a token the API keeps refusing for at least two hours (three checks) stops the SDK and deletes
+  its local data, offline packages included; `tokenStatus()` is then `rejected`.
+- iOS: `Proximiio.create` no longer throws `invalidArgument` without
+  `NSBluetoothAlwaysUsageDescription`. The SDK leaves beacon scanning off, logs an error naming the key
+  and reports Bluetooth as denied.
+- iOS: `requestPermissions(always: true)` waits for the SDK's answer; the plugin no longer gives up on
+  it after the app has been active for 1.5 s.
 
 ## [6.0.0-beta.2] - 2026-10-26
 

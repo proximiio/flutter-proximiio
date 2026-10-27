@@ -140,13 +140,6 @@ final class ProximiioHub {
     let usesBluetooth = configuration.positioning.iBeaconScanningEnabled
       || configuration.positioning.eddystoneScanningEnabled
       || configuration.positioning.trilateration.uwbEnabled
-    // CoreBluetooth ends the app when a central manager is made without this usage description.
-    if usesBluetooth, Bundle.main.object(forInfoDictionaryKey: "NSBluetoothAlwaysUsageDescription") == nil {
-      throw Mappers.invalidArgument(
-        "Info.plist has no NSBluetoothAlwaysUsageDescription; iOS would end the app when start() scans for beacons. "
-          + "Add it, or use ConfigurationPreset.relayOnly."
-      )
-    }
     if let previous = sdk { await stopAndDrain(previous) }
     let sdk = try Proximiio(configuration: configuration)
     cancelRunStreams()

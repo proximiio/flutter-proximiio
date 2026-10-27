@@ -19,6 +19,7 @@ void main() {
       expect(msg.customIBeaconUuids, isEmpty);
       expect(msg.bleEvaluationIntervalSeconds, isNull);
       expect(msg.distanceFilter, isNull);
+      expect(msg.allowsOfflineStart, isNull);
       expect(msg.android, isNull);
     });
 
@@ -51,6 +52,7 @@ void main() {
           barometerEnabled: false,
           bleEvaluationInterval: const Duration(milliseconds: 500),
           distanceFilter: const DistanceFilter(minimumDisplacement: 0.4),
+          allowsOfflineStart: false,
           android: const AndroidServiceOptions(
             notificationTitle: 'Title',
             notificationIcon: 'ic_stat',
@@ -75,6 +77,7 @@ void main() {
       expect(msg.bleEvaluationIntervalSeconds, 0.5);
       expect(msg.distanceFilter?.minimumDisplacement, 0.4);
       expect(msg.distanceFilter?.accuracyDisplacementFactor, isNull);
+      expect(msg.allowsOfflineStart, isFalse);
       expect(msg.android?.notificationTitle, 'Title');
       expect(msg.android?.notificationIcon, 'ic_stat');
       expect(msg.android?.mode, MsgServiceNotificationMode.required);
@@ -197,6 +200,13 @@ void main() {
 
       expect(event, isA<GeofenceExited>());
       expect((event as GeofenceExited).dwellTime, const Duration(seconds: 61, milliseconds: 250));
+    });
+
+    test('every token status has a public counterpart', () {
+      for (final status in MsgTokenStatus.values) {
+        expect(fromMsgTokenStatus(status).name, status.name);
+      }
+      expect(TokenStatus.values.length, MsgTokenStatus.values.length);
     });
 
     test('every geofence event kind maps to its own class', () {

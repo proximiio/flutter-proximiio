@@ -79,6 +79,10 @@ abstract interface class Proximiio {
   /// The current lifecycle state.
   Future<ProximiioState> state();
 
+  /// Whether the API confirmed the token in this run. iOS only; throws
+  /// [ProximiioErrorCode.unsupported] on Android.
+  Future<TokenStatus> tokenStatus();
+
   /// Asks for location (and, with [always], background location) and, unless the configuration is
   /// [ConfigurationPreset.relayOnly], Bluetooth; on Android 13+ also notifications while the
   /// foreground service is configured. Returns the resulting status. Motion is asked by
@@ -92,9 +96,11 @@ abstract interface class Proximiio {
   /// Asks for the motion / activity-recognition permission (needed for PDR).
   Future<bool> requestMotionPermission();
 
-  /// Validates the token with the Proximi.io API (needs a connection), loads the application and
-  /// applies the stored venue data. Throws [ProximiioErrorCode.invalidToken] for a rejected token and
-  /// [ProximiioErrorCode.api] when the API cannot be reached.
+  /// Validates the token with the Proximi.io API, loads the application and applies the stored venue
+  /// data. Throws [ProximiioErrorCode.invalidToken] for a rejected token and [ProximiioErrorCode.api]
+  /// when the API cannot be reached. On iOS it also succeeds without a connection when the API
+  /// accepted this token on this phone before ([ProximiioConfiguration.allowsOfflineStart]); the SDK
+  /// checks the token later ([tokenStatus]). It gives up after 30 s on iOS.
   Future<ProximiioApplication?> authenticate();
 
   /// Starts positioning. Throws [ProximiioErrorCode.notAuthenticated] before a successful
@@ -397,6 +403,9 @@ class BridgedProximiio implements Proximiio, ProximiioAndroid {
 
   @override
   Future<ProximiioState> state() => guarded(() async => fromMsgState(await _api.state()));
+
+  @override
+  Future<TokenStatus> tokenStatus() => guarded(() async => fromMsgTokenStatus(await _api.tokenStatus()));
 
   @override
   Future<PermissionStatus> requestPermissions({bool always = false}) =>

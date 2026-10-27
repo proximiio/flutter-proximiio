@@ -24,6 +24,8 @@ import 'package:pigeon/pigeon.dart';
 // ── Enums ────────────────────────────────────────────────────────────────────
 enum MsgSdkState { idle, authenticated, starting, running, stopping }
 
+enum MsgTokenStatus { verified, unverified, rejected }
+
 enum MsgConfigurationPreset { standard, highAccuracy, lowPower, relayOnly }
 
 enum MsgDesiredAccuracy { bestForNavigation, best, nearestTenMeters, hundredMeters, kilometer, threeKilometers }
@@ -93,6 +95,7 @@ class MsgConfiguration {
   bool? barometerEnabled;
   double? bleEvaluationIntervalSeconds;
   MsgDistanceFilter? distanceFilter;
+  bool? allowsOfflineStart;
   MsgAndroidServiceOptions? android;
 }
 
@@ -621,6 +624,10 @@ abstract class ProximiioHostApi {
 
   @async
   MsgSdkState state();
+
+  /// iOS only; `unsupported` on Android.
+  @async
+  MsgTokenStatus tokenStatus();
 
   @async
   MsgPermissionStatus requestPermissions(bool always);

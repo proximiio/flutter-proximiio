@@ -182,6 +182,12 @@ enum MsgSdkState: Int {
   case stopping = 4
 }
 
+enum MsgTokenStatus: Int {
+  case verified = 0
+  case unverified = 1
+  case rejected = 2
+}
+
 enum MsgConfigurationPreset: Int {
   case standard = 0
   case highAccuracy = 1
@@ -438,6 +444,7 @@ struct MsgConfiguration: Hashable {
   var barometerEnabled: Bool? = nil
   var bleEvaluationIntervalSeconds: Double? = nil
   var distanceFilter: MsgDistanceFilter? = nil
+  var allowsOfflineStart: Bool? = nil
   var android: MsgAndroidServiceOptions? = nil
 
 
@@ -459,7 +466,8 @@ struct MsgConfiguration: Hashable {
     let barometerEnabled: Bool? = nilOrValue(pigeonVar_list[13])
     let bleEvaluationIntervalSeconds: Double? = nilOrValue(pigeonVar_list[14])
     let distanceFilter: MsgDistanceFilter? = nilOrValue(pigeonVar_list[15])
-    let android: MsgAndroidServiceOptions? = nilOrValue(pigeonVar_list[16])
+    let allowsOfflineStart: Bool? = nilOrValue(pigeonVar_list[16])
+    let android: MsgAndroidServiceOptions? = nilOrValue(pigeonVar_list[17])
 
     return MsgConfiguration(
       token: token,
@@ -478,6 +486,7 @@ struct MsgConfiguration: Hashable {
       barometerEnabled: barometerEnabled,
       bleEvaluationIntervalSeconds: bleEvaluationIntervalSeconds,
       distanceFilter: distanceFilter,
+      allowsOfflineStart: allowsOfflineStart,
       android: android
     )
   }
@@ -499,6 +508,7 @@ struct MsgConfiguration: Hashable {
       barometerEnabled,
       bleEvaluationIntervalSeconds,
       distanceFilter,
+      allowsOfflineStart,
       android,
     ]
   }
@@ -506,7 +516,7 @@ struct MsgConfiguration: Hashable {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return deepEqualsMessages(lhs.token, rhs.token) && deepEqualsMessages(lhs.preset, rhs.preset) && deepEqualsMessages(lhs.relayRunsInBackground, rhs.relayRunsInBackground) && deepEqualsMessages(lhs.apiBaseUrl, rhs.apiBaseUrl) && deepEqualsMessages(lhs.fallbackApiBaseUrls, rhs.fallbackApiBaseUrls) && deepEqualsMessages(lhs.syncIntervalSeconds, rhs.syncIntervalSeconds) && deepEqualsMessages(lhs.desiredAccuracy, rhs.desiredAccuracy) && deepEqualsMessages(lhs.allowsBackgroundLocationUpdates, rhs.allowsBackgroundLocationUpdates) && deepEqualsMessages(lhs.visitorReportingEnabled, rhs.visitorReportingEnabled) && deepEqualsMessages(lhs.geofenceExitDelaySeconds, rhs.geofenceExitDelaySeconds) && deepEqualsMessages(lhs.withholdsPositionsInPrivacyZones, rhs.withholdsPositionsInPrivacyZones) && deepEqualsMessages(lhs.customIBeaconUuids, rhs.customIBeaconUuids) && deepEqualsMessages(lhs.pdrFusionEnabled, rhs.pdrFusionEnabled) && deepEqualsMessages(lhs.barometerEnabled, rhs.barometerEnabled) && deepEqualsMessages(lhs.bleEvaluationIntervalSeconds, rhs.bleEvaluationIntervalSeconds) && deepEqualsMessages(lhs.distanceFilter, rhs.distanceFilter) && deepEqualsMessages(lhs.android, rhs.android)
+    return deepEqualsMessages(lhs.token, rhs.token) && deepEqualsMessages(lhs.preset, rhs.preset) && deepEqualsMessages(lhs.relayRunsInBackground, rhs.relayRunsInBackground) && deepEqualsMessages(lhs.apiBaseUrl, rhs.apiBaseUrl) && deepEqualsMessages(lhs.fallbackApiBaseUrls, rhs.fallbackApiBaseUrls) && deepEqualsMessages(lhs.syncIntervalSeconds, rhs.syncIntervalSeconds) && deepEqualsMessages(lhs.desiredAccuracy, rhs.desiredAccuracy) && deepEqualsMessages(lhs.allowsBackgroundLocationUpdates, rhs.allowsBackgroundLocationUpdates) && deepEqualsMessages(lhs.visitorReportingEnabled, rhs.visitorReportingEnabled) && deepEqualsMessages(lhs.geofenceExitDelaySeconds, rhs.geofenceExitDelaySeconds) && deepEqualsMessages(lhs.withholdsPositionsInPrivacyZones, rhs.withholdsPositionsInPrivacyZones) && deepEqualsMessages(lhs.customIBeaconUuids, rhs.customIBeaconUuids) && deepEqualsMessages(lhs.pdrFusionEnabled, rhs.pdrFusionEnabled) && deepEqualsMessages(lhs.barometerEnabled, rhs.barometerEnabled) && deepEqualsMessages(lhs.bleEvaluationIntervalSeconds, rhs.bleEvaluationIntervalSeconds) && deepEqualsMessages(lhs.distanceFilter, rhs.distanceFilter) && deepEqualsMessages(lhs.allowsOfflineStart, rhs.allowsOfflineStart) && deepEqualsMessages(lhs.android, rhs.android)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -527,6 +537,7 @@ struct MsgConfiguration: Hashable {
     deepHashMessages(value: barometerEnabled, hasher: &hasher)
     deepHashMessages(value: bleEvaluationIntervalSeconds, hasher: &hasher)
     deepHashMessages(value: distanceFilter, hasher: &hasher)
+    deepHashMessages(value: allowsOfflineStart, hasher: &hasher)
     deepHashMessages(value: android, hasher: &hasher)
   }
 }
@@ -2542,196 +2553,202 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 130:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgConfigurationPreset(rawValue: enumResultAsInt)
+        return MsgTokenStatus(rawValue: enumResultAsInt)
       }
       return nil
     case 131:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgDesiredAccuracy(rawValue: enumResultAsInt)
+        return MsgConfigurationPreset(rawValue: enumResultAsInt)
       }
       return nil
     case 132:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgServiceNotificationMode(rawValue: enumResultAsInt)
+        return MsgDesiredAccuracy(rawValue: enumResultAsInt)
       }
       return nil
     case 133:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgLogLevel(rawValue: enumResultAsInt)
+        return MsgServiceNotificationMode(rawValue: enumResultAsInt)
       }
       return nil
     case 134:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgLocationAuthorization(rawValue: enumResultAsInt)
+        return MsgLogLevel(rawValue: enumResultAsInt)
       }
       return nil
     case 135:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgLocationAccuracy(rawValue: enumResultAsInt)
+        return MsgLocationAuthorization(rawValue: enumResultAsInt)
       }
       return nil
     case 136:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgBluetoothAuthorization(rawValue: enumResultAsInt)
+        return MsgLocationAccuracy(rawValue: enumResultAsInt)
       }
       return nil
     case 137:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgMotionAuthorization(rawValue: enumResultAsInt)
+        return MsgBluetoothAuthorization(rawValue: enumResultAsInt)
       }
       return nil
     case 138:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgPositionSource(rawValue: enumResultAsInt)
+        return MsgMotionAuthorization(rawValue: enumResultAsInt)
       }
       return nil
     case 139:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgFloorChangeDirection(rawValue: enumResultAsInt)
+        return MsgPositionSource(rawValue: enumResultAsInt)
       }
       return nil
     case 140:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgFloorChangeSource(rawValue: enumResultAsInt)
+        return MsgFloorChangeDirection(rawValue: enumResultAsInt)
       }
       return nil
     case 141:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgRouteProfile(rawValue: enumResultAsInt)
+        return MsgFloorChangeSource(rawValue: enumResultAsInt)
       }
       return nil
     case 142:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgRouteAvoidance(rawValue: enumResultAsInt)
+        return MsgRouteProfile(rawValue: enumResultAsInt)
       }
       return nil
     case 143:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgInstructionKind(rawValue: enumResultAsInt)
+        return MsgRouteAvoidance(rawValue: enumResultAsInt)
       }
       return nil
     case 144:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgBeaconKind(rawValue: enumResultAsInt)
+        return MsgInstructionKind(rawValue: enumResultAsInt)
       }
       return nil
     case 145:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgPackageStateKind(rawValue: enumResultAsInt)
+        return MsgBeaconKind(rawValue: enumResultAsInt)
       }
       return nil
     case 146:
       let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
       if let enumResultAsInt = enumResultAsInt {
-        return MsgSimulationState(rawValue: enumResultAsInt)
+        return MsgPackageStateKind(rawValue: enumResultAsInt)
       }
       return nil
     case 147:
-      return MsgAndroidServiceOptions.fromList(self.readValue() as! [Any?])
+      let enumResultAsInt: Int? = nilOrValue(self.readValue() as! Int?)
+      if let enumResultAsInt = enumResultAsInt {
+        return MsgSimulationState(rawValue: enumResultAsInt)
+      }
+      return nil
     case 148:
-      return MsgDistanceFilter.fromList(self.readValue() as! [Any?])
+      return MsgAndroidServiceOptions.fromList(self.readValue() as! [Any?])
     case 149:
-      return MsgConfiguration.fromList(self.readValue() as! [Any?])
+      return MsgDistanceFilter.fromList(self.readValue() as! [Any?])
     case 150:
-      return MsgCoordinate.fromList(self.readValue() as! [Any?])
+      return MsgConfiguration.fromList(self.readValue() as! [Any?])
     case 151:
-      return MsgApplication.fromList(self.readValue() as! [Any?])
+      return MsgCoordinate.fromList(self.readValue() as! [Any?])
     case 152:
-      return MsgPlace.fromList(self.readValue() as! [Any?])
+      return MsgApplication.fromList(self.readValue() as! [Any?])
     case 153:
-      return MsgFloor.fromList(self.readValue() as! [Any?])
+      return MsgPlace.fromList(self.readValue() as! [Any?])
     case 154:
-      return MsgZone.fromList(self.readValue() as! [Any?])
+      return MsgFloor.fromList(self.readValue() as! [Any?])
     case 155:
-      return MsgPermissionStatus.fromList(self.readValue() as! [Any?])
+      return MsgZone.fromList(self.readValue() as! [Any?])
     case 156:
-      return MsgStateChange.fromList(self.readValue() as! [Any?])
+      return MsgPermissionStatus.fromList(self.readValue() as! [Any?])
     case 157:
-      return MsgPositionUpdate.fromList(self.readValue() as! [Any?])
+      return MsgStateChange.fromList(self.readValue() as! [Any?])
     case 158:
-      return MsgFloorChange.fromList(self.readValue() as! [Any?])
+      return MsgPositionUpdate.fromList(self.readValue() as! [Any?])
     case 159:
-      return MsgGeofenceEntered.fromList(self.readValue() as! [Any?])
+      return MsgFloorChange.fromList(self.readValue() as! [Any?])
     case 160:
-      return MsgGeofenceExited.fromList(self.readValue() as! [Any?])
+      return MsgGeofenceEntered.fromList(self.readValue() as! [Any?])
     case 161:
-      return MsgPrivacyZoneEntered.fromList(self.readValue() as! [Any?])
+      return MsgGeofenceExited.fromList(self.readValue() as! [Any?])
     case 162:
-      return MsgPrivacyZoneExited.fromList(self.readValue() as! [Any?])
+      return MsgPrivacyZoneEntered.fromList(self.readValue() as! [Any?])
     case 163:
-      return MsgPrivacyZoneState.fromList(self.readValue() as! [Any?])
+      return MsgPrivacyZoneExited.fromList(self.readValue() as! [Any?])
     case 164:
-      return MsgRouteOptions.fromList(self.readValue() as! [Any?])
+      return MsgPrivacyZoneState.fromList(self.readValue() as! [Any?])
     case 165:
-      return MsgRoutePoint.fromList(self.readValue() as! [Any?])
+      return MsgRouteOptions.fromList(self.readValue() as! [Any?])
     case 166:
-      return MsgLevelChange.fromList(self.readValue() as! [Any?])
+      return MsgRoutePoint.fromList(self.readValue() as! [Any?])
     case 167:
-      return MsgRouteSegment.fromList(self.readValue() as! [Any?])
+      return MsgLevelChange.fromList(self.readValue() as! [Any?])
     case 168:
-      return MsgRouteInstruction.fromList(self.readValue() as! [Any?])
+      return MsgRouteSegment.fromList(self.readValue() as! [Any?])
     case 169:
-      return MsgComputedRoute.fromList(self.readValue() as! [Any?])
+      return MsgRouteInstruction.fromList(self.readValue() as! [Any?])
     case 170:
-      return MsgDurationRow.fromList(self.readValue() as! [Any?])
+      return MsgComputedRoute.fromList(self.readValue() as! [Any?])
     case 171:
-      return MsgAmenity.fromList(self.readValue() as! [Any?])
+      return MsgDurationRow.fromList(self.readValue() as! [Any?])
     case 172:
-      return MsgFeature.fromList(self.readValue() as! [Any?])
+      return MsgAmenity.fromList(self.readValue() as! [Any?])
     case 173:
-      return MsgDepartment.fromList(self.readValue() as! [Any?])
+      return MsgFeature.fromList(self.readValue() as! [Any?])
     case 174:
-      return MsgJourneyWaypoint.fromList(self.readValue() as! [Any?])
+      return MsgDepartment.fromList(self.readValue() as! [Any?])
     case 175:
-      return MsgJourney.fromList(self.readValue() as! [Any?])
+      return MsgJourneyWaypoint.fromList(self.readValue() as! [Any?])
     case 176:
-      return MsgVenueDataChange.fromList(self.readValue() as! [Any?])
+      return MsgJourney.fromList(self.readValue() as! [Any?])
     case 177:
-      return MsgSyncUpdated.fromList(self.readValue() as! [Any?])
+      return MsgVenueDataChange.fromList(self.readValue() as! [Any?])
     case 178:
-      return MsgSyncDeleted.fromList(self.readValue() as! [Any?])
+      return MsgSyncUpdated.fromList(self.readValue() as! [Any?])
     case 179:
-      return MsgSyncCompleted.fromList(self.readValue() as! [Any?])
+      return MsgSyncDeleted.fromList(self.readValue() as! [Any?])
     case 180:
-      return MsgSyncFailed.fromList(self.readValue() as! [Any?])
+      return MsgSyncCompleted.fromList(self.readValue() as! [Any?])
     case 181:
-      return MsgStoreRecreated.fromList(self.readValue() as! [Any?])
+      return MsgSyncFailed.fromList(self.readValue() as! [Any?])
     case 182:
-      return MsgBeaconIdentifier.fromList(self.readValue() as! [Any?])
+      return MsgStoreRecreated.fromList(self.readValue() as! [Any?])
     case 183:
-      return MsgBeaconObservation.fromList(self.readValue() as! [Any?])
+      return MsgBeaconIdentifier.fromList(self.readValue() as! [Any?])
     case 184:
-      return MsgBeaconTelemetry.fromList(self.readValue() as! [Any?])
+      return MsgBeaconObservation.fromList(self.readValue() as! [Any?])
     case 185:
-      return MsgBeaconFound.fromList(self.readValue() as! [Any?])
+      return MsgBeaconTelemetry.fromList(self.readValue() as! [Any?])
     case 186:
-      return MsgBeaconUpdated.fromList(self.readValue() as! [Any?])
+      return MsgBeaconFound.fromList(self.readValue() as! [Any?])
     case 187:
-      return MsgBeaconLost.fromList(self.readValue() as! [Any?])
+      return MsgBeaconUpdated.fromList(self.readValue() as! [Any?])
     case 188:
-      return MsgBeaconTelemetryReceived.fromList(self.readValue() as! [Any?])
+      return MsgBeaconLost.fromList(self.readValue() as! [Any?])
     case 189:
-      return MsgPackageState.fromList(self.readValue() as! [Any?])
+      return MsgBeaconTelemetryReceived.fromList(self.readValue() as! [Any?])
     case 190:
-      return MsgSimulatedWaypoint.fromList(self.readValue() as! [Any?])
+      return MsgPackageState.fromList(self.readValue() as! [Any?])
     case 191:
-      return MsgSimulatedRoute.fromList(self.readValue() as! [Any?])
+      return MsgSimulatedWaypoint.fromList(self.readValue() as! [Any?])
     case 192:
+      return MsgSimulatedRoute.fromList(self.readValue() as! [Any?])
+    case 193:
       return MsgDiagnostics.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -2744,194 +2761,197 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     if let value = value as? MsgSdkState {
       super.writeByte(129)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgConfigurationPreset {
+    } else if let value = value as? MsgTokenStatus {
       super.writeByte(130)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgDesiredAccuracy {
+    } else if let value = value as? MsgConfigurationPreset {
       super.writeByte(131)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgServiceNotificationMode {
+    } else if let value = value as? MsgDesiredAccuracy {
       super.writeByte(132)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgLogLevel {
+    } else if let value = value as? MsgServiceNotificationMode {
       super.writeByte(133)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgLocationAuthorization {
+    } else if let value = value as? MsgLogLevel {
       super.writeByte(134)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgLocationAccuracy {
+    } else if let value = value as? MsgLocationAuthorization {
       super.writeByte(135)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgBluetoothAuthorization {
+    } else if let value = value as? MsgLocationAccuracy {
       super.writeByte(136)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgMotionAuthorization {
+    } else if let value = value as? MsgBluetoothAuthorization {
       super.writeByte(137)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgPositionSource {
+    } else if let value = value as? MsgMotionAuthorization {
       super.writeByte(138)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgFloorChangeDirection {
+    } else if let value = value as? MsgPositionSource {
       super.writeByte(139)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgFloorChangeSource {
+    } else if let value = value as? MsgFloorChangeDirection {
       super.writeByte(140)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgRouteProfile {
+    } else if let value = value as? MsgFloorChangeSource {
       super.writeByte(141)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgRouteAvoidance {
+    } else if let value = value as? MsgRouteProfile {
       super.writeByte(142)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgInstructionKind {
+    } else if let value = value as? MsgRouteAvoidance {
       super.writeByte(143)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgBeaconKind {
+    } else if let value = value as? MsgInstructionKind {
       super.writeByte(144)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgPackageStateKind {
+    } else if let value = value as? MsgBeaconKind {
       super.writeByte(145)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgSimulationState {
+    } else if let value = value as? MsgPackageStateKind {
       super.writeByte(146)
       super.writeValue(value.rawValue)
-    } else if let value = value as? MsgAndroidServiceOptions {
+    } else if let value = value as? MsgSimulationState {
       super.writeByte(147)
-      super.writeValue(value.toList())
-    } else if let value = value as? MsgDistanceFilter {
+      super.writeValue(value.rawValue)
+    } else if let value = value as? MsgAndroidServiceOptions {
       super.writeByte(148)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgConfiguration {
+    } else if let value = value as? MsgDistanceFilter {
       super.writeByte(149)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgCoordinate {
+    } else if let value = value as? MsgConfiguration {
       super.writeByte(150)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgApplication {
+    } else if let value = value as? MsgCoordinate {
       super.writeByte(151)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPlace {
+    } else if let value = value as? MsgApplication {
       super.writeByte(152)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgFloor {
+    } else if let value = value as? MsgPlace {
       super.writeByte(153)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgZone {
+    } else if let value = value as? MsgFloor {
       super.writeByte(154)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPermissionStatus {
+    } else if let value = value as? MsgZone {
       super.writeByte(155)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgStateChange {
+    } else if let value = value as? MsgPermissionStatus {
       super.writeByte(156)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPositionUpdate {
+    } else if let value = value as? MsgStateChange {
       super.writeByte(157)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgFloorChange {
+    } else if let value = value as? MsgPositionUpdate {
       super.writeByte(158)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgGeofenceEntered {
+    } else if let value = value as? MsgFloorChange {
       super.writeByte(159)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgGeofenceExited {
+    } else if let value = value as? MsgGeofenceEntered {
       super.writeByte(160)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPrivacyZoneEntered {
+    } else if let value = value as? MsgGeofenceExited {
       super.writeByte(161)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPrivacyZoneExited {
+    } else if let value = value as? MsgPrivacyZoneEntered {
       super.writeByte(162)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPrivacyZoneState {
+    } else if let value = value as? MsgPrivacyZoneExited {
       super.writeByte(163)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgRouteOptions {
+    } else if let value = value as? MsgPrivacyZoneState {
       super.writeByte(164)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgRoutePoint {
+    } else if let value = value as? MsgRouteOptions {
       super.writeByte(165)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgLevelChange {
+    } else if let value = value as? MsgRoutePoint {
       super.writeByte(166)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgRouteSegment {
+    } else if let value = value as? MsgLevelChange {
       super.writeByte(167)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgRouteInstruction {
+    } else if let value = value as? MsgRouteSegment {
       super.writeByte(168)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgComputedRoute {
+    } else if let value = value as? MsgRouteInstruction {
       super.writeByte(169)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgDurationRow {
+    } else if let value = value as? MsgComputedRoute {
       super.writeByte(170)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgAmenity {
+    } else if let value = value as? MsgDurationRow {
       super.writeByte(171)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgFeature {
+    } else if let value = value as? MsgAmenity {
       super.writeByte(172)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgDepartment {
+    } else if let value = value as? MsgFeature {
       super.writeByte(173)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgJourneyWaypoint {
+    } else if let value = value as? MsgDepartment {
       super.writeByte(174)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgJourney {
+    } else if let value = value as? MsgJourneyWaypoint {
       super.writeByte(175)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgVenueDataChange {
+    } else if let value = value as? MsgJourney {
       super.writeByte(176)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgSyncUpdated {
+    } else if let value = value as? MsgVenueDataChange {
       super.writeByte(177)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgSyncDeleted {
+    } else if let value = value as? MsgSyncUpdated {
       super.writeByte(178)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgSyncCompleted {
+    } else if let value = value as? MsgSyncDeleted {
       super.writeByte(179)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgSyncFailed {
+    } else if let value = value as? MsgSyncCompleted {
       super.writeByte(180)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgStoreRecreated {
+    } else if let value = value as? MsgSyncFailed {
       super.writeByte(181)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconIdentifier {
+    } else if let value = value as? MsgStoreRecreated {
       super.writeByte(182)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconObservation {
+    } else if let value = value as? MsgBeaconIdentifier {
       super.writeByte(183)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconTelemetry {
+    } else if let value = value as? MsgBeaconObservation {
       super.writeByte(184)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconFound {
+    } else if let value = value as? MsgBeaconTelemetry {
       super.writeByte(185)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconUpdated {
+    } else if let value = value as? MsgBeaconFound {
       super.writeByte(186)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconLost {
+    } else if let value = value as? MsgBeaconUpdated {
       super.writeByte(187)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconTelemetryReceived {
+    } else if let value = value as? MsgBeaconLost {
       super.writeByte(188)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPackageState {
+    } else if let value = value as? MsgBeaconTelemetryReceived {
       super.writeByte(189)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgSimulatedWaypoint {
+    } else if let value = value as? MsgPackageState {
       super.writeByte(190)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgSimulatedRoute {
+    } else if let value = value as? MsgSimulatedWaypoint {
       super.writeByte(191)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgDiagnostics {
+    } else if let value = value as? MsgSimulatedRoute {
       super.writeByte(192)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgDiagnostics {
+      super.writeByte(193)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -2970,6 +2990,8 @@ protocol ProximiioHostApi {
   /// Whether an SDK instance exists in this process (made by any engine).
   func isConfigured() throws -> Bool
   func state(completion: @escaping (Result<MsgSdkState, Error>) -> Void)
+  /// iOS only; `unsupported` on Android.
+  func tokenStatus(completion: @escaping (Result<MsgTokenStatus, Error>) -> Void)
   func requestPermissions(always: Bool, completion: @escaping (Result<MsgPermissionStatus, Error>) -> Void)
   func requestMotionPermission(completion: @escaping (Result<Bool, Error>) -> Void)
   func authenticate(completion: @escaping (Result<MsgApplication?, Error>) -> Void)
@@ -3094,6 +3116,22 @@ class ProximiioHostApiSetup {
       }
     } else {
       stateChannel.setMessageHandler(nil)
+    }
+    /// iOS only; `unsupported` on Android.
+    let tokenStatusChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.tokenStatus\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      tokenStatusChannel.setMessageHandler { _, reply in
+        api.tokenStatus { result in
+          switch result {
+          case .success(let res):
+            reply(wrapResult(res))
+          case .failure(let error):
+            reply(wrapError(error))
+          }
+        }
+      }
+    } else {
+      tokenStatusChannel.setMessageHandler(nil)
     }
     let requestPermissionsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.requestPermissions\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {

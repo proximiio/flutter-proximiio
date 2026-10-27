@@ -86,7 +86,8 @@ await sdk.stop();</code></pre>
 }</code></pre>
 
 <p>
-  <code>authenticate</code> validates the token with the Proximi.io API and needs a connection.
+  <code>authenticate</code> validates the token with the Proximi.io API. Android needs a connection for
+  it. iOS also succeeds without one when the API accepted the token on this phone before.
   <code>start</code> throws <code>notAuthenticated</code> until <code>authenticate</code> has
   succeeded. Without the location permission <code>start</code> succeeds but produces no positions;
   check the permission status first.

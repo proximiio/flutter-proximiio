@@ -63,8 +63,8 @@ validation checks them against the APIs the SDK links and rejects the upload wit
 | `NSNearbyInteractionUsageDescription` | UWB anchors are ranged |
 | `NSCameraUsageDescription` | camera-assisted UWB direction |
 
-Without `NSBluetoothAlwaysUsageDescription` iOS ends the app when the SDK scans for beacons, so
-`Proximiio.create` throws `invalidArgument` for every preset except `relayOnly`.
+A missing key turns its input off: the SDK logs an error naming the key and reports that permission as
+denied. Without `NSBluetoothAlwaysUsageDescription` no beacons are scanned.
 
 For background positioning also add `location` to `UIBackgroundModes` and set
 `allowsBackgroundLocationUpdates: true`.

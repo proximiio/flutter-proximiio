@@ -19,6 +19,22 @@ enum ProximiioState {
   stopping,
 }
 
+/// Whether the Proximi.io API confirmed the application token in this run; see
+/// [Proximiio.tokenStatus].
+enum TokenStatus {
+  /// The API accepted the token in this run. Venue data syncs and analytics upload.
+  verified,
+
+  /// Not confirmed yet: before [Proximiio.authenticate], after a start without a connection, or while
+  /// the API refuses the token for less than two hours. Positioning runs on the stored venue data;
+  /// nothing syncs or uploads.
+  unverified,
+
+  /// The API refused the token for at least two hours (three checks). The SDK stopped and deleted
+  /// its local data; [Proximiio.start] throws until [Proximiio.authenticate] succeeds again.
+  rejected,
+}
+
 /// What produced a position.
 enum PositionSource {
   /// Bluetooth beacons.

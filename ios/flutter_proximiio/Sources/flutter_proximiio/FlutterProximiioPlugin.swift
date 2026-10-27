@@ -93,15 +93,16 @@ private final class HostApi: ProximiioHostApi {
     run(completion) { sdk in Mappers.state(await sdk.state) }
   }
 
+  func tokenStatus(completion: @escaping (Result<MsgTokenStatus, Error>) -> Void) {
+    run(completion) { sdk in Mappers.tokenStatus(await sdk.tokenStatus) }
+  }
+
   /// Location through the SDK, then Bluetooth, which iOS would otherwise ask at the first `start()`.
-  /// Each request gives up once no system prompt is on screen (see ``SystemPrompt``), and the status
-  /// is read again at the end.
+  /// The Bluetooth request gives up once no system prompt is on screen (see ``SystemPrompt``), and
+  /// the status is read again at the end.
   func requestPermissions(always: Bool, completion: @escaping (Result<MsgPermissionStatus, Error>) -> Void) {
     run(completion) { sdk in
-      var status = await SystemPrompt.answer(
-        to: { await sdk.requestPermissions(always: always) },
-        orRead: { await sdk.requestPermissions(always: false) }
-      )
+      var status = await sdk.requestPermissions(always: always)
       if ProximiioHub.shared.usesBluetooth, BluetoothPrompt.isNeeded {
         await SystemPrompt.answer(to: { await BluetoothPrompt.show() }, orRead: {})
         status = await sdk.requestPermissions(always: false)

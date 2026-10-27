@@ -37,6 +37,7 @@ description: Every setting of ProximiioConfiguration and AndroidServiceOptions, 
     <tr><td><code>barometerEnabled</code></td><td><code>true</code></td><td>iOS only; Android always uses the barometer when present</td></tr>
     <tr><td><code>bleEvaluationInterval</code></td><td>preset: 2.5 s; <code>highAccuracy</code> 1 s; <code>lowPower</code> 5 s</td><td>How often a position is computed from the beacons; must be positive</td></tr>
     <tr><td><code>distanceFilter</code></td><td>SDK defaults</td><td>Movement needed before a new position is published; see <a href="#distancefilter">DistanceFilter</a></td></tr>
+    <tr><td><code>allowsOfflineStart</code></td><td><code>true</code></td><td>iOS only: <code>authenticate</code> succeeds without a connection for a token accepted on this phone before; see <a href="{{root}}guides/offline-and-sync.html">Offline and sync</a></td></tr>
     <tr><td><code>relayRunsInBackground</code></td><td><code>false</code></td><td>iOS, <code>relayOnly</code>: keep receiving relay positions in the background</td></tr>
     <tr><td><code>android</code></td><td>none</td><td>Android foreground service; without it no service runs</td></tr>
   </tbody>
@@ -80,8 +81,7 @@ description: Every setting of ProximiioConfiguration and AndroidServiceOptions, 
 <p>
   <code>Proximiio.create</code> throws <code>invalidArgument</code> for a URL that is not absolute, a UUID
   that does not parse, a <code>bleEvaluationInterval</code> that is not positive, or a
-  <code>DistanceFilter</code> value that is negative or not finite. On iOS it also throws <code>invalidArgument</code> when <code>Info.plist</code> has no
-  <code>NSBluetoothAlwaysUsageDescription</code> and the preset is not <code>relayOnly</code>.
+  <code>DistanceFilter</code> value that is negative or not finite.
 </p>
 
 <h2>Related documentation</h2>

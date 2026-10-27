@@ -5,7 +5,7 @@
 # The Proximi.io SDK pod is not on CocoaPods trunk. Add it to the app's ios/Podfile,
 # inside the Runner target, at the same version as below:
 #
-#   pod 'Proximiio', :podspec => 'https://raw.githubusercontent.com/proximiio/proximiio-sdk-ios-binary/6.0.0-beta.64/Proximiio.podspec'
+#   pod 'Proximiio', :podspec => 'https://raw.githubusercontent.com/proximiio/proximiio-sdk-ios-binary/6.0.0-beta.66/Proximiio.podspec'
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_proximiio'
@@ -22,7 +22,7 @@ privacy zones, venue data and wayfinding.
   s.source_files     = 'flutter_proximiio/Sources/flutter_proximiio/**/*.swift'
   s.resource_bundles = { 'flutter_proximiio_privacy' => ['flutter_proximiio/Sources/flutter_proximiio/PrivacyInfo.xcprivacy'] }
   s.dependency 'Flutter'
-  s.dependency 'Proximiio', '6.0.0-beta.64'
+  s.dependency 'Proximiio', '6.0.0-beta.66'
   s.platform         = :ios, '15.0'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version    = '5.0'
