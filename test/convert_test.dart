@@ -237,6 +237,48 @@ void main() {
       expect(state.positioningSourcePrivateSince, DateTime.fromMillisecondsSinceEpoch(1000, isUtc: true));
     });
 
+    test('PDR step', () {
+      final step = fromMsgPdrUpdate(
+        MsgPdrUpdate(
+          northMeters: 0.5,
+          eastMeters: -0.25,
+          distanceMeters: 0.7,
+          headingDegrees: 333.4,
+          isMoving: true,
+          placement: MsgDevicePlacement.handSwinging,
+          timestampSeconds: 12.5,
+        ),
+      );
+      expect(
+        step,
+        const PdrUpdate(
+          northMeters: 0.5,
+          eastMeters: -0.25,
+          distanceMeters: 0.7,
+          headingDegrees: 333.4,
+          isMoving: true,
+          placement: DevicePlacement.handSwinging,
+          timestamp: Duration(milliseconds: 12500),
+        ),
+      );
+      for (final placement in MsgDevicePlacement.values) {
+        expect(
+          fromMsgPdrUpdate(
+            MsgPdrUpdate(
+              northMeters: 0,
+              eastMeters: 0,
+              distanceMeters: 0,
+              headingDegrees: 0,
+              isMoving: false,
+              placement: placement,
+              timestampSeconds: 0,
+            ),
+          ).placement.name,
+          placement.name,
+        );
+      }
+    });
+
     test('every transport state and source has a public counterpart', () {
       for (final state in MsgSdkState.values) {
         expect(fromMsgState(state).name, state.name);

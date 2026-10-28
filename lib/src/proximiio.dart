@@ -76,6 +76,11 @@ abstract interface class Proximiio {
   /// Beacons of the venue coming into and out of range.
   Stream<BeaconEvent> get beaconEvents;
 
+  /// Each PDR step: its length, the direction of walking and whether the visitor walks. Steps arrive
+  /// only while PDR runs ([enablePdr]) with PDR fusion on (`pdrFusionEnabled`, or the
+  /// [ConfigurationPreset.highAccuracy] preset).
+  Stream<PdrUpdate> get pdrObservations;
+
   /// The current lifecycle state.
   Future<ProximiioState> state();
 
@@ -337,6 +342,9 @@ class BridgeEvents {
 
   /// See [Proximiio.beaconEvents].
   Stream<msg.MsgBeaconEvent> beaconEvents() => msg.beaconEvents();
+
+  /// See [Proximiio.pdrObservations].
+  Stream<msg.MsgPdrUpdate> pdrObservations() => msg.pdrObservations();
 }
 
 /// [Proximiio] over the Pigeon bridge.
@@ -400,6 +408,9 @@ class BridgedProximiio implements Proximiio, ProximiioAndroid {
 
   @override
   Stream<BeaconEvent> get beaconEvents => _shared.beaconEvents;
+
+  @override
+  Stream<PdrUpdate> get pdrObservations => _shared.pdrObservations;
 
   @override
   Future<ProximiioState> state() => guarded(() async => fromMsgState(await _api.state()));
@@ -698,6 +709,8 @@ final class _BridgedStreams {
   late final Stream<SyncEvent> syncEvents = _bridge(_events.syncEvents(), fromMsgSyncEvent);
 
   late final Stream<BeaconEvent> beaconEvents = _bridge(_events.beaconEvents(), fromMsgBeaconEvent);
+
+  late final Stream<PdrUpdate> pdrObservations = _bridge(_events.pdrObservations(), fromMsgPdrUpdate);
 
   /// Both `map` and `fromHandlers` keep the channel's broadcast stream a broadcast stream.
   static Stream<T> _bridge<M, T>(Stream<M> source, T Function(M) convert) => source

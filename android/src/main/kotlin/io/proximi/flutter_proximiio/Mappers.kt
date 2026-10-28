@@ -21,6 +21,8 @@ import io.proximi.sdk.core.platform.PermissionStatus
 import io.proximi.sdk.geofencing.GeofenceEvent
 import io.proximi.sdk.journey.ProximiioJourneyError
 import io.proximi.sdk.offline.OfflinePackageError
+import io.proximi.sdk.pdr.context.DevicePlacement
+import io.proximi.sdk.pdr.manager.PdrUpdate
 import io.proximi.sdk.wayfinding.WayfindingRoutingError
 import io.proximi.sdk.positioning.engine.PositioningEngine
 import io.proximi.sdk.positioning.engine.PositionSource
@@ -322,6 +324,23 @@ internal object Mappers {
       FloorChangeSource.MANUAL -> MsgFloorChangeSource.MANUAL
     },
     timestampMs = value.timestamp,
+  )
+
+  fun pdrUpdate(value: PdrUpdate) = MsgPdrUpdate(
+    northMeters = value.northMeters,
+    eastMeters = value.eastMeters,
+    distanceMeters = value.distanceMeters,
+    headingDegrees = value.headingDegrees,
+    isMoving = value.isMoving,
+    placement = when (value.placement) {
+      DevicePlacement.HAND_TEXTING -> MsgDevicePlacement.HAND_TEXTING
+      DevicePlacement.HAND_SWINGING -> MsgDevicePlacement.HAND_SWINGING
+      DevicePlacement.POCKET -> MsgDevicePlacement.POCKET
+      DevicePlacement.BAG -> MsgDevicePlacement.BAG
+      DevicePlacement.TABLE -> MsgDevicePlacement.TABLE
+      DevicePlacement.UNKNOWN -> MsgDevicePlacement.UNKNOWN
+    },
+    timestampSeconds = value.timestamp,
   )
 
   fun geofenceEvent(value: GeofenceEvent): MsgGeofenceEvent = when (value) {

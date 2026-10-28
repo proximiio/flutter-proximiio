@@ -273,6 +273,28 @@ enum Mappers {
     )
   }
 
+  static func pdrUpdate(_ value: PdrUpdate) -> MsgPdrUpdate {
+    let placement: MsgDevicePlacement
+    switch value.placement {
+    case .handTexting: placement = .handTexting
+    case .handSwinging: placement = .handSwinging
+    case .pocket: placement = .pocket
+    case .bag: placement = .bag
+    case .table: placement = .table
+    case .unknown: placement = .unknown
+    @unknown default: placement = .unknown
+    }
+    return MsgPdrUpdate(
+      northMeters: value.northMeters,
+      eastMeters: value.eastMeters,
+      distanceMeters: value.distanceMeters,
+      headingDegrees: value.headingDegrees,
+      isMoving: value.isMoving,
+      placement: placement,
+      timestampSeconds: value.timestamp
+    )
+  }
+
   /// `nil` for an event kind added to the SDK after this plugin release.
   static func geofenceEvent(_ value: GeofenceEvent) -> MsgGeofenceEvent? {
     switch value {

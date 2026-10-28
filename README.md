@@ -12,6 +12,7 @@ Each release pins exact native SDK versions; they are built and tested together.
 
 | flutter_proximiio | iOS SDK (`Proximiio`) | Android SDK (`io.proximi.sdk:proximiio`) |
 |---|---|---|
+| 6.0.0-beta.4 | 6.0.0-beta.66 | 6.0.0-beta.31 |
 | 6.0.0-beta.3 | 6.0.0-beta.66 | 6.0.0-beta.31 |
 | 6.0.0-beta.2 | 6.0.0-beta.64 | 6.0.0-beta.31 |
 | 6.0.0-beta.1 | 6.0.0-beta.64 | 6.0.0-beta.31 |
@@ -31,7 +32,7 @@ dependencies:
   flutter_proximiio:
     git:
       url: https://github.com/proximiio/flutter-proximiio
-      ref: 6.0.0-beta.3
+      ref: 6.0.0-beta.4
 ```
 
 ### iOS

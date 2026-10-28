@@ -167,6 +167,17 @@ FloorChangeEvent fromMsgFloorChange(MsgFloorChange e) => FloorChangeEvent(
   timestamp: _time(e.timestampMs),
 );
 
+/// Transport → [PdrUpdate].
+PdrUpdate fromMsgPdrUpdate(MsgPdrUpdate u) => PdrUpdate(
+  northMeters: u.northMeters,
+  eastMeters: u.eastMeters,
+  distanceMeters: u.distanceMeters,
+  headingDegrees: u.headingDegrees,
+  isMoving: u.isMoving,
+  placement: DevicePlacement.values.byName(u.placement.name),
+  timestamp: _duration(u.timestampSeconds),
+);
+
 /// Transport → [GeofenceEvent].
 GeofenceEvent fromMsgGeofenceEvent(MsgGeofenceEvent e) => switch (e) {
   MsgGeofenceEntered(:final geofence) => GeofenceEntered(fromMsgGeofence(geofence)),

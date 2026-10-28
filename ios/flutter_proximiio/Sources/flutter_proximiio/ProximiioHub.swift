@@ -64,6 +64,12 @@ final class BeaconEventsRelay: BeaconEventsStreamHandler {
   override func onCancel(withArguments arguments: Any?) { box.sink = nil }
 }
 
+final class PdrObservationsRelay: PdrObservationsStreamHandler {
+  let box = EventBox<MsgPdrUpdate>()
+  override func onListen(withArguments arguments: Any?, sink: PigeonEventSink<MsgPdrUpdate>) { box.sink = sink }
+  override func onCancel(withArguments arguments: Any?) { box.sink = nil }
+}
+
 /// The event channels of one Flutter engine.
 final class EngineStreams {
   let stateChanges = StateChangesRelay()
@@ -75,11 +81,13 @@ final class EngineStreams {
   let venueDataChanges = VenueDataChangesRelay()
   let syncEvents = SyncEventsRelay()
   let beaconEvents = BeaconEventsRelay()
+  let pdrObservations = PdrObservationsRelay()
 
   init(messenger: FlutterBinaryMessenger) {
     VenueDataChangesStreamHandler.register(with: messenger, streamHandler: venueDataChanges)
     SyncEventsStreamHandler.register(with: messenger, streamHandler: syncEvents)
     BeaconEventsStreamHandler.register(with: messenger, streamHandler: beaconEvents)
+    PdrObservationsStreamHandler.register(with: messenger, streamHandler: pdrObservations)
     StateChangesStreamHandler.register(with: messenger, streamHandler: stateChanges)
     PermissionUpdatesStreamHandler.register(with: messenger, streamHandler: permissionUpdates)
     PositionsStreamHandler.register(with: messenger, streamHandler: positions)
@@ -174,6 +182,7 @@ final class ProximiioHub {
     let venueDataChanges = await sdk.venueDataChanges()
     let syncEvents = await sdk.syncEvents()
     let beaconEvents = await sdk.beaconEvents()
+    let pdrObservations = await sdk.pdrObservations()
     let finished = { @MainActor [weak self] () -> Void in self?.openRunStreams -= 1 }
     runTasks = [
       forward(positions, map: Mappers.position, onFinish: finished) { $0.positions.box },
@@ -183,6 +192,7 @@ final class ProximiioHub {
       forward(venueDataChanges, map: VenueMappers.venueDataChange, onFinish: finished) { $0.venueDataChanges.box },
       forward(syncEvents, map: VenueMappers.syncEvent, onFinish: finished) { $0.syncEvents.box },
       forward(beaconEvents, map: VenueMappers.beaconEvent, onFinish: finished) { $0.beaconEvents.box },
+      forward(pdrObservations, map: Mappers.pdrUpdate, onFinish: finished) { $0.pdrObservations.box },
     ]
     openRunStreams = runTasks.count
   }

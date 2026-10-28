@@ -48,6 +48,8 @@ enum MsgFloorChangeDirection { up, down, unknown }
 
 enum MsgFloorChangeSource { barometer, beacon, manual, unknown }
 
+enum MsgDevicePlacement { handTexting, handSwinging, pocket, bag, table, unknown }
+
 // ── Configuration ────────────────────────────────────────────────────────────
 
 /// Android foreground-service notification. Ignored on iOS.
@@ -205,6 +207,27 @@ class MsgFloorChange {
   double confidence;
   MsgFloorChangeSource source;
   int timestampMs;
+}
+
+/// One PDR step. `timestampSeconds` is on the SDK's monotonic PDR clock, not wall time.
+class MsgPdrUpdate {
+  MsgPdrUpdate({
+    required this.northMeters,
+    required this.eastMeters,
+    required this.distanceMeters,
+    required this.headingDegrees,
+    required this.isMoving,
+    required this.placement,
+    required this.timestampSeconds,
+  });
+
+  double northMeters;
+  double eastMeters;
+  double distanceMeters;
+  double headingDegrees;
+  bool isMoving;
+  MsgDevicePlacement placement;
+  double timestampSeconds;
 }
 
 sealed class MsgGeofenceEvent {}
@@ -853,4 +876,6 @@ abstract class ProximiioEventApi {
   MsgSyncEvent syncEvents();
 
   MsgBeaconEvent beaconEvents();
+
+  MsgPdrUpdate pdrObservations();
 }

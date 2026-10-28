@@ -8,6 +8,8 @@ import io.proximi.sdk.core.model.ProximiioGeofence
 import io.proximi.sdk.core.model.ProximiioGeometryIssue
 import io.proximi.sdk.core.platform.PermissionStatus
 import io.proximi.sdk.geofencing.GeofenceEvent
+import io.proximi.sdk.pdr.context.DevicePlacement
+import io.proximi.sdk.pdr.manager.PdrUpdate
 import io.proximi.sdk.positioning.native.CoreLocationAccuracy
 import java.net.URI
 import kotlin.test.Test
@@ -169,6 +171,38 @@ class MappersTest {
 
     assertIs<MsgGeofenceExited>(event)
     assertEquals(61.25, event.dwellTimeSeconds)
+  }
+
+  @Test
+  fun `PDR step keeps the heading, the placement and the PDR clock`() {
+    val step = Mappers.pdrUpdate(
+      PdrUpdate(
+        northMeters = 0.5,
+        eastMeters = -0.25,
+        distanceMeters = 0.7,
+        headingDegrees = 333.4,
+        isMoving = true,
+        placement = DevicePlacement.HAND_SWINGING,
+        timestamp = 12.5,
+      ),
+    )
+
+    assertEquals(
+      MsgPdrUpdate(
+        northMeters = 0.5,
+        eastMeters = -0.25,
+        distanceMeters = 0.7,
+        headingDegrees = 333.4,
+        isMoving = true,
+        placement = MsgDevicePlacement.HAND_SWINGING,
+        timestampSeconds = 12.5,
+      ),
+      step,
+    )
+    DevicePlacement.entries.forEach { placement ->
+      val mapped = Mappers.pdrUpdate(PdrUpdate(0.0, 0.0, 0.0, 0.0, false, placement, 0.0)).placement
+      assertEquals(placement.name, mapped.name)
+    }
   }
 
   @Test

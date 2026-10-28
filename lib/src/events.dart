@@ -157,6 +157,70 @@ class FloorChangeEvent with ValueEquality {
   String toString() => 'FloorChangeEvent(${previousFloor?.level} → ${floor?.level}, ${source.name})';
 }
 
+/// Where the device is carried, as PDR detects it.
+enum DevicePlacement {
+  /// In the hand, screen up, as when reading.
+  handTexting,
+
+  /// In a swinging hand.
+  handSwinging,
+
+  /// In a pocket.
+  pocket,
+
+  /// In a bag.
+  bag,
+
+  /// Lying on a table.
+  table,
+
+  /// Not detected.
+  unknown,
+}
+
+/// One step of pedestrian dead reckoning (PDR).
+class PdrUpdate with ValueEquality {
+  /// Creates a PDR step.
+  const PdrUpdate({
+    required this.northMeters,
+    required this.eastMeters,
+    required this.distanceMeters,
+    required this.headingDegrees,
+    required this.isMoving,
+    required this.placement,
+    required this.timestamp,
+  });
+
+  /// Displacement towards north in metres; 0 when PDR only detects motion.
+  final double northMeters;
+
+  /// Displacement towards east in metres; 0 when PDR only detects motion.
+  final double eastMeters;
+
+  /// Step length in metres.
+  final double distanceMeters;
+
+  /// Direction of walking in degrees from north, clockwise, in `[0, 360)`.
+  final double headingDegrees;
+
+  /// Whether the visitor is walking.
+  final bool isMoving;
+
+  /// Where the device is carried.
+  final DevicePlacement placement;
+
+  /// Time of the step on the SDK's monotonic PDR clock. Compare it with other steps; it is not a time of day.
+  final Duration timestamp;
+
+  @override
+  List<Object?> get props => [northMeters, eastMeters, distanceMeters, headingDegrees, isMoving, placement, timestamp];
+
+  @override
+  String toString() =>
+      'PdrUpdate(${distanceMeters.toStringAsFixed(2)} m at ${headingDegrees.toStringAsFixed(0)}°, '
+      '${isMoving ? 'moving' : 'still'}, ${placement.name})';
+}
+
 /// A geofence or privacy-zone transition.
 sealed class GeofenceEvent with ValueEquality {
   const GeofenceEvent();

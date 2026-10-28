@@ -14,6 +14,7 @@ import io.proximi.sdk.floorChanges
 import io.proximi.sdk.syncEvents
 import io.proximi.sdk.venueDataChanges
 import io.proximi.sdk.geofenceEvents
+import io.proximi.sdk.pdrObservations
 import io.proximi.sdk.permissionUpdates
 import io.proximi.sdk.positions
 import io.proximi.sdk.privacyZoneStateChanges
@@ -96,6 +97,12 @@ internal class BeaconEventsRelay : BeaconEventsStreamHandler() {
   override fun onCancel(p0: Any?) { box.sink = null }
 }
 
+internal class PdrObservationsRelay : PdrObservationsStreamHandler() {
+  val box = EventBox<MsgPdrUpdate>()
+  override fun onListen(p0: Any?, sink: PigeonEventSink<MsgPdrUpdate>) { box.sink = sink }
+  override fun onCancel(p0: Any?) { box.sink = null }
+}
+
 /** The event channels of one Flutter engine. */
 internal class EngineStreams(messenger: BinaryMessenger) {
   val stateChanges = StateChangesRelay()
@@ -107,6 +114,7 @@ internal class EngineStreams(messenger: BinaryMessenger) {
   val venueDataChanges = VenueDataChangesRelay()
   val syncEvents = SyncEventsRelay()
   val beaconEvents = BeaconEventsRelay()
+  val pdrObservations = PdrObservationsRelay()
 
   init {
     StateChangesStreamHandler.register(messenger, stateChanges)
@@ -118,6 +126,7 @@ internal class EngineStreams(messenger: BinaryMessenger) {
     VenueDataChangesStreamHandler.register(messenger, venueDataChanges)
     SyncEventsStreamHandler.register(messenger, syncEvents)
     BeaconEventsStreamHandler.register(messenger, beaconEvents)
+    PdrObservationsStreamHandler.register(messenger, pdrObservations)
   }
 }
 
@@ -218,6 +227,7 @@ internal object ProximiioHub {
       forward(sdk.venueDataChanges().map(VenueMappers::venueDataChange)) { it.venueDataChanges.box },
       forward(sdk.syncEvents().map(VenueMappers::syncEvent)) { it.syncEvents.box },
       forward(sdk.beaconEvents().map(VenueMappers::beaconEvent)) { it.beaconEvents.box },
+      forward(sdk.pdrObservations().map(Mappers::pdrUpdate)) { it.pdrObservations.box },
     )
   }
 

@@ -6,6 +6,13 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [6.0.0-beta.4] - 2026-10-28
+
+### Added
+- `Proximiio.pdrObservations`: each PDR step as a `PdrUpdate`, with the step length, the direction of walking
+  (`headingDegrees`), `isMoving` and the device placement (`DevicePlacement`). It mirrors `pdrObservations()` of
+  the iOS and Android SDKs and delivers steps while PDR runs (`enablePdr()`) with PDR fusion on.
+
 ### Fixed
 - Docs: `pdrFusionEnabled` and the `highAccuracy` preset only turn on PDR fusion. PDR runs after `enablePdr()`
   (tuning guide, configuration reference, dartdoc).

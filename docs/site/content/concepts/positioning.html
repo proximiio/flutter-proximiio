@@ -52,7 +52,7 @@ description: Position sources, what a PositionUpdate contains, and how custom po
   only the floor, use <code>setFloor(floorId)</code>.
 </p>
 
-<h2>Pedestrian dead reckoning</h2>
+<h2 id="pedestrian-dead-reckoning">Pedestrian dead reckoning</h2>
 
 <p>
   PDR uses the motion sensors to keep the position steady between beacon updates. It needs the
@@ -63,7 +63,24 @@ description: Position sources, what a PositionUpdate contains, and how custom po
   await sdk.enablePdr();
 }</code></pre>
 
-<p>To fuse PDR from the start, set <code>pdrFusionEnabled: true</code> in the configuration.</p>
+<p>
+  To fuse PDR into positions, set <code>pdrFusionEnabled: true</code> in the configuration, or use the
+  <code>highAccuracy</code> preset. Either one only turns on the fusion: PDR runs after <code>enablePdr()</code>.
+</p>
+
+<p>
+  <code>pdrObservations</code> reports each step while PDR runs with the fusion on. A step has its length,
+  the direction of walking (<code>headingDegrees</code>, clockwise from north), whether the visitor walks, and
+  where the phone is carried. Use the direction to turn the position marker, for example in a web map:
+</p>
+
+<pre><code class="language-dart">sdk.pdrObservations.listen((step) {
+  if (step.isMoving) showHeading(step.headingDegrees);
+});</code></pre>
+
+<p>
+  A standing visitor takes no steps, so no new direction arrives and the last one stays.
+</p>
 
 <h2>Route snapping</h2>
 
