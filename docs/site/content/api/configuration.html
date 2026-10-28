@@ -64,8 +64,8 @@ description: Every setting of ProximiioConfiguration and AndroidServiceOptions, 
   The SDK publishes a position only after it moved at least
   <code>max(minimumDisplacement, accuracyDisplacementFactor × accuracy)</code> from the last published
   position. <code>accuracy</code> is the smaller <code>horizontalAccuracy</code> of the two positions. A
-  stationary visitor gets no new positions. With PDR fusion, a detected step publishes a position without
-  this check.
+  stationary visitor gets no new positions. With PDR fusion and PDR running (<code>enablePdr</code>), a detected
+  step publishes a position without this check.
 </p>
 
 <table>

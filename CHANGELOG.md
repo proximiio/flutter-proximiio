@@ -6,6 +6,10 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+- Docs: `pdrFusionEnabled` and the `highAccuracy` preset only turn on PDR fusion. PDR runs after `enablePdr()`
+  (tuning guide, configuration reference, dartdoc).
+
 ## [6.0.0-beta.3] - 2026-10-27
 
 ### Added

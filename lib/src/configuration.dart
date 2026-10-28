@@ -110,7 +110,8 @@ class AndroidServiceOptions {
 /// When the SDK publishes a new position: only after it moved at least
 /// `max(minimumDisplacement, accuracyDisplacementFactor × accuracy)` from the last published one,
 /// where `accuracy` is the smaller `horizontalAccuracy` of the two. A stationary visitor gets no new
-/// positions. With PDR fusion, a detected step publishes a position without this check.
+/// positions. With PDR fusion and PDR running (`enablePdr`), a detected step publishes a position
+/// without this check.
 ///
 /// Unset fields keep the SDK's defaults.
 class DistanceFilter {
@@ -191,7 +192,8 @@ class ProximiioConfiguration {
   /// iBeacon UUIDs to scan for in addition to those of the venue data.
   final List<String> customIBeaconUuids;
 
-  /// Fuse pedestrian dead reckoning into positions.
+  /// Fuse pedestrian dead reckoning into positions. It takes effect once PDR runs, after
+  /// `enablePdr`.
   final bool? pdrFusionEnabled;
 
   /// Use the barometer for floor changes. iOS only; Android always uses it when present.
