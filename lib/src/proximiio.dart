@@ -84,8 +84,7 @@ abstract interface class Proximiio {
   /// The current lifecycle state.
   Future<ProximiioState> state();
 
-  /// Whether the API confirmed the token in this run. iOS only; throws
-  /// [ProximiioErrorCode.unsupported] on Android.
+  /// Whether the API confirmed the token in this run.
   Future<TokenStatus> tokenStatus();
 
   /// Asks for location (and, with [always], background location) and, unless the configuration is
@@ -103,9 +102,9 @@ abstract interface class Proximiio {
 
   /// Validates the token with the Proximi.io API, loads the application and applies the stored venue
   /// data. Throws [ProximiioErrorCode.invalidToken] for a rejected token and [ProximiioErrorCode.api]
-  /// when the API cannot be reached. On iOS it also succeeds without a connection when the API
-  /// accepted this token on this phone before ([ProximiioConfiguration.allowsOfflineStart]); the SDK
-  /// checks the token later ([tokenStatus]). It gives up after 30 s on iOS.
+  /// when the API cannot be reached. It also succeeds without a connection when the API accepted this
+  /// token on this phone before ([ProximiioConfiguration.allowsOfflineStart]); the SDK checks the token
+  /// later ([tokenStatus]). On a connection that does not answer it gives up after 30 s.
   Future<ProximiioApplication?> authenticate();
 
   /// Starts positioning. Throws [ProximiioErrorCode.notAuthenticated] before a successful

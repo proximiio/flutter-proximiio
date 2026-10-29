@@ -7,7 +7,15 @@ enum VenueMappers {
   // MARK: Venue data
 
   static func amenity(_ value: ProximiioAmenity) -> MsgAmenity {
-    MsgAmenity(id: value.id, title: value.title, category: value.category, icon: value.icon, details: value.details)
+    MsgAmenity(
+      id: value.id,
+      title: value.title,
+      category: value.category,
+      icon: value.icon,
+      details: value.details,
+      metadataJson: Mappers.json(value.metadata),
+      titleTranslations: value.titleTranslations
+    )
   }
 
   private static func encoded<Value: Encodable>(_ value: Value?) -> String? {

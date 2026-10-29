@@ -6,6 +6,34 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [6.0.0-beta.5] - 2026-10-29
+
+### Added
+- `ProximiioAmenity.metadata`: what the venue's editors attached to the amenity, decoded from JSON, such as
+  whether it is listed in search. `ProximiioAmenity.titleTranslations` and `localizedTitle([language])`: the
+  title in one language.
+- Android: `tokenStatus()` works; it threw `unsupported` before. `allowsOfflineStart` applies on Android too.
+
+### Changed
+- The plugin builds on the iOS SDK 6.0.0-beta.67 (was 6.0.0-beta.66) and the Android SDK 6.0.0-beta.35 (was
+  6.0.0-beta.31).
+- Behaviour change, Android: **phones see BLE beacons.** Before, the Android SDK reported no iBeacon or Eddystone
+  beacon: `beaconEvents` stayed silent, `diagnostics()` counted 0 visible beacons, and positions came only from the
+  platform location and PDR. Now Android positions from beacons, with the floor, as iOS does. Android reports every
+  iBeacon in range; iOS reports only the UUIDs it ranges.
+- Behaviour change, Android: the beacon scan starts when Bluetooth access is granted, or Bluetooth is switched on,
+  after `start()`. Before, it stayed off until the next `start()`.
+- Behaviour change, Android: `authenticate()` succeeds without a connection when the API accepted this token on
+  this phone before (`allowsOfflineStart`, default `true`); `tokenStatus()` is then `unverified`. It used to throw
+  `api`. A token the API keeps refusing for at least two hours stops the SDK and deletes its local data, as on iOS.
+- Behaviour change, both platforms: places, floors, departments, geofences, privacy zones and inputs deleted on the
+  server leave the phone within about 15 minutes, even when the change log missed the deletion. Each arrives as
+  `SyncDeleted` and in `venueDataChanges`.
+
+### Fixed
+- `ProximiioFeature.title(language)` falls back to the base language (`en` for `en-US`) and skips blank
+  translations, as the SDKs do.
+
 ## [6.0.0-beta.4] - 2026-10-28
 
 ### Added

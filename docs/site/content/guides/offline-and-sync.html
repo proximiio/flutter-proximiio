@@ -33,16 +33,17 @@ description: How venue data is synchronised, how to follow changes, and how to i
   <code>authenticate</code> succeeds.
 </p>
 
-<table>
-  <thead><tr><th>Platform</th><th><code>authenticate</code> without a connection</th></tr></thead>
-  <tbody>
-    <tr><td>iOS</td><td>Succeeds at once when the API accepted the token on this phone before (<code>allowsOfflineStart</code>, default <code>true</code>). <code>tokenStatus()</code> is <code>unverified</code>: positioning runs on the stored data, nothing syncs or uploads, and the SDK checks the token when the connection returns. On a network that does not answer it gives up after 30 s. A token never accepted on this phone throws <code>ProximiioErrorCode.api</code>.</td></tr>
-    <tr><td>Android</td><td>Throws <code>ProximiioErrorCode.api</code> (<code>kind: network</code>); the app does not position until it is online.</td></tr>
-  </tbody>
-</table>
+<p>
+  Without a connection, <code>authenticate</code> succeeds at once when the API accepted the token on this
+  phone before (<code>allowsOfflineStart</code>, default <code>true</code>). <code>tokenStatus()</code> is then
+  <code>unverified</code>: positioning runs on the stored data, nothing syncs or uploads, and the SDK checks the
+  token when the connection returns. On a network that does not answer it gives up after 30 s. A token never
+  accepted on this phone throws <code>ProximiioErrorCode.api</code>. On Android a bundled seed built for this token
+  also lets it start offline.
+</p>
 
 <p>
-  On iOS, a token the API keeps refusing for at least two hours (three checks) stops the SDK and deletes its
+  A token the API keeps refusing for at least two hours (three checks) stops the SDK and deletes its
   local data, offline packages included. <code>tokenStatus()</code> is then <code>rejected</code> and
   <code>syncEvents</code> reports the failure.
 </p>

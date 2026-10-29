@@ -14,7 +14,7 @@ let package = Package(
         .library(name: "flutter-proximiio", targets: ["flutter_proximiio"])
     ],
     dependencies: [
-        .package(url: "https://github.com/proximiio/proximiio-sdk-ios-binary.git", exact: "6.0.0-beta.66")
+        .package(url: "https://github.com/proximiio/proximiio-sdk-ios-binary.git", exact: "6.0.0-beta.67")
     ],
     targets: [
         .target(

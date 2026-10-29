@@ -1583,6 +1583,8 @@ struct MsgAmenity: Hashable {
   var category: String? = nil
   var icon: String? = nil
   var details: String? = nil
+  var metadataJson: String? = nil
+  var titleTranslations: [String: String]
 
 
   // swift-format-ignore: AlwaysUseLowerCamelCase
@@ -1592,13 +1594,17 @@ struct MsgAmenity: Hashable {
     let category: String? = nilOrValue(pigeonVar_list[2])
     let icon: String? = nilOrValue(pigeonVar_list[3])
     let details: String? = nilOrValue(pigeonVar_list[4])
+    let metadataJson: String? = nilOrValue(pigeonVar_list[5])
+    let titleTranslations = pigeonVar_list[6] as! [String: String]
 
     return MsgAmenity(
       id: id,
       title: title,
       category: category,
       icon: icon,
-      details: details
+      details: details,
+      metadataJson: metadataJson,
+      titleTranslations: titleTranslations
     )
   }
   func toList() -> [Any?] {
@@ -1608,13 +1614,15 @@ struct MsgAmenity: Hashable {
       category,
       icon,
       details,
+      metadataJson,
+      titleTranslations,
     ]
   }
   static func == (lhs: MsgAmenity, rhs: MsgAmenity) -> Bool {
     if Swift.type(of: lhs) != Swift.type(of: rhs) {
       return false
     }
-    return deepEqualsMessages(lhs.id, rhs.id) && deepEqualsMessages(lhs.title, rhs.title) && deepEqualsMessages(lhs.category, rhs.category) && deepEqualsMessages(lhs.icon, rhs.icon) && deepEqualsMessages(lhs.details, rhs.details)
+    return deepEqualsMessages(lhs.id, rhs.id) && deepEqualsMessages(lhs.title, rhs.title) && deepEqualsMessages(lhs.category, rhs.category) && deepEqualsMessages(lhs.icon, rhs.icon) && deepEqualsMessages(lhs.details, rhs.details) && deepEqualsMessages(lhs.metadataJson, rhs.metadataJson) && deepEqualsMessages(lhs.titleTranslations, rhs.titleTranslations)
   }
 
   func hash(into hasher: inout Hasher) {
@@ -1624,6 +1632,8 @@ struct MsgAmenity: Hashable {
     deepHashMessages(value: category, hasher: &hasher)
     deepHashMessages(value: icon, hasher: &hasher)
     deepHashMessages(value: details, hasher: &hasher)
+    deepHashMessages(value: metadataJson, hasher: &hasher)
+    deepHashMessages(value: titleTranslations, hasher: &hasher)
   }
 }
 
@@ -3076,7 +3086,6 @@ protocol ProximiioHostApi {
   /// Whether an SDK instance exists in this process (made by any engine).
   func isConfigured() throws -> Bool
   func state(completion: @escaping (Result<MsgSdkState, Error>) -> Void)
-  /// iOS only; `unsupported` on Android.
   func tokenStatus(completion: @escaping (Result<MsgTokenStatus, Error>) -> Void)
   func requestPermissions(always: Bool, completion: @escaping (Result<MsgPermissionStatus, Error>) -> Void)
   func requestMotionPermission(completion: @escaping (Result<Bool, Error>) -> Void)
@@ -3203,7 +3212,6 @@ class ProximiioHostApiSetup {
     } else {
       stateChannel.setMessageHandler(nil)
     }
-    /// iOS only; `unsupported` on Android.
     let tokenStatusChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.tokenStatus\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       tokenStatusChannel.setMessageHandler { _, reply in

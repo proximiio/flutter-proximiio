@@ -61,7 +61,6 @@ internal object Mappers {
       MsgConfigurationPreset.RELAY_ONLY -> ProximiioConfiguration.relayOnly(msg.token, serviceOptions = service)
     }
     // barometerEnabled has no Android counterpart; the Android SDK always uses the barometer when present.
-    // allowsOfflineStart has none either: the Android SDK's authenticate() always asks the API.
     return preset.copy(
       apiBaseURL = msg.apiBaseUrl?.let(::uri) ?: preset.apiBaseURL,
       fallbackAPIBaseURLs = msg.fallbackApiBaseUrls.takeIf { it.isNotEmpty() }?.map(::uri) ?: preset.fallbackAPIBaseURLs,
@@ -74,6 +73,7 @@ internal object Mappers {
       serviceOptions = service ?: preset.serviceOptions,
       geofenceExitDelay = msg.geofenceExitDelaySeconds ?: preset.geofenceExitDelay,
       withholdsPositionsInPrivacyZones = msg.withholdsPositionsInPrivacyZones ?: preset.withholdsPositionsInPrivacyZones,
+      allowsOfflineStart = msg.allowsOfflineStart ?: preset.allowsOfflineStart,
     )
   }
 
@@ -286,6 +286,12 @@ internal object Mappers {
     Proximiio.State.STARTING -> MsgSdkState.STARTING
     Proximiio.State.RUNNING -> MsgSdkState.RUNNING
     Proximiio.State.STOPPING -> MsgSdkState.STOPPING
+  }
+
+  fun tokenStatus(value: Proximiio.TokenStatus): MsgTokenStatus = when (value) {
+    Proximiio.TokenStatus.VERIFIED -> MsgTokenStatus.VERIFIED
+    Proximiio.TokenStatus.UNVERIFIED -> MsgTokenStatus.UNVERIFIED
+    Proximiio.TokenStatus.REJECTED -> MsgTokenStatus.REJECTED
   }
 
   // endregion

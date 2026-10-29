@@ -1,5 +1,5 @@
 group = "io.proximi.flutter_proximiio"
-version = "6.0.0-beta.4"
+version = "6.0.0-beta.5"
 
 buildscript {
     val kotlinVersion = "2.4.0"
@@ -75,7 +75,7 @@ kotlin {
 
 dependencies {
     // Pinned exactly: each flutter_proximiio release is built and tested against one SDK release.
-    implementation("io.proximi.sdk:proximiio:6.0.0-beta.31")
+    implementation("io.proximi.sdk:proximiio:6.0.0-beta.35")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
 
     // The JUnit 5 variant by name: built-in Kotlin does not pick it from useJUnitPlatform().

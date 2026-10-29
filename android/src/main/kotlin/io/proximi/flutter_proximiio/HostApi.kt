@@ -109,9 +109,8 @@ internal class HostApi(private val context: Context) : ProximiioHostApi {
   override fun state(callback: (Result<MsgSdkState>) -> Unit) =
     run(callback) { Mappers.state(it.state()) }
 
-  /** The Android SDK has no token status yet; Android's [authenticate] always asks the API. */
   override fun tokenStatus(callback: (Result<MsgTokenStatus>) -> Unit) =
-    callback(Result.failure(ProximiioFlutterError("unsupported", "The token status exists only on iOS.")))
+    run(callback) { Mappers.tokenStatus(it.tokenStatus()) }
 
   /**
    * Location (and background location with [always]) through the SDK, then what the SDK leaves to

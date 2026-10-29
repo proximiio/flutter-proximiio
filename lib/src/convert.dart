@@ -256,8 +256,15 @@ Map<String, Object?>? _object(String? json) {
 }
 
 /// Transport → [ProximiioAmenity].
-ProximiioAmenity fromMsgAmenity(MsgAmenity a) =>
-    ProximiioAmenity(id: a.id, title: a.title, category: a.category, icon: a.icon, details: a.details);
+ProximiioAmenity fromMsgAmenity(MsgAmenity a) => ProximiioAmenity(
+  id: a.id,
+  title: a.title,
+  category: a.category,
+  icon: a.icon,
+  details: a.details,
+  metadata: _metadata(a.metadataJson),
+  titleTranslations: a.titleTranslations,
+);
 
 /// Transport → [ProximiioFeature].
 ProximiioFeature fromMsgFeature(MsgFeature f) => ProximiioFeature(

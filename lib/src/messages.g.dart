@@ -1546,7 +1546,15 @@ class MsgDurationRow {
 }
 
 class MsgAmenity {
-  MsgAmenity({required this.id, this.title, this.category, this.icon, this.details});
+  MsgAmenity({
+    required this.id,
+    this.title,
+    this.category,
+    this.icon,
+    this.details,
+    this.metadataJson,
+    required this.titleTranslations,
+  });
 
   String id;
 
@@ -1558,8 +1566,12 @@ class MsgAmenity {
 
   String? details;
 
+  String? metadataJson;
+
+  Map<String, String> titleTranslations;
+
   List<Object?> _toList() {
-    return <Object?>[id, title, category, icon, details];
+    return <Object?>[id, title, category, icon, details, metadataJson, titleTranslations];
   }
 
   Object encode() {
@@ -1574,6 +1586,8 @@ class MsgAmenity {
       category: result[2] as String?,
       icon: result[3] as String?,
       details: result[4] as String?,
+      metadataJson: result[5] as String?,
+      titleTranslations: (result[6]! as Map<Object?, Object?>).cast<String, String>(),
     );
   }
 
@@ -1590,7 +1604,9 @@ class MsgAmenity {
         _deepEquals(title, other.title) &&
         _deepEquals(category, other.category) &&
         _deepEquals(icon, other.icon) &&
-        _deepEquals(details, other.details);
+        _deepEquals(details, other.details) &&
+        _deepEquals(metadataJson, other.metadataJson) &&
+        _deepEquals(titleTranslations, other.titleTranslations);
   }
 
   @override
@@ -3155,7 +3171,6 @@ class ProximiioHostApi {
     return pigeonVar_replyValue! as MsgSdkState;
   }
 
-  /// iOS only; `unsupported` on Android.
   Future<MsgTokenStatus> tokenStatus() async {
     final pigeonVar_channelName =
         'dev.flutter.pigeon.flutter_proximiio.ProximiioHostApi.tokenStatus$pigeonVar_messageChannelSuffix';

@@ -31,6 +31,8 @@ internal object VenueMappers {
     category = value.category,
     icon = value.icon,
     details = value.details,
+    metadataJson = Mappers.json(value.metadata),
+    titleTranslations = value.titleTranslations,
   )
 
   fun feature(value: ProximiioFeature) = MsgFeature(

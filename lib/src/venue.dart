@@ -3,12 +3,20 @@ import 'value.dart';
 /// A kind of point of interest (shop, toilet, exit…) that features refer to.
 class ProximiioAmenity with ValueEquality {
   /// Creates an amenity.
-  const ProximiioAmenity({required this.id, this.title, this.category, this.icon, this.details});
+  const ProximiioAmenity({
+    required this.id,
+    this.title,
+    this.category,
+    this.icon,
+    this.details,
+    this.metadata,
+    this.titleTranslations = const {},
+  });
 
   /// Amenity id; features refer to it in `properties.amenity`.
   final String id;
 
-  /// Display name.
+  /// Display name. [localizedTitle] gives it in one language.
   final String? title;
 
   /// Amenity category id.
@@ -20,8 +28,29 @@ class ProximiioAmenity with ValueEquality {
   /// Description.
   final String? details;
 
+  /// What the venue's editors attached to the amenity, decoded from JSON (`Map`, `List`, `String`, `num`,
+  /// `bool`), such as whether it is listed in search. The SDK does not interpret it.
+  final Object? metadata;
+
+  /// Titles by language code, from `title_i18n`.
+  final Map<String, String> titleTranslations;
+
+  /// The title in [language] (a code such as `en` or `en-US`): its translation, else the translation of
+  /// the base language (`en`), else [title].
+  String? localizedTitle([String? language]) => _translation(titleTranslations, language) ?? title;
+
   @override
-  List<Object?> get props => [id, title, category, icon, details];
+  List<Object?> get props => [id, title, category, icon, details, metadata, titleTranslations];
+}
+
+/// The translation for [language], else for its base language (`en` for `en-US`); blank ones are skipped.
+String? _translation(Map<String, String> translations, String? language) {
+  if (language == null) return null;
+  for (final key in {language, language.split(RegExp('[-_]')).first}) {
+    final translated = translations[key];
+    if (translated != null && translated.trim().isNotEmpty) return translated;
+  }
+  return null;
 }
 
 /// A GeoJSON feature of the venue: a POI, a room, a path, a level changer…
@@ -66,10 +95,11 @@ class ProximiioFeature with ValueEquality {
   /// Titles by language code, from `properties.title_i18n`.
   final Map<String, String> titleTranslations;
 
-  /// Title in [language] (a code such as `en`), falling back to `properties.title`.
+  /// Title in [language] (a code such as `en` or `en-US`): its translation, else the translation of the base
+  /// language (`en`), else `properties.title`.
   String? title([String? language]) {
-    final translated = language == null ? null : titleTranslations[language];
-    if (translated != null && translated.isNotEmpty) return translated;
+    final translated = _translation(titleTranslations, language);
+    if (translated != null) return translated;
     final plain = properties?['title'];
     return plain is String ? plain : null;
   }

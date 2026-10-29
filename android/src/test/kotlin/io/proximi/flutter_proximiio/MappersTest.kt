@@ -31,6 +31,7 @@ class MappersTest {
     pdrFusionEnabled: Boolean? = null,
     bleEvaluationIntervalSeconds: Double? = null,
     distanceFilter: MsgDistanceFilter? = null,
+    allowsOfflineStart: Boolean? = null,
   ) = MsgConfiguration(
     token = "token",
     preset = preset,
@@ -43,7 +44,39 @@ class MappersTest {
     pdrFusionEnabled = pdrFusionEnabled,
     bleEvaluationIntervalSeconds = bleEvaluationIntervalSeconds,
     distanceFilter = distanceFilter,
+    allowsOfflineStart = allowsOfflineStart,
   )
+
+  @Test
+  fun `offline start follows the configuration, else the SDK default`() {
+    assertEquals(true, Mappers.configuration(config(), context).allowsOfflineStart)
+    assertEquals(false, Mappers.configuration(config(allowsOfflineStart = false), context).allowsOfflineStart)
+  }
+
+  @Test
+  fun `token status keeps its case`() {
+    io.proximi.sdk.Proximiio.TokenStatus.entries.forEach { status ->
+      assertEquals(status.rawValue, Mappers.tokenStatus(status).name.lowercase())
+    }
+  }
+
+  @Test
+  fun `amenity carries its metadata and title translations`() {
+    val amenity = VenueMappers.amenity(
+      io.proximi.sdk.core.model.ProximiioAmenity(
+        id = "a",
+        title = "Cafe",
+        category = null,
+        icon = null,
+        details = null,
+        metadata = JsonValue.Object(mapOf("searchable" to JsonValue.Bool(true))),
+        titleTranslations = mapOf("sk" to "Kaviareň"),
+      ),
+    )
+
+    assertEquals("""{"searchable":true}""", amenity.metadataJson)
+    assertEquals(mapOf("sk" to "Kaviareň"), amenity.titleTranslations)
+  }
 
   @Test
   fun `unset overrides keep the preset values`() {

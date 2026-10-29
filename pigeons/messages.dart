@@ -378,13 +378,15 @@ class MsgDurationRow {
 // ── Venue data ───────────────────────────────────────────────────────────────
 
 class MsgAmenity {
-  MsgAmenity({required this.id});
+  MsgAmenity({required this.id, required this.titleTranslations});
 
   String id;
   String? title;
   String? category;
   String? icon;
   String? details;
+  String? metadataJson;
+  Map<String, String> titleTranslations;
 }
 
 class MsgFeature {
@@ -648,7 +650,6 @@ abstract class ProximiioHostApi {
   @async
   MsgSdkState state();
 
-  /// iOS only; `unsupported` on Android.
   @async
   MsgTokenStatus tokenStatus();
 

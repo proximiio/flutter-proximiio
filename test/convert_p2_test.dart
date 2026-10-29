@@ -105,8 +105,28 @@ void main() {
       expect(feature.geometry?['type'], 'Point');
       expect(feature.properties?['title'], 'Cafe');
       expect(feature.title('sk'), 'Kaviareň');
+      expect(feature.title('sk-SK'), 'Kaviareň');
       expect(feature.title('de'), 'Cafe');
       expect(feature.title(), 'Cafe');
+    });
+
+    test('amenity metadata and title translations', () {
+      final amenity = fromMsgAmenity(
+        MsgAmenity(
+          id: 'a',
+          title: 'Cafe',
+          metadataJson: '{"searchable":true,"order":2}',
+          titleTranslations: {'sk': 'Kaviareň', 'ar': ' '},
+        ),
+      );
+
+      expect(amenity.metadata, {'searchable': true, 'order': 2});
+      expect(amenity.titleTranslations, {'sk': 'Kaviareň', 'ar': ' '});
+      expect(amenity.localizedTitle('sk'), 'Kaviareň');
+      expect(amenity.localizedTitle('sk-SK'), 'Kaviareň');
+      expect(amenity.localizedTitle('ar'), 'Cafe', reason: 'a blank translation is skipped');
+      expect(amenity.localizedTitle(), 'Cafe');
+      expect(fromMsgAmenity(MsgAmenity(id: 'b', titleTranslations: {})).metadata, isNull);
     });
 
     test('journey durations are seconds from the SDK', () {

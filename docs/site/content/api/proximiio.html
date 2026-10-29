@@ -31,7 +31,7 @@ description: The Proximiio class — creation, lifecycle, venue data, wayfinding
     <tr><td><code>Future&lt;PermissionStatus&gt; requestPermissions({bool always = false})</code></td><td><a href="{{root}}getting-started/permissions.html">Permissions</a></td><td></td></tr>
     <tr><td><code>Future&lt;bool&gt; requestMotionPermission()</code></td><td>Motion, for PDR</td><td></td></tr>
     <tr><td><code>Future&lt;ProximiioApplication?&gt; authenticate()</code></td><td>Validate the token; needs a connection on Android, and on iOS for a token not accepted on this phone before</td><td><code>invalidToken</code>, <code>api</code></td></tr>
-    <tr><td><code>Future&lt;TokenStatus&gt; tokenStatus()</code></td><td>iOS: <code>verified</code>, <code>unverified</code> or <code>rejected</code></td><td><code>unsupported</code> on Android</td></tr>
+    <tr><td><code>Future&lt;TokenStatus&gt; tokenStatus()</code></td><td><code>verified</code>, <code>unverified</code> or <code>rejected</code></td><td></td></tr>
     <tr><td><code>Future&lt;void&gt; start()</code></td><td>Start positioning</td><td><code>notAuthenticated</code></td></tr>
     <tr><td><code>Future&lt;void&gt; stop()</code></td><td>Stop; reports exits for entered geofences</td><td></td></tr>
     <tr><td><code>Future&lt;void&gt; signOut()</code></td><td>Stop, forget the token and the stored data</td><td></td></tr>

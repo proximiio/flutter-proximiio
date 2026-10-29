@@ -1714,7 +1714,9 @@ data class MsgAmenity (
   val title: String? = null,
   val category: String? = null,
   val icon: String? = null,
-  val details: String? = null
+  val details: String? = null,
+  val metadataJson: String? = null,
+  val titleTranslations: Map<String, String>
 )
  {
   companion object {
@@ -1724,7 +1726,9 @@ data class MsgAmenity (
       val category = pigeonVar_list[2] as String?
       val icon = pigeonVar_list[3] as String?
       val details = pigeonVar_list[4] as String?
-      return MsgAmenity(id, title, category, icon, details)
+      val metadataJson = pigeonVar_list[5] as String?
+      val titleTranslations = pigeonVar_list[6] as Map<String, String>
+      return MsgAmenity(id, title, category, icon, details, metadataJson, titleTranslations)
     }
   }
   fun toList(): List<Any?> {
@@ -1734,6 +1738,8 @@ data class MsgAmenity (
       category,
       icon,
       details,
+      metadataJson,
+      titleTranslations,
     )
   }
   override fun equals(other: Any?): Boolean {
@@ -1744,7 +1750,7 @@ data class MsgAmenity (
       return true
     }
     val other = other as MsgAmenity
-    return MessagesPigeonUtils.deepEquals(this.id, other.id) && MessagesPigeonUtils.deepEquals(this.title, other.title) && MessagesPigeonUtils.deepEquals(this.category, other.category) && MessagesPigeonUtils.deepEquals(this.icon, other.icon) && MessagesPigeonUtils.deepEquals(this.details, other.details)
+    return MessagesPigeonUtils.deepEquals(this.id, other.id) && MessagesPigeonUtils.deepEquals(this.title, other.title) && MessagesPigeonUtils.deepEquals(this.category, other.category) && MessagesPigeonUtils.deepEquals(this.icon, other.icon) && MessagesPigeonUtils.deepEquals(this.details, other.details) && MessagesPigeonUtils.deepEquals(this.metadataJson, other.metadataJson) && MessagesPigeonUtils.deepEquals(this.titleTranslations, other.titleTranslations)
   }
 
   override fun hashCode(): Int {
@@ -1754,6 +1760,8 @@ data class MsgAmenity (
     result = 31 * result + MessagesPigeonUtils.deepHash(this.category)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.icon)
     result = 31 * result + MessagesPigeonUtils.deepHash(this.details)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.metadataJson)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.titleTranslations)
     return result
   }
 }
@@ -3380,7 +3388,6 @@ interface ProximiioHostApi {
   /** Whether an SDK instance exists in this process (made by any engine). */
   fun isConfigured(): Boolean
   fun state(callback: (Result<MsgSdkState>) -> Unit)
-  /** iOS only; `unsupported` on Android. */
   fun tokenStatus(callback: (Result<MsgTokenStatus>) -> Unit)
   fun requestPermissions(always: Boolean, callback: (Result<MsgPermissionStatus>) -> Unit)
   fun requestMotionPermission(callback: (Result<Boolean>) -> Unit)
