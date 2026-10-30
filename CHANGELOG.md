@@ -6,6 +6,18 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [6.0.0-beta.6] - 2026-10-30
+
+### Changed
+- The plugin builds on the iOS SDK 6.0.0-beta.68 (was 6.0.0-beta.67) and the Android SDK 6.0.0-beta.36 (was
+  6.0.0-beta.35).
+- Faster, both platforms: repeated reads of the stored venue data (`features()`, `geofences()`, `places()`,
+  `floors()`, `departments()`, `privacyZones()`, `amenities()`) are answered from memory until that data changes.
+  Before, each call decoded every stored row, about half a second for a venue of a thousand features, and other
+  calls waited behind it. The results are the same, in the same order.
+- Faster, both platforms: `loadCachedRouteNetwork()` does not read the stored features again when the installed
+  route network was built from them and they have not changed.
+
 ## [6.0.0-beta.5] - 2026-10-29
 
 ### Added

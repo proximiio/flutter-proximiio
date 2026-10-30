@@ -5,11 +5,11 @@
 # The Proximi.io SDK pod is not on CocoaPods trunk. Add it to the app's ios/Podfile,
 # inside the Runner target, at the same version as below:
 #
-#   pod 'Proximiio', :podspec => 'https://raw.githubusercontent.com/proximiio/proximiio-sdk-ios-binary/6.0.0-beta.67/Proximiio.podspec'
+#   pod 'Proximiio', :podspec => 'https://raw.githubusercontent.com/proximiio/proximiio-sdk-ios-binary/6.0.0-beta.68/Proximiio.podspec'
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_proximiio'
-  s.version          = '6.0.0-beta.5'
+  s.version          = '6.0.0-beta.6'
   s.summary          = 'Proximi.io indoor positioning for Flutter (bridge over the Proximi.io iOS SDK v6).'
   s.description      = <<-DESC
 Flutter plugin bridging the Proximi.io iOS SDK v6: positioning, floors, geofences,
@@ -22,7 +22,7 @@ privacy zones, venue data and wayfinding.
   s.source_files     = 'flutter_proximiio/Sources/flutter_proximiio/**/*.swift'
   s.resource_bundles = { 'flutter_proximiio_privacy' => ['flutter_proximiio/Sources/flutter_proximiio/PrivacyInfo.xcprivacy'] }
   s.dependency 'Flutter'
-  s.dependency 'Proximiio', '6.0.0-beta.67'
+  s.dependency 'Proximiio', '6.0.0-beta.68'
   s.platform         = :ios, '15.0'
   s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
   s.swift_version    = '5.0'

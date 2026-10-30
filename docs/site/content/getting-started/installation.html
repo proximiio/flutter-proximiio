@@ -25,7 +25,7 @@ description: Add flutter_proximiio, set up the iOS pod and Info.plist keys, and 
   flutter_proximiio:
     git:
       url: https://github.com/proximiio/flutter-proximiio
-      ref: 6.0.0-beta.5</code></pre>
+      ref: 6.0.0-beta.6</code></pre>
 
 <p>Pin <code>ref</code> to a release tag. A git dependency without <code>ref</code> follows the default branch.</p>
 
@@ -43,7 +43,7 @@ description: Add flutter_proximiio, set up the iOS pod and Info.plist keys, and 
 
 target 'Runner' do
   use_frameworks!
-  pod 'Proximiio', :podspec =&gt; 'https://raw.githubusercontent.com/proximiio/proximiio-sdk-ios-binary/6.0.0-beta.67/Proximiio.podspec'
+  pod 'Proximiio', :podspec =&gt; 'https://raw.githubusercontent.com/proximiio/proximiio-sdk-ios-binary/6.0.0-beta.68/Proximiio.podspec'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 end</code></pre>
