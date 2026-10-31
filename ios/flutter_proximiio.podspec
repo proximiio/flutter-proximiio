@@ -9,7 +9,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_proximiio'
-  s.version          = '6.0.0-beta.6'
+  s.version          = '6.0.0-beta.7'
   s.summary          = 'Proximi.io indoor positioning for Flutter (bridge over the Proximi.io iOS SDK v6).'
   s.description      = <<-DESC
 Flutter plugin bridging the Proximi.io iOS SDK v6: positioning, floors, geofences,

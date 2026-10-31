@@ -1211,6 +1211,57 @@ data class MsgPdrUpdate (
 }
 
 /**
+ * One compass reading of the plugin's compass (not the SDK's): degrees from north, clockwise, for the
+ * top of the screen. `isTrueNorth` is false while only magnetic north is known.
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class MsgCompassHeading (
+  val degrees: Double,
+  val accuracyDegrees: Double,
+  val isTrueNorth: Boolean,
+  val timestampMs: Long
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): MsgCompassHeading {
+      val degrees = pigeonVar_list[0] as Double
+      val accuracyDegrees = pigeonVar_list[1] as Double
+      val isTrueNorth = pigeonVar_list[2] as Boolean
+      val timestampMs = pigeonVar_list[3] as Long
+      return MsgCompassHeading(degrees, accuracyDegrees, isTrueNorth, timestampMs)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      degrees,
+      accuracyDegrees,
+      isTrueNorth,
+      timestampMs,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as MsgCompassHeading
+    return MessagesPigeonUtils.deepEquals(this.degrees, other.degrees) && MessagesPigeonUtils.deepEquals(this.accuracyDegrees, other.accuracyDegrees) && MessagesPigeonUtils.deepEquals(this.isTrueNorth, other.isTrueNorth) && MessagesPigeonUtils.deepEquals(this.timestampMs, other.timestampMs)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.degrees)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.accuracyDegrees)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.isTrueNorth)
+    result = 31 * result + MessagesPigeonUtils.deepHash(this.timestampMs)
+    return result
+  }
+}
+
+/**
  * Generated class from Pigeon that represents data sent in messages.
  * This class should not be extended by any user class outside of the generated file.
  */
@@ -2921,170 +2972,175 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
       }
       162.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgGeofenceEntered.fromList(it)
+          MsgCompassHeading.fromList(it)
         }
       }
       163.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgGeofenceExited.fromList(it)
+          MsgGeofenceEntered.fromList(it)
         }
       }
       164.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPrivacyZoneEntered.fromList(it)
+          MsgGeofenceExited.fromList(it)
         }
       }
       165.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPrivacyZoneExited.fromList(it)
+          MsgPrivacyZoneEntered.fromList(it)
         }
       }
       166.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPrivacyZoneState.fromList(it)
+          MsgPrivacyZoneExited.fromList(it)
         }
       }
       167.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgRouteOptions.fromList(it)
+          MsgPrivacyZoneState.fromList(it)
         }
       }
       168.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgRoutePoint.fromList(it)
+          MsgRouteOptions.fromList(it)
         }
       }
       169.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgLevelChange.fromList(it)
+          MsgRoutePoint.fromList(it)
         }
       }
       170.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgRouteSegment.fromList(it)
+          MsgLevelChange.fromList(it)
         }
       }
       171.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgRouteInstruction.fromList(it)
+          MsgRouteSegment.fromList(it)
         }
       }
       172.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgComputedRoute.fromList(it)
+          MsgRouteInstruction.fromList(it)
         }
       }
       173.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgDurationRow.fromList(it)
+          MsgComputedRoute.fromList(it)
         }
       }
       174.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgAmenity.fromList(it)
+          MsgDurationRow.fromList(it)
         }
       }
       175.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgFeature.fromList(it)
+          MsgAmenity.fromList(it)
         }
       }
       176.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgDepartment.fromList(it)
+          MsgFeature.fromList(it)
         }
       }
       177.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgJourneyWaypoint.fromList(it)
+          MsgDepartment.fromList(it)
         }
       }
       178.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgJourney.fromList(it)
+          MsgJourneyWaypoint.fromList(it)
         }
       }
       179.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgVenueDataChange.fromList(it)
+          MsgJourney.fromList(it)
         }
       }
       180.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgSyncUpdated.fromList(it)
+          MsgVenueDataChange.fromList(it)
         }
       }
       181.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgSyncDeleted.fromList(it)
+          MsgSyncUpdated.fromList(it)
         }
       }
       182.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgSyncCompleted.fromList(it)
+          MsgSyncDeleted.fromList(it)
         }
       }
       183.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgSyncFailed.fromList(it)
+          MsgSyncCompleted.fromList(it)
         }
       }
       184.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgStoreRecreated.fromList(it)
+          MsgSyncFailed.fromList(it)
         }
       }
       185.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconIdentifier.fromList(it)
+          MsgStoreRecreated.fromList(it)
         }
       }
       186.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconObservation.fromList(it)
+          MsgBeaconIdentifier.fromList(it)
         }
       }
       187.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconTelemetry.fromList(it)
+          MsgBeaconObservation.fromList(it)
         }
       }
       188.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconFound.fromList(it)
+          MsgBeaconTelemetry.fromList(it)
         }
       }
       189.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconUpdated.fromList(it)
+          MsgBeaconFound.fromList(it)
         }
       }
       190.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconLost.fromList(it)
+          MsgBeaconUpdated.fromList(it)
         }
       }
       191.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgBeaconTelemetryReceived.fromList(it)
+          MsgBeaconLost.fromList(it)
         }
       }
       192.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgPackageState.fromList(it)
+          MsgBeaconTelemetryReceived.fromList(it)
         }
       }
       193.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgSimulatedWaypoint.fromList(it)
+          MsgPackageState.fromList(it)
         }
       }
       194.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          MsgSimulatedRoute.fromList(it)
+          MsgSimulatedWaypoint.fromList(it)
         }
       }
       195.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          MsgSimulatedRoute.fromList(it)
+        }
+      }
+      196.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
           MsgDiagnostics.fromList(it)
         }
@@ -3226,140 +3282,144 @@ private open class MessagesPigeonCodec : StandardMessageCodec() {
         stream.write(161)
         writeValue(stream, value.toList())
       }
-      is MsgGeofenceEntered -> {
+      is MsgCompassHeading -> {
         stream.write(162)
         writeValue(stream, value.toList())
       }
-      is MsgGeofenceExited -> {
+      is MsgGeofenceEntered -> {
         stream.write(163)
         writeValue(stream, value.toList())
       }
-      is MsgPrivacyZoneEntered -> {
+      is MsgGeofenceExited -> {
         stream.write(164)
         writeValue(stream, value.toList())
       }
-      is MsgPrivacyZoneExited -> {
+      is MsgPrivacyZoneEntered -> {
         stream.write(165)
         writeValue(stream, value.toList())
       }
-      is MsgPrivacyZoneState -> {
+      is MsgPrivacyZoneExited -> {
         stream.write(166)
         writeValue(stream, value.toList())
       }
-      is MsgRouteOptions -> {
+      is MsgPrivacyZoneState -> {
         stream.write(167)
         writeValue(stream, value.toList())
       }
-      is MsgRoutePoint -> {
+      is MsgRouteOptions -> {
         stream.write(168)
         writeValue(stream, value.toList())
       }
-      is MsgLevelChange -> {
+      is MsgRoutePoint -> {
         stream.write(169)
         writeValue(stream, value.toList())
       }
-      is MsgRouteSegment -> {
+      is MsgLevelChange -> {
         stream.write(170)
         writeValue(stream, value.toList())
       }
-      is MsgRouteInstruction -> {
+      is MsgRouteSegment -> {
         stream.write(171)
         writeValue(stream, value.toList())
       }
-      is MsgComputedRoute -> {
+      is MsgRouteInstruction -> {
         stream.write(172)
         writeValue(stream, value.toList())
       }
-      is MsgDurationRow -> {
+      is MsgComputedRoute -> {
         stream.write(173)
         writeValue(stream, value.toList())
       }
-      is MsgAmenity -> {
+      is MsgDurationRow -> {
         stream.write(174)
         writeValue(stream, value.toList())
       }
-      is MsgFeature -> {
+      is MsgAmenity -> {
         stream.write(175)
         writeValue(stream, value.toList())
       }
-      is MsgDepartment -> {
+      is MsgFeature -> {
         stream.write(176)
         writeValue(stream, value.toList())
       }
-      is MsgJourneyWaypoint -> {
+      is MsgDepartment -> {
         stream.write(177)
         writeValue(stream, value.toList())
       }
-      is MsgJourney -> {
+      is MsgJourneyWaypoint -> {
         stream.write(178)
         writeValue(stream, value.toList())
       }
-      is MsgVenueDataChange -> {
+      is MsgJourney -> {
         stream.write(179)
         writeValue(stream, value.toList())
       }
-      is MsgSyncUpdated -> {
+      is MsgVenueDataChange -> {
         stream.write(180)
         writeValue(stream, value.toList())
       }
-      is MsgSyncDeleted -> {
+      is MsgSyncUpdated -> {
         stream.write(181)
         writeValue(stream, value.toList())
       }
-      is MsgSyncCompleted -> {
+      is MsgSyncDeleted -> {
         stream.write(182)
         writeValue(stream, value.toList())
       }
-      is MsgSyncFailed -> {
+      is MsgSyncCompleted -> {
         stream.write(183)
         writeValue(stream, value.toList())
       }
-      is MsgStoreRecreated -> {
+      is MsgSyncFailed -> {
         stream.write(184)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconIdentifier -> {
+      is MsgStoreRecreated -> {
         stream.write(185)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconObservation -> {
+      is MsgBeaconIdentifier -> {
         stream.write(186)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconTelemetry -> {
+      is MsgBeaconObservation -> {
         stream.write(187)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconFound -> {
+      is MsgBeaconTelemetry -> {
         stream.write(188)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconUpdated -> {
+      is MsgBeaconFound -> {
         stream.write(189)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconLost -> {
+      is MsgBeaconUpdated -> {
         stream.write(190)
         writeValue(stream, value.toList())
       }
-      is MsgBeaconTelemetryReceived -> {
+      is MsgBeaconLost -> {
         stream.write(191)
         writeValue(stream, value.toList())
       }
-      is MsgPackageState -> {
+      is MsgBeaconTelemetryReceived -> {
         stream.write(192)
         writeValue(stream, value.toList())
       }
-      is MsgSimulatedWaypoint -> {
+      is MsgPackageState -> {
         stream.write(193)
         writeValue(stream, value.toList())
       }
-      is MsgSimulatedRoute -> {
+      is MsgSimulatedWaypoint -> {
         stream.write(194)
         writeValue(stream, value.toList())
       }
-      is MsgDiagnostics -> {
+      is MsgSimulatedRoute -> {
         stream.write(195)
+        writeValue(stream, value.toList())
+      }
+      is MsgDiagnostics -> {
+        stream.write(196)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -4825,6 +4885,23 @@ abstract class PdrObservationsStreamHandler : MessagesPigeonEventChannelWrapper<
   }
 // Implement methods from MessagesPigeonEventChannelWrapper
 override fun onListen(p0: Any?, sink: PigeonEventSink<MsgPdrUpdate>) {}
+
+override fun onCancel(p0: Any?) {}
+}
+      
+abstract class CompassHeadingsStreamHandler : MessagesPigeonEventChannelWrapper<MsgCompassHeading> {
+  companion object {
+    fun register(messenger: BinaryMessenger, streamHandler: CompassHeadingsStreamHandler, instanceName: String = "") {
+      var channelName: String = "dev.flutter.pigeon.flutter_proximiio.ProximiioEventApi.compassHeadings"
+      if (instanceName.isNotEmpty()) {
+        channelName += ".$instanceName"
+      }
+      val internalStreamHandler = MessagesPigeonStreamHandler<MsgCompassHeading>(streamHandler)
+      EventChannel(messenger, channelName, MessagesPigeonMethodCodec).setStreamHandler(internalStreamHandler)
+    }
+  }
+// Implement methods from MessagesPigeonEventChannelWrapper
+override fun onListen(p0: Any?, sink: PigeonEventSink<MsgCompassHeading>) {}
 
 override fun onCancel(p0: Any?) {}
 }

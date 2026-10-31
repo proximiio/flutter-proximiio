@@ -1092,6 +1092,55 @@ struct MsgPdrUpdate: Hashable {
   }
 }
 
+/// One compass reading of the plugin's compass (not the SDK's): degrees from north, clockwise, for the
+/// top of the screen. `isTrueNorth` is false while only magnetic north is known.
+///
+/// Generated class from Pigeon that represents data sent in messages.
+struct MsgCompassHeading: Hashable {
+  var degrees: Double
+  var accuracyDegrees: Double
+  var isTrueNorth: Bool
+  var timestampMs: Int64
+
+
+  // swift-format-ignore: AlwaysUseLowerCamelCase
+  static func fromList(_ pigeonVar_list: [Any?]) -> MsgCompassHeading? {
+    let degrees = pigeonVar_list[0] as! Double
+    let accuracyDegrees = pigeonVar_list[1] as! Double
+    let isTrueNorth = pigeonVar_list[2] as! Bool
+    let timestampMs = pigeonVar_list[3] as! Int64
+
+    return MsgCompassHeading(
+      degrees: degrees,
+      accuracyDegrees: accuracyDegrees,
+      isTrueNorth: isTrueNorth,
+      timestampMs: timestampMs
+    )
+  }
+  func toList() -> [Any?] {
+    return [
+      degrees,
+      accuracyDegrees,
+      isTrueNorth,
+      timestampMs,
+    ]
+  }
+  static func == (lhs: MsgCompassHeading, rhs: MsgCompassHeading) -> Bool {
+    if Swift.type(of: lhs) != Swift.type(of: rhs) {
+      return false
+    }
+    return deepEqualsMessages(lhs.degrees, rhs.degrees) && deepEqualsMessages(lhs.accuracyDegrees, rhs.accuracyDegrees) && deepEqualsMessages(lhs.isTrueNorth, rhs.isTrueNorth) && deepEqualsMessages(lhs.timestampMs, rhs.timestampMs)
+  }
+
+  func hash(into hasher: inout Hasher) {
+    hasher.combine("MsgCompassHeading")
+    deepHashMessages(value: degrees, hasher: &hasher)
+    deepHashMessages(value: accuracyDegrees, hasher: &hasher)
+    deepHashMessages(value: isTrueNorth, hasher: &hasher)
+    deepHashMessages(value: timestampMs, hasher: &hasher)
+  }
+}
+
 /// Generated class from Pigeon that represents data sent in messages.
 /// This protocol should not be extended by any user class outside of the generated file.
 protocol MsgGeofenceEvent {
@@ -2773,72 +2822,74 @@ private class MessagesPigeonCodecReader: FlutterStandardReader {
     case 161:
       return MsgPdrUpdate.fromList(self.readValue() as! [Any?])
     case 162:
-      return MsgGeofenceEntered.fromList(self.readValue() as! [Any?])
+      return MsgCompassHeading.fromList(self.readValue() as! [Any?])
     case 163:
-      return MsgGeofenceExited.fromList(self.readValue() as! [Any?])
+      return MsgGeofenceEntered.fromList(self.readValue() as! [Any?])
     case 164:
-      return MsgPrivacyZoneEntered.fromList(self.readValue() as! [Any?])
+      return MsgGeofenceExited.fromList(self.readValue() as! [Any?])
     case 165:
-      return MsgPrivacyZoneExited.fromList(self.readValue() as! [Any?])
+      return MsgPrivacyZoneEntered.fromList(self.readValue() as! [Any?])
     case 166:
-      return MsgPrivacyZoneState.fromList(self.readValue() as! [Any?])
+      return MsgPrivacyZoneExited.fromList(self.readValue() as! [Any?])
     case 167:
-      return MsgRouteOptions.fromList(self.readValue() as! [Any?])
+      return MsgPrivacyZoneState.fromList(self.readValue() as! [Any?])
     case 168:
-      return MsgRoutePoint.fromList(self.readValue() as! [Any?])
+      return MsgRouteOptions.fromList(self.readValue() as! [Any?])
     case 169:
-      return MsgLevelChange.fromList(self.readValue() as! [Any?])
+      return MsgRoutePoint.fromList(self.readValue() as! [Any?])
     case 170:
-      return MsgRouteSegment.fromList(self.readValue() as! [Any?])
+      return MsgLevelChange.fromList(self.readValue() as! [Any?])
     case 171:
-      return MsgRouteInstruction.fromList(self.readValue() as! [Any?])
+      return MsgRouteSegment.fromList(self.readValue() as! [Any?])
     case 172:
-      return MsgComputedRoute.fromList(self.readValue() as! [Any?])
+      return MsgRouteInstruction.fromList(self.readValue() as! [Any?])
     case 173:
-      return MsgDurationRow.fromList(self.readValue() as! [Any?])
+      return MsgComputedRoute.fromList(self.readValue() as! [Any?])
     case 174:
-      return MsgAmenity.fromList(self.readValue() as! [Any?])
+      return MsgDurationRow.fromList(self.readValue() as! [Any?])
     case 175:
-      return MsgFeature.fromList(self.readValue() as! [Any?])
+      return MsgAmenity.fromList(self.readValue() as! [Any?])
     case 176:
-      return MsgDepartment.fromList(self.readValue() as! [Any?])
+      return MsgFeature.fromList(self.readValue() as! [Any?])
     case 177:
-      return MsgJourneyWaypoint.fromList(self.readValue() as! [Any?])
+      return MsgDepartment.fromList(self.readValue() as! [Any?])
     case 178:
-      return MsgJourney.fromList(self.readValue() as! [Any?])
+      return MsgJourneyWaypoint.fromList(self.readValue() as! [Any?])
     case 179:
-      return MsgVenueDataChange.fromList(self.readValue() as! [Any?])
+      return MsgJourney.fromList(self.readValue() as! [Any?])
     case 180:
-      return MsgSyncUpdated.fromList(self.readValue() as! [Any?])
+      return MsgVenueDataChange.fromList(self.readValue() as! [Any?])
     case 181:
-      return MsgSyncDeleted.fromList(self.readValue() as! [Any?])
+      return MsgSyncUpdated.fromList(self.readValue() as! [Any?])
     case 182:
-      return MsgSyncCompleted.fromList(self.readValue() as! [Any?])
+      return MsgSyncDeleted.fromList(self.readValue() as! [Any?])
     case 183:
-      return MsgSyncFailed.fromList(self.readValue() as! [Any?])
+      return MsgSyncCompleted.fromList(self.readValue() as! [Any?])
     case 184:
-      return MsgStoreRecreated.fromList(self.readValue() as! [Any?])
+      return MsgSyncFailed.fromList(self.readValue() as! [Any?])
     case 185:
-      return MsgBeaconIdentifier.fromList(self.readValue() as! [Any?])
+      return MsgStoreRecreated.fromList(self.readValue() as! [Any?])
     case 186:
-      return MsgBeaconObservation.fromList(self.readValue() as! [Any?])
+      return MsgBeaconIdentifier.fromList(self.readValue() as! [Any?])
     case 187:
-      return MsgBeaconTelemetry.fromList(self.readValue() as! [Any?])
+      return MsgBeaconObservation.fromList(self.readValue() as! [Any?])
     case 188:
-      return MsgBeaconFound.fromList(self.readValue() as! [Any?])
+      return MsgBeaconTelemetry.fromList(self.readValue() as! [Any?])
     case 189:
-      return MsgBeaconUpdated.fromList(self.readValue() as! [Any?])
+      return MsgBeaconFound.fromList(self.readValue() as! [Any?])
     case 190:
-      return MsgBeaconLost.fromList(self.readValue() as! [Any?])
+      return MsgBeaconUpdated.fromList(self.readValue() as! [Any?])
     case 191:
-      return MsgBeaconTelemetryReceived.fromList(self.readValue() as! [Any?])
+      return MsgBeaconLost.fromList(self.readValue() as! [Any?])
     case 192:
-      return MsgPackageState.fromList(self.readValue() as! [Any?])
+      return MsgBeaconTelemetryReceived.fromList(self.readValue() as! [Any?])
     case 193:
-      return MsgSimulatedWaypoint.fromList(self.readValue() as! [Any?])
+      return MsgPackageState.fromList(self.readValue() as! [Any?])
     case 194:
-      return MsgSimulatedRoute.fromList(self.readValue() as! [Any?])
+      return MsgSimulatedWaypoint.fromList(self.readValue() as! [Any?])
     case 195:
+      return MsgSimulatedRoute.fromList(self.readValue() as! [Any?])
+    case 196:
       return MsgDiagnostics.fromList(self.readValue() as! [Any?])
     default:
       return super.readValue(ofType: type)
@@ -2947,107 +2998,110 @@ private class MessagesPigeonCodecWriter: FlutterStandardWriter {
     } else if let value = value as? MsgPdrUpdate {
       super.writeByte(161)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgGeofenceEntered {
+    } else if let value = value as? MsgCompassHeading {
       super.writeByte(162)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgGeofenceExited {
+    } else if let value = value as? MsgGeofenceEntered {
       super.writeByte(163)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPrivacyZoneEntered {
+    } else if let value = value as? MsgGeofenceExited {
       super.writeByte(164)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPrivacyZoneExited {
+    } else if let value = value as? MsgPrivacyZoneEntered {
       super.writeByte(165)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPrivacyZoneState {
+    } else if let value = value as? MsgPrivacyZoneExited {
       super.writeByte(166)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgRouteOptions {
+    } else if let value = value as? MsgPrivacyZoneState {
       super.writeByte(167)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgRoutePoint {
+    } else if let value = value as? MsgRouteOptions {
       super.writeByte(168)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgLevelChange {
+    } else if let value = value as? MsgRoutePoint {
       super.writeByte(169)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgRouteSegment {
+    } else if let value = value as? MsgLevelChange {
       super.writeByte(170)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgRouteInstruction {
+    } else if let value = value as? MsgRouteSegment {
       super.writeByte(171)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgComputedRoute {
+    } else if let value = value as? MsgRouteInstruction {
       super.writeByte(172)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgDurationRow {
+    } else if let value = value as? MsgComputedRoute {
       super.writeByte(173)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgAmenity {
+    } else if let value = value as? MsgDurationRow {
       super.writeByte(174)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgFeature {
+    } else if let value = value as? MsgAmenity {
       super.writeByte(175)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgDepartment {
+    } else if let value = value as? MsgFeature {
       super.writeByte(176)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgJourneyWaypoint {
+    } else if let value = value as? MsgDepartment {
       super.writeByte(177)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgJourney {
+    } else if let value = value as? MsgJourneyWaypoint {
       super.writeByte(178)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgVenueDataChange {
+    } else if let value = value as? MsgJourney {
       super.writeByte(179)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgSyncUpdated {
+    } else if let value = value as? MsgVenueDataChange {
       super.writeByte(180)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgSyncDeleted {
+    } else if let value = value as? MsgSyncUpdated {
       super.writeByte(181)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgSyncCompleted {
+    } else if let value = value as? MsgSyncDeleted {
       super.writeByte(182)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgSyncFailed {
+    } else if let value = value as? MsgSyncCompleted {
       super.writeByte(183)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgStoreRecreated {
+    } else if let value = value as? MsgSyncFailed {
       super.writeByte(184)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconIdentifier {
+    } else if let value = value as? MsgStoreRecreated {
       super.writeByte(185)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconObservation {
+    } else if let value = value as? MsgBeaconIdentifier {
       super.writeByte(186)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconTelemetry {
+    } else if let value = value as? MsgBeaconObservation {
       super.writeByte(187)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconFound {
+    } else if let value = value as? MsgBeaconTelemetry {
       super.writeByte(188)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconUpdated {
+    } else if let value = value as? MsgBeaconFound {
       super.writeByte(189)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconLost {
+    } else if let value = value as? MsgBeaconUpdated {
       super.writeByte(190)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgBeaconTelemetryReceived {
+    } else if let value = value as? MsgBeaconLost {
       super.writeByte(191)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgPackageState {
+    } else if let value = value as? MsgBeaconTelemetryReceived {
       super.writeByte(192)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgSimulatedWaypoint {
+    } else if let value = value as? MsgPackageState {
       super.writeByte(193)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgSimulatedRoute {
+    } else if let value = value as? MsgSimulatedWaypoint {
       super.writeByte(194)
       super.writeValue(value.toList())
-    } else if let value = value as? MsgDiagnostics {
+    } else if let value = value as? MsgSimulatedRoute {
       super.writeByte(195)
+      super.writeValue(value.toList())
+    } else if let value = value as? MsgDiagnostics {
+      super.writeByte(196)
       super.writeValue(value.toList())
     } else {
       super.writeValue(value)
@@ -4349,6 +4403,20 @@ class PdrObservationsStreamHandler: PigeonEventChannelWrapper<MsgPdrUpdate> {
       channelName += ".\(instanceName)"
     }
     let internalStreamHandler = PigeonStreamHandler<MsgPdrUpdate>(wrapper: streamHandler)
+    let channel = FlutterEventChannel(name: channelName, binaryMessenger: messenger, codec: messagesPigeonMethodCodec)
+    channel.setStreamHandler(internalStreamHandler)
+  }
+}
+      
+class CompassHeadingsStreamHandler: PigeonEventChannelWrapper<MsgCompassHeading> {
+  static func register(with messenger: FlutterBinaryMessenger,
+                      instanceName: String = "",
+                      streamHandler: CompassHeadingsStreamHandler) {
+    var channelName = "dev.flutter.pigeon.flutter_proximiio.ProximiioEventApi.compassHeadings"
+    if !instanceName.isEmpty {
+      channelName += ".\(instanceName)"
+    }
+    let internalStreamHandler = PigeonStreamHandler<MsgCompassHeading>(wrapper: streamHandler)
     let channel = FlutterEventChannel(name: channelName, binaryMessenger: messenger, codec: messagesPigeonMethodCodec)
     channel.setStreamHandler(internalStreamHandler)
   }

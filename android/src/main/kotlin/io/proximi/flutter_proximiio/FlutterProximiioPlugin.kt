@@ -18,7 +18,7 @@ class FlutterProximiioPlugin : FlutterPlugin, ActivityAware {
   private var activityBinding: ActivityPluginBinding? = null
 
   override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-    val streams = EngineStreams(binding.binaryMessenger)
+    val streams = EngineStreams(binding.binaryMessenger, binding.applicationContext)
     this.streams = streams
     ProximiioHub.attach(streams)
     ProximiioHostApi.setUp(binding.binaryMessenger, HostApi(binding.applicationContext))

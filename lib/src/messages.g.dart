@@ -1016,6 +1016,62 @@ class MsgPdrUpdate {
   int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
 }
 
+/// One compass reading of the plugin's compass (not the SDK's): degrees from north, clockwise, for the
+/// top of the screen. `isTrueNorth` is false while only magnetic north is known.
+class MsgCompassHeading {
+  MsgCompassHeading({
+    required this.degrees,
+    required this.accuracyDegrees,
+    required this.isTrueNorth,
+    required this.timestampMs,
+  });
+
+  double degrees;
+
+  double accuracyDegrees;
+
+  bool isTrueNorth;
+
+  int timestampMs;
+
+  List<Object?> _toList() {
+    return <Object?>[degrees, accuracyDegrees, isTrueNorth, timestampMs];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static MsgCompassHeading decode(Object result) {
+    result as List<Object?>;
+    return MsgCompassHeading(
+      degrees: result[0]! as double,
+      accuracyDegrees: result[1]! as double,
+      isTrueNorth: result[2]! as bool,
+      timestampMs: result[3]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! MsgCompassHeading || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(degrees, other.degrees) &&
+        _deepEquals(accuracyDegrees, other.accuracyDegrees) &&
+        _deepEquals(isTrueNorth, other.isTrueNorth) &&
+        _deepEquals(timestampMs, other.timestampMs);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+}
+
 sealed class MsgGeofenceEvent {}
 
 class MsgGeofenceEntered extends MsgGeofenceEvent {
@@ -2826,107 +2882,110 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is MsgPdrUpdate) {
       buffer.putUint8(161);
       writeValue(buffer, value.encode());
-    } else if (value is MsgGeofenceEntered) {
+    } else if (value is MsgCompassHeading) {
       buffer.putUint8(162);
       writeValue(buffer, value.encode());
-    } else if (value is MsgGeofenceExited) {
+    } else if (value is MsgGeofenceEntered) {
       buffer.putUint8(163);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPrivacyZoneEntered) {
+    } else if (value is MsgGeofenceExited) {
       buffer.putUint8(164);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPrivacyZoneExited) {
+    } else if (value is MsgPrivacyZoneEntered) {
       buffer.putUint8(165);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPrivacyZoneState) {
+    } else if (value is MsgPrivacyZoneExited) {
       buffer.putUint8(166);
       writeValue(buffer, value.encode());
-    } else if (value is MsgRouteOptions) {
+    } else if (value is MsgPrivacyZoneState) {
       buffer.putUint8(167);
       writeValue(buffer, value.encode());
-    } else if (value is MsgRoutePoint) {
+    } else if (value is MsgRouteOptions) {
       buffer.putUint8(168);
       writeValue(buffer, value.encode());
-    } else if (value is MsgLevelChange) {
+    } else if (value is MsgRoutePoint) {
       buffer.putUint8(169);
       writeValue(buffer, value.encode());
-    } else if (value is MsgRouteSegment) {
+    } else if (value is MsgLevelChange) {
       buffer.putUint8(170);
       writeValue(buffer, value.encode());
-    } else if (value is MsgRouteInstruction) {
+    } else if (value is MsgRouteSegment) {
       buffer.putUint8(171);
       writeValue(buffer, value.encode());
-    } else if (value is MsgComputedRoute) {
+    } else if (value is MsgRouteInstruction) {
       buffer.putUint8(172);
       writeValue(buffer, value.encode());
-    } else if (value is MsgDurationRow) {
+    } else if (value is MsgComputedRoute) {
       buffer.putUint8(173);
       writeValue(buffer, value.encode());
-    } else if (value is MsgAmenity) {
+    } else if (value is MsgDurationRow) {
       buffer.putUint8(174);
       writeValue(buffer, value.encode());
-    } else if (value is MsgFeature) {
+    } else if (value is MsgAmenity) {
       buffer.putUint8(175);
       writeValue(buffer, value.encode());
-    } else if (value is MsgDepartment) {
+    } else if (value is MsgFeature) {
       buffer.putUint8(176);
       writeValue(buffer, value.encode());
-    } else if (value is MsgJourneyWaypoint) {
+    } else if (value is MsgDepartment) {
       buffer.putUint8(177);
       writeValue(buffer, value.encode());
-    } else if (value is MsgJourney) {
+    } else if (value is MsgJourneyWaypoint) {
       buffer.putUint8(178);
       writeValue(buffer, value.encode());
-    } else if (value is MsgVenueDataChange) {
+    } else if (value is MsgJourney) {
       buffer.putUint8(179);
       writeValue(buffer, value.encode());
-    } else if (value is MsgSyncUpdated) {
+    } else if (value is MsgVenueDataChange) {
       buffer.putUint8(180);
       writeValue(buffer, value.encode());
-    } else if (value is MsgSyncDeleted) {
+    } else if (value is MsgSyncUpdated) {
       buffer.putUint8(181);
       writeValue(buffer, value.encode());
-    } else if (value is MsgSyncCompleted) {
+    } else if (value is MsgSyncDeleted) {
       buffer.putUint8(182);
       writeValue(buffer, value.encode());
-    } else if (value is MsgSyncFailed) {
+    } else if (value is MsgSyncCompleted) {
       buffer.putUint8(183);
       writeValue(buffer, value.encode());
-    } else if (value is MsgStoreRecreated) {
+    } else if (value is MsgSyncFailed) {
       buffer.putUint8(184);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconIdentifier) {
+    } else if (value is MsgStoreRecreated) {
       buffer.putUint8(185);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconObservation) {
+    } else if (value is MsgBeaconIdentifier) {
       buffer.putUint8(186);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconTelemetry) {
+    } else if (value is MsgBeaconObservation) {
       buffer.putUint8(187);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconFound) {
+    } else if (value is MsgBeaconTelemetry) {
       buffer.putUint8(188);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconUpdated) {
+    } else if (value is MsgBeaconFound) {
       buffer.putUint8(189);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconLost) {
+    } else if (value is MsgBeaconUpdated) {
       buffer.putUint8(190);
       writeValue(buffer, value.encode());
-    } else if (value is MsgBeaconTelemetryReceived) {
+    } else if (value is MsgBeaconLost) {
       buffer.putUint8(191);
       writeValue(buffer, value.encode());
-    } else if (value is MsgPackageState) {
+    } else if (value is MsgBeaconTelemetryReceived) {
       buffer.putUint8(192);
       writeValue(buffer, value.encode());
-    } else if (value is MsgSimulatedWaypoint) {
+    } else if (value is MsgPackageState) {
       buffer.putUint8(193);
       writeValue(buffer, value.encode());
-    } else if (value is MsgSimulatedRoute) {
+    } else if (value is MsgSimulatedWaypoint) {
       buffer.putUint8(194);
       writeValue(buffer, value.encode());
-    } else if (value is MsgDiagnostics) {
+    } else if (value is MsgSimulatedRoute) {
       buffer.putUint8(195);
+      writeValue(buffer, value.encode());
+    } else if (value is MsgDiagnostics) {
+      buffer.putUint8(196);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -3023,72 +3082,74 @@ class _PigeonCodec extends StandardMessageCodec {
       case 161:
         return MsgPdrUpdate.decode(readValue(buffer)!);
       case 162:
-        return MsgGeofenceEntered.decode(readValue(buffer)!);
+        return MsgCompassHeading.decode(readValue(buffer)!);
       case 163:
-        return MsgGeofenceExited.decode(readValue(buffer)!);
+        return MsgGeofenceEntered.decode(readValue(buffer)!);
       case 164:
-        return MsgPrivacyZoneEntered.decode(readValue(buffer)!);
+        return MsgGeofenceExited.decode(readValue(buffer)!);
       case 165:
-        return MsgPrivacyZoneExited.decode(readValue(buffer)!);
+        return MsgPrivacyZoneEntered.decode(readValue(buffer)!);
       case 166:
-        return MsgPrivacyZoneState.decode(readValue(buffer)!);
+        return MsgPrivacyZoneExited.decode(readValue(buffer)!);
       case 167:
-        return MsgRouteOptions.decode(readValue(buffer)!);
+        return MsgPrivacyZoneState.decode(readValue(buffer)!);
       case 168:
-        return MsgRoutePoint.decode(readValue(buffer)!);
+        return MsgRouteOptions.decode(readValue(buffer)!);
       case 169:
-        return MsgLevelChange.decode(readValue(buffer)!);
+        return MsgRoutePoint.decode(readValue(buffer)!);
       case 170:
-        return MsgRouteSegment.decode(readValue(buffer)!);
+        return MsgLevelChange.decode(readValue(buffer)!);
       case 171:
-        return MsgRouteInstruction.decode(readValue(buffer)!);
+        return MsgRouteSegment.decode(readValue(buffer)!);
       case 172:
-        return MsgComputedRoute.decode(readValue(buffer)!);
+        return MsgRouteInstruction.decode(readValue(buffer)!);
       case 173:
-        return MsgDurationRow.decode(readValue(buffer)!);
+        return MsgComputedRoute.decode(readValue(buffer)!);
       case 174:
-        return MsgAmenity.decode(readValue(buffer)!);
+        return MsgDurationRow.decode(readValue(buffer)!);
       case 175:
-        return MsgFeature.decode(readValue(buffer)!);
+        return MsgAmenity.decode(readValue(buffer)!);
       case 176:
-        return MsgDepartment.decode(readValue(buffer)!);
+        return MsgFeature.decode(readValue(buffer)!);
       case 177:
-        return MsgJourneyWaypoint.decode(readValue(buffer)!);
+        return MsgDepartment.decode(readValue(buffer)!);
       case 178:
-        return MsgJourney.decode(readValue(buffer)!);
+        return MsgJourneyWaypoint.decode(readValue(buffer)!);
       case 179:
-        return MsgVenueDataChange.decode(readValue(buffer)!);
+        return MsgJourney.decode(readValue(buffer)!);
       case 180:
-        return MsgSyncUpdated.decode(readValue(buffer)!);
+        return MsgVenueDataChange.decode(readValue(buffer)!);
       case 181:
-        return MsgSyncDeleted.decode(readValue(buffer)!);
+        return MsgSyncUpdated.decode(readValue(buffer)!);
       case 182:
-        return MsgSyncCompleted.decode(readValue(buffer)!);
+        return MsgSyncDeleted.decode(readValue(buffer)!);
       case 183:
-        return MsgSyncFailed.decode(readValue(buffer)!);
+        return MsgSyncCompleted.decode(readValue(buffer)!);
       case 184:
-        return MsgStoreRecreated.decode(readValue(buffer)!);
+        return MsgSyncFailed.decode(readValue(buffer)!);
       case 185:
-        return MsgBeaconIdentifier.decode(readValue(buffer)!);
+        return MsgStoreRecreated.decode(readValue(buffer)!);
       case 186:
-        return MsgBeaconObservation.decode(readValue(buffer)!);
+        return MsgBeaconIdentifier.decode(readValue(buffer)!);
       case 187:
-        return MsgBeaconTelemetry.decode(readValue(buffer)!);
+        return MsgBeaconObservation.decode(readValue(buffer)!);
       case 188:
-        return MsgBeaconFound.decode(readValue(buffer)!);
+        return MsgBeaconTelemetry.decode(readValue(buffer)!);
       case 189:
-        return MsgBeaconUpdated.decode(readValue(buffer)!);
+        return MsgBeaconFound.decode(readValue(buffer)!);
       case 190:
-        return MsgBeaconLost.decode(readValue(buffer)!);
+        return MsgBeaconUpdated.decode(readValue(buffer)!);
       case 191:
-        return MsgBeaconTelemetryReceived.decode(readValue(buffer)!);
+        return MsgBeaconLost.decode(readValue(buffer)!);
       case 192:
-        return MsgPackageState.decode(readValue(buffer)!);
+        return MsgBeaconTelemetryReceived.decode(readValue(buffer)!);
       case 193:
-        return MsgSimulatedWaypoint.decode(readValue(buffer)!);
+        return MsgPackageState.decode(readValue(buffer)!);
       case 194:
-        return MsgSimulatedRoute.decode(readValue(buffer)!);
+        return MsgSimulatedWaypoint.decode(readValue(buffer)!);
       case 195:
+        return MsgSimulatedRoute.decode(readValue(buffer)!);
+      case 196:
         return MsgDiagnostics.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -4345,5 +4406,18 @@ Stream<MsgPdrUpdate> pdrObservations({String instanceName = ''}) {
   );
   return pdrObservationsChannel.receiveBroadcastStream().map((dynamic event) {
     return event as MsgPdrUpdate;
+  });
+}
+
+Stream<MsgCompassHeading> compassHeadings({String instanceName = ''}) {
+  if (instanceName.isNotEmpty) {
+    instanceName = '.$instanceName';
+  }
+  final EventChannel compassHeadingsChannel = EventChannel(
+    'dev.flutter.pigeon.flutter_proximiio.ProximiioEventApi.compassHeadings$instanceName',
+    pigeonMethodCodec,
+  );
+  return compassHeadingsChannel.receiveBroadcastStream().map((dynamic event) {
+    return event as MsgCompassHeading;
   });
 }

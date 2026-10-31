@@ -230,6 +230,22 @@ class MsgPdrUpdate {
   double timestampSeconds;
 }
 
+/// One compass reading of the plugin's compass (not the SDK's): degrees from north, clockwise, for the
+/// top of the screen. `isTrueNorth` is false while only magnetic north is known.
+class MsgCompassHeading {
+  MsgCompassHeading({
+    required this.degrees,
+    required this.accuracyDegrees,
+    required this.isTrueNorth,
+    required this.timestampMs,
+  });
+
+  double degrees;
+  double accuracyDegrees;
+  bool isTrueNorth;
+  int timestampMs;
+}
+
 sealed class MsgGeofenceEvent {}
 
 class MsgGeofenceEntered extends MsgGeofenceEvent {
@@ -879,4 +895,8 @@ abstract class ProximiioEventApi {
   MsgBeaconEvent beaconEvents();
 
   MsgPdrUpdate pdrObservations();
+
+  /// The plugin's own compass, not an SDK stream: it runs while Dart listens and the app is in the
+  /// foreground, whether the SDK runs or not.
+  MsgCompassHeading compassHeadings();
 }

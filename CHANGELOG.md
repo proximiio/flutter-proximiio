@@ -6,6 +6,23 @@ The format follows [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [6.0.0-beta.7] - 2026-10-31
+
+### Added
+- `Proximiio.compassHeadings` → `CompassHeading` (`degrees`, `accuracyDegrees`, `isTrueNorth`, `timestamp`): the
+  phone's compass, for a position marker that turns with the phone. It updates while the visitor stands still,
+  about 10 times a second, and needs no permission and no `start()`: it runs while the stream has a listener and
+  the app is in the foreground. Android: the rotation-vector sensor, low-pass filtered, corrected to true north
+  from the latest position of a run. iOS: Core Location's heading, with coarse location updates for true north
+  when the location permission is granted. The plugin's own code; neither native SDK has a compass stream.
+  `pdrObservations` stays the direction of walking, once per step and only while PDR runs.
+
+### Documentation
+- README, Android: which permissions an app that positions only while it is open can remove
+  (`ACCESS_BACKGROUND_LOCATION`, `FOREGROUND_SERVICE_LOCATION`, `FOREGROUND_SERVICE_CONNECTED_DEVICE`, the
+  foreground service, and `ACTIVITY_RECOGNITION` without PDR), which to keep, and that the Usage snippet's
+  `android:` turns the foreground service on.
+
 ## [6.0.0-beta.6] - 2026-10-30
 
 ### Changed

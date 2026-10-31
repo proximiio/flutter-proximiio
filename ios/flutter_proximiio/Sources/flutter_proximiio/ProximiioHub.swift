@@ -70,6 +70,21 @@ final class PdrObservationsRelay: PdrObservationsStreamHandler {
   override func onCancel(withArguments arguments: Any?) { box.sink = nil }
 }
 
+/// The plugin's compass runs while any engine listens, so listening and cancelling tell the hub.
+final class CompassHeadingsRelay: CompassHeadingsStreamHandler {
+  let box = EventBox<MsgCompassHeading>()
+
+  override func onListen(withArguments arguments: Any?, sink: PigeonEventSink<MsgCompassHeading>) {
+    box.sink = sink
+    Task { @MainActor in ProximiioHub.shared.updateCompass() }
+  }
+
+  override func onCancel(withArguments arguments: Any?) {
+    box.sink = nil
+    Task { @MainActor in ProximiioHub.shared.updateCompass() }
+  }
+}
+
 /// The event channels of one Flutter engine.
 final class EngineStreams {
   let stateChanges = StateChangesRelay()
@@ -82,12 +97,14 @@ final class EngineStreams {
   let syncEvents = SyncEventsRelay()
   let beaconEvents = BeaconEventsRelay()
   let pdrObservations = PdrObservationsRelay()
+  let compassHeadings = CompassHeadingsRelay()
 
   init(messenger: FlutterBinaryMessenger) {
     VenueDataChangesStreamHandler.register(with: messenger, streamHandler: venueDataChanges)
     SyncEventsStreamHandler.register(with: messenger, streamHandler: syncEvents)
     BeaconEventsStreamHandler.register(with: messenger, streamHandler: beaconEvents)
     PdrObservationsStreamHandler.register(with: messenger, streamHandler: pdrObservations)
+    CompassHeadingsStreamHandler.register(with: messenger, streamHandler: compassHeadings)
     StateChangesStreamHandler.register(with: messenger, streamHandler: stateChanges)
     PermissionUpdatesStreamHandler.register(with: messenger, streamHandler: permissionUpdates)
     PositionsStreamHandler.register(with: messenger, streamHandler: positions)
@@ -120,13 +137,31 @@ final class ProximiioHub {
   /// Forwarders in `runTasks` whose stream has not finished.
   private var openRunStreams = 0
   private var lifecycleTail: Task<Void, Never>?
+  /// The plugin's compass, made the first time Dart listens to it.
+  private var compass: CompassFeed?
 
   func attach(_ engine: EngineStreams) {
     engines.append(engine)
+    updateCompass()
   }
 
   func detach(_ engine: EngineStreams) {
     engines.removeAll { $0 === engine }
+    updateCompass()
+  }
+
+  /// Runs the compass while any engine listens to it (and the app is in the foreground).
+  func updateCompass() {
+    let wanted = engines.contains { $0.compassHeadings.box.sink != nil }
+    if compass == nil {
+      guard wanted else { return }
+      let feed = CompassFeed()
+      feed.onHeading = { [weak self] heading in
+        self?.engines.forEach { $0.compassHeadings.box.send(heading) }
+      }
+      compass = feed
+    }
+    compass?.isEnabled = wanted
   }
 
   /// Runs configure, authenticate, start, stop and sign-out one at a time across all engines, so

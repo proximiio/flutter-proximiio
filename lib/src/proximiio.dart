@@ -81,6 +81,19 @@ abstract interface class Proximiio {
   /// [ConfigurationPreset.highAccuracy] preset).
   Stream<PdrUpdate> get pdrObservations;
 
+  /// The phone's compass: which way the top of the screen points, about ten times a second while the
+  /// phone turns, also while the visitor stands still. Use it to turn a position marker with the phone;
+  /// [pdrObservations] gives the direction of walking instead.
+  ///
+  /// Unlike the other streams it does not need [start]: the compass runs while this stream has a
+  /// listener and the app is in the foreground, and the first reading arrives a moment after the first
+  /// listener. It needs no permission. On Android it is the rotation-vector sensor, smoothed, corrected
+  /// to true north from the latest position of a run; on iOS it is Core Location's heading, which
+  /// starts coarse location updates for true north when the location permission is granted. Readings
+  /// the platform marks unreliable are skipped: if none arrive, the compass needs calibrating (move the
+  /// phone in a figure eight). A device without a compass gives none.
+  Stream<CompassHeading> get compassHeadings;
+
   /// The current lifecycle state.
   Future<ProximiioState> state();
 
@@ -344,6 +357,9 @@ class BridgeEvents {
 
   /// See [Proximiio.pdrObservations].
   Stream<msg.MsgPdrUpdate> pdrObservations() => msg.pdrObservations();
+
+  /// See [Proximiio.compassHeadings].
+  Stream<msg.MsgCompassHeading> compassHeadings() => msg.compassHeadings();
 }
 
 /// [Proximiio] over the Pigeon bridge.
@@ -410,6 +426,9 @@ class BridgedProximiio implements Proximiio, ProximiioAndroid {
 
   @override
   Stream<PdrUpdate> get pdrObservations => _shared.pdrObservations;
+
+  @override
+  Stream<CompassHeading> get compassHeadings => _shared.compassHeadings;
 
   @override
   Future<ProximiioState> state() => guarded(() async => fromMsgState(await _api.state()));
@@ -710,6 +729,8 @@ final class _BridgedStreams {
   late final Stream<BeaconEvent> beaconEvents = _bridge(_events.beaconEvents(), fromMsgBeaconEvent);
 
   late final Stream<PdrUpdate> pdrObservations = _bridge(_events.pdrObservations(), fromMsgPdrUpdate);
+
+  late final Stream<CompassHeading> compassHeadings = _bridge(_events.compassHeadings(), fromMsgCompassHeading);
 
   /// Both `map` and `fromHandlers` keep the channel's broadcast stream a broadcast stream.
   static Stream<T> _bridge<M, T>(Stream<M> source, T Function(M) convert) => source

@@ -6,7 +6,8 @@ description: Every stream of Proximiio, its event type, and when it delivers eve
 <p>
   All streams are broadcast streams that stay open for the life of the app. They deliver events while
   the SDK runs (<code>stateChanges</code> and <code>permissionUpdates</code> also while stopped) and survive <code>stop</code> and <code>start</code>. A stream
-  error is a <code>ProximiioException</code>.
+  error is a <code>ProximiioException</code>. <code>compassHeadings</code> is the exception: it does not
+  need the SDK to run (see <a href="#compass">Compass</a>).
 </p>
 
 <table>
@@ -22,8 +23,37 @@ description: Every stream of Proximiio, its event type, and when it delivers eve
     <tr><td><code>syncEvents</code></td><td><code>SyncEvent</code></td><td><code>SyncUpdated</code>, <code>SyncDeleted</code>, <code>SyncCompleted</code>, <code>SyncFailed</code>, <code>StoreRecreated</code></td></tr>
     <tr><td><code>beaconEvents</code></td><td><code>BeaconEvent</code></td><td><code>BeaconFound</code>, <code>BeaconUpdated</code>, <code>BeaconLost</code>, <code>BeaconTelemetryReceived</code></td></tr>
     <tr><td><code>pdrObservations</code></td><td><code>PdrUpdate</code></td><td>Each PDR step: length, direction of walking, whether the visitor walks. Only while PDR runs with PDR fusion on; see <a href="{{root}}concepts/positioning.html#pedestrian-dead-reckoning">Positioning</a></td></tr>
+    <tr><td><code>compassHeadings</code></td><td><code>CompassHeading</code></td><td>Which way the top of the screen points, about 10 times a second while the phone turns. Runs while listened to and the app is in the foreground; see <a href="#compass">Compass</a></td></tr>
   </tbody>
 </table>
+
+<h2 id="compass">Compass</h2>
+
+<p>
+  <code>compassHeadings</code> turns a position marker with the phone, also while the visitor stands
+  still. <code>pdrObservations</code> gives the direction of walking instead, once per step and only while
+  PDR runs.
+</p>
+
+<ul>
+  <li><strong>Lifecycle.</strong> The compass runs while the stream has a listener and the app is in the
+    foreground, whether the SDK runs or not. The first reading arrives a moment after the first listener.</li>
+  <li><strong>Permissions.</strong> None. On iOS, with the location permission granted, the plugin also
+    runs coarse location updates so Core Location can give true north.</li>
+  <li><strong>North.</strong> <code>degrees</code> are from true north when <code>isTrueNorth</code> is
+    <code>true</code>, else from magnetic north: on Android until the first position of a run, on iOS
+    without the location permission.</li>
+  <li><strong>Screen.</strong> 0° is the top of the screen in its current orientation.</li>
+  <li><strong>Unreliable readings</strong> are skipped. When none arrive, the compass needs calibrating:
+    the visitor moves the phone in a figure eight. A device without a compass delivers nothing.</li>
+</ul>
+
+<pre><code class="language-dart">// A Proximi.io wayfinding web app in a WebView turns its position marker with SET_HEADING.
+sdk.compassHeadings.listen((heading) {
+  controller.runJavaScript(
+    "window.postMessage({type: 'SET_HEADING', heading: ${heading.degrees}}, '*')",
+  );
+});</code></pre>
 
 <h2>Sealed events</h2>
 

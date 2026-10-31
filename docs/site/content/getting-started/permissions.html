@@ -31,7 +31,8 @@ if (!status.isLocationAuthorized) {
 </p>
 
 <p>
-  Motion is needed only for PDR (<code>enablePdr</code>) and, on iOS, for barometric floor changes.
+  Motion is needed only for PDR (<code>enablePdr</code>) and, on iOS, for barometric floor changes. The
+  compass (<code>compassHeadings</code>) needs no permission.
   On Android, background location is a separate prompt because Android 11 and newer deny it when it
   is asked together with foreground location.
 </p>

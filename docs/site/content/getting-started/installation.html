@@ -25,7 +25,7 @@ description: Add flutter_proximiio, set up the iOS pod and Info.plist keys, and 
   flutter_proximiio:
     git:
       url: https://github.com/proximiio/flutter-proximiio
-      ref: 6.0.0-beta.6</code></pre>
+      ref: 6.0.0-beta.7</code></pre>
 
 <p>Pin <code>ref</code> to a release tag. A git dependency without <code>ref</code> follows the default branch.</p>
 
@@ -147,15 +147,40 @@ end</code></pre>
 <h3>Manifest</h3>
 
 <p>
-  The SDK's manifest adds the location, Bluetooth, foreground-service and notification permissions
-  and its foreground service to the app. Nothing has to be declared by hand. To keep an app
-  foreground-only, remove background location:
+  The SDK's manifest adds the location, Bluetooth, foreground-service, activity-recognition and
+  notification permissions and its foreground service to the app. Nothing has to be declared by hand.
+  Google Play asks for a declaration for background location, for each foreground-service type and for
+  activity recognition. An app that positions only while it is open can remove them in
+  <code>android/app/src/main/AndroidManifest.xml</code>:
 </p>
 
 <pre><code class="language-xml">&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"&gt;
+    &lt;!-- Positioning only while the app is open. --&gt;
     &lt;uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" tools:node="remove" /&gt;
+    &lt;!-- No foreground service: leave ProximiioConfiguration.android unset. --&gt;
+    &lt;uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" tools:node="remove" /&gt;
+    &lt;uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" tools:node="remove" /&gt;
+    &lt;!-- No PDR: never call requestMotionPermission() or enablePdr(). --&gt;
+    &lt;uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" tools:node="remove" /&gt;
+
+    &lt;application&gt;
+        &lt;service android:name="io.proximi.sdk.service.ProximiioForegroundService" tools:node="remove" /&gt;
+    &lt;/application&gt;
 &lt;/manifest&gt;</code></pre>
+
+<ul>
+  <li>The foreground service starts only when the configuration has <code>android:</code> options
+    (<code>AndroidServiceOptions</code>). Without them its permissions and the <code>&lt;service&gt;</code>
+    element can go. Pass <code>android:</code> only for <a href="{{root}}guides/background.html">background positioning</a>.</li>
+  <li>Activity recognition feeds PDR only. Without it positions still come from GPS and beacons, a little
+    less smoothly between beacon fixes, and <code>pdrObservations</code> delivers nothing.
+    <code>compassHeadings</code> needs no permission.</li>
+  <li>Keep <code>ACCESS_FINE_LOCATION</code>, <code>ACCESS_COARSE_LOCATION</code>, <code>BLUETOOTH_SCAN</code>,
+    <code>BLUETOOTH_CONNECT</code>, <code>INTERNET</code> and <code>ACCESS_NETWORK_STATE</code>. Do not add
+    <code>neverForLocation</code> to <code>BLUETOOTH_SCAN</code>: beacon positioning derives the location
+    from the scan.</li>
+</ul>
 
 <h2>Verify</h2>
 

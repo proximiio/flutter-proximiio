@@ -12,6 +12,7 @@ Each release pins exact native SDK versions; they are built and tested together.
 
 | flutter_proximiio | iOS SDK (`Proximiio`) | Android SDK (`io.proximi.sdk:proximiio`) |
 |---|---|---|
+| 6.0.0-beta.7 | 6.0.0-beta.68 | 6.0.0-beta.36 |
 | 6.0.0-beta.6 | 6.0.0-beta.68 | 6.0.0-beta.36 |
 | 6.0.0-beta.5 | 6.0.0-beta.67 | 6.0.0-beta.35 |
 | 6.0.0-beta.4 | 6.0.0-beta.66 | 6.0.0-beta.31 |
@@ -34,7 +35,7 @@ dependencies:
   flutter_proximiio:
     git:
       url: https://github.com/proximiio/flutter-proximiio
-      ref: 6.0.0-beta.6
+      ref: 6.0.0-beta.7
 ```
 
 ### iOS
@@ -99,15 +100,37 @@ In `android/app/build.gradle.kts` set `minSdk = 26` and `compileSdk = 37`. A pro
 Studio bundles, with or without built-in Kotlin. An older project needs the Android Gradle Plugin 8.13 or
 newer; Gradle before 9.1 does not run on JDK 25.
 
-The SDK's manifest brings the location, Bluetooth, foreground-service and notification permissions and
-its foreground service. To keep an app foreground-only, remove background location:
+The SDK's manifest brings the location, Bluetooth, foreground-service, activity-recognition and
+notification permissions and its foreground service. Google Play asks for a declaration for background
+location, for each foreground-service type and for activity recognition (Health). An app that positions
+only while it is open can remove them in `android/app/src/main/AndroidManifest.xml`:
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <!-- Positioning only while the app is open. -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" tools:node="remove" />
+    <!-- No foreground service: leave ProximiioConfiguration.android unset. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" tools:node="remove" />
+    <!-- No PDR: never call requestMotionPermission() or enablePdr(). -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" tools:node="remove" />
+
+    <application>
+        <service android:name="io.proximi.sdk.service.ProximiioForegroundService" tools:node="remove" />
+    </application>
 </manifest>
 ```
+
+- **The foreground service** starts only when the configuration has `android:` (`AndroidServiceOptions`).
+  Without it the service never runs, so its permissions and the `<service>` element can go. The Usage
+  snippet below passes `android:` for background positioning; leave it out in a foreground-only app.
+- **Activity recognition** feeds PDR only. Without it positions still come from GPS and beacons, a little
+  less smoothly between beacon fixes, and `pdrObservations` stays silent. `compassHeadings` needs no
+  permission and keeps working.
+- **Keep** `ACCESS_FINE_LOCATION`, `ACCESS_COARSE_LOCATION`, `BLUETOOTH_SCAN`, `BLUETOOTH_CONNECT`,
+  `INTERNET` and `ACCESS_NETWORK_STATE`. Never add `neverForLocation` to `BLUETOOTH_SCAN`: beacon positioning
+  derives the location from the scan.
 
 ## Usage
 
@@ -118,6 +141,8 @@ final sdk = await Proximiio.create(
   ProximiioConfiguration(
     token: token,                                   // never commit it; see the example app
     apiBaseUrl: Uri.parse('https://api.proximi.fi'), // the host of your residency group or installation
+    // Only for positioning in the background: runs the Android foreground service. Leave it out in an
+    // app that positions only while it is open.
     android: const AndroidServiceOptions(notificationTitle: 'Indoor positioning'),
   ),
 );
@@ -141,6 +166,9 @@ sdk.geofenceEvents.listen((event) {
   }
 });
 
+// Which way the phone points, to turn the position marker. No permission, no start() needed.
+sdk.compassHeadings.listen((heading) => print('${heading.degrees}° ±${heading.accuracyDegrees}°'));
+
 final floors = await sdk.floors();
 await sdk.stop();
 ```
@@ -151,6 +179,9 @@ await sdk.stop();
 - **Privacy zones**: positions inside them are withheld by default, as in 1.x
   (`withholdsPositionsInPrivacyZones: false` to receive them; the native v6 default is `false`).
 - **Streams** can be listened to at any time and stay open across `stop()` / `start()`.
+- **Heading**: `compassHeadings` is the phone's compass (it turns with the phone, also standing still,
+  about 10 Hz, smoothed on Android). `pdrObservations` is the direction of walking, once per step and only
+  while PDR runs. For a marker that turns with the phone, use the compass.
 - **Errors** are `ProximiioException`s; switch on `code` (`invalidToken`, `locationPermissionDenied`,
   `api`, …). `isRetryable` is true for network and server failures.
 - **Visitor analytics** are on by default in SDK v6. Turn them off with

@@ -178,6 +178,14 @@ PdrUpdate fromMsgPdrUpdate(MsgPdrUpdate u) => PdrUpdate(
   timestamp: _duration(u.timestampSeconds),
 );
 
+/// Transport → [CompassHeading].
+CompassHeading fromMsgCompassHeading(MsgCompassHeading h) => CompassHeading(
+  degrees: h.degrees,
+  accuracyDegrees: h.accuracyDegrees,
+  isTrueNorth: h.isTrueNorth,
+  timestamp: _time(h.timestampMs),
+);
+
 /// Transport → [GeofenceEvent].
 GeofenceEvent fromMsgGeofenceEvent(MsgGeofenceEvent e) => switch (e) {
   MsgGeofenceEntered(:final geofence) => GeofenceEntered(fromMsgGeofence(geofence)),

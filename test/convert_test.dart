@@ -279,6 +279,22 @@ void main() {
       }
     });
 
+    test('compass heading', () {
+      final heading = fromMsgCompassHeading(
+        MsgCompassHeading(degrees: 271.5, accuracyDegrees: 12, isTrueNorth: true, timestampMs: 1500),
+      );
+      expect(
+        heading,
+        CompassHeading(
+          degrees: 271.5,
+          accuracyDegrees: 12,
+          isTrueNorth: true,
+          timestamp: DateTime.fromMillisecondsSinceEpoch(1500, isUtc: true),
+        ),
+      );
+      expect(heading.toString(), 'CompassHeading(272° ±12°, true north)');
+    });
+
     test('every transport state and source has a public counterpart', () {
       for (final state in MsgSdkState.values) {
         expect(fromMsgState(state).name, state.name);

@@ -221,6 +221,44 @@ class PdrUpdate with ValueEquality {
       '${isMoving ? 'moving' : 'still'}, ${placement.name})';
 }
 
+/// Which way the top of the screen points, from the phone's compass.
+///
+/// It turns with the phone, also while the visitor stands still. [PdrUpdate.headingDegrees] is the
+/// direction of walking instead, and changes only with steps.
+class CompassHeading with ValueEquality {
+  /// Creates a compass reading.
+  const CompassHeading({
+    required this.degrees,
+    required this.accuracyDegrees,
+    required this.isTrueNorth,
+    required this.timestamp,
+  });
+
+  /// Degrees from north, clockwise, in `[0, 360)`, for the top of the screen in its current
+  /// orientation. From true north when [isTrueNorth], else from magnetic north.
+  final double degrees;
+
+  /// The ± error in degrees, as the platform estimates it.
+  final double accuracyDegrees;
+
+  /// Whether [degrees] are from true north. `false` until the phone knows where it is: on Android
+  /// until the first position of a run, on iOS until Core Location has a location (it needs the
+  /// location permission). Magnetic north differs from true north by the local declination, a few
+  /// degrees in most places.
+  final bool isTrueNorth;
+
+  /// When the reading was taken.
+  final DateTime timestamp;
+
+  @override
+  List<Object?> get props => [degrees, accuracyDegrees, isTrueNorth, timestamp];
+
+  @override
+  String toString() =>
+      'CompassHeading(${degrees.toStringAsFixed(0)}° ±${accuracyDegrees.toStringAsFixed(0)}°, '
+      '${isTrueNorth ? 'true' : 'magnetic'} north)';
+}
+
 /// A geofence or privacy-zone transition.
 sealed class GeofenceEvent with ValueEquality {
   const GeofenceEvent();

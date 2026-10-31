@@ -29,6 +29,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -103,8 +104,23 @@ internal class PdrObservationsRelay : PdrObservationsStreamHandler() {
   override fun onCancel(p0: Any?) { box.sink = null }
 }
 
+/** The plugin's compass runs while any engine listens, so listening and cancelling tell the hub. */
+internal class CompassHeadingsRelay(private val context: Context) : CompassHeadingsStreamHandler() {
+  val box = EventBox<MsgCompassHeading>()
+
+  override fun onListen(p0: Any?, sink: PigeonEventSink<MsgCompassHeading>) {
+    box.sink = sink
+    ProximiioHub.updateCompass(context)
+  }
+
+  override fun onCancel(p0: Any?) {
+    box.sink = null
+    ProximiioHub.updateCompass(context)
+  }
+}
+
 /** The event channels of one Flutter engine. */
-internal class EngineStreams(messenger: BinaryMessenger) {
+internal class EngineStreams(messenger: BinaryMessenger, context: Context) {
   val stateChanges = StateChangesRelay()
   val permissionUpdates = PermissionUpdatesRelay()
   val positions = PositionsRelay()
@@ -115,6 +131,7 @@ internal class EngineStreams(messenger: BinaryMessenger) {
   val syncEvents = SyncEventsRelay()
   val beaconEvents = BeaconEventsRelay()
   val pdrObservations = PdrObservationsRelay()
+  val compassHeadings = CompassHeadingsRelay(context.applicationContext)
 
   init {
     StateChangesStreamHandler.register(messenger, stateChanges)
@@ -127,6 +144,7 @@ internal class EngineStreams(messenger: BinaryMessenger) {
     SyncEventsStreamHandler.register(messenger, syncEvents)
     BeaconEventsStreamHandler.register(messenger, beaconEvents)
     PdrObservationsStreamHandler.register(messenger, pdrObservations)
+    CompassHeadingsStreamHandler.register(messenger, compassHeadings)
   }
 }
 
@@ -171,6 +189,12 @@ internal object ProximiioHub {
   private var runJobs: List<Job> = emptyList()
   private var prompts: PluginPrompts? = null
 
+  /** The plugin's compass, made the first time Dart listens to it. */
+  private var compass: CompassFeed? = null
+
+  /** Where the last position of a run was, for the compass's true north. */
+  private var lastCoordinate: MsgCoordinate? = null
+
   fun attach(engine: EngineStreams) {
     engines += engine
   }
@@ -178,7 +202,22 @@ internal object ProximiioHub {
   /** Removes [engine]; `true` when no engine is left. */
   fun detach(engine: EngineStreams): Boolean {
     engines -= engine
+    compass?.isEnabled = engines.any { it.compassHeadings.box.sink != null }
     return engines.isEmpty()
+  }
+
+  /** Runs the compass while any engine listens to it (and the app is in the foreground). */
+  fun updateCompass(context: Context) {
+    val wanted = engines.any { it.compassHeadings.box.sink != null }
+    val feed = compass ?: run {
+      if (!wanted) return
+      CompassFeed(SensorCompass(context), ProcessAppForeground()).also { made ->
+        made.onHeading = { heading -> engines.forEach { it.compassHeadings.box.send(heading) } }
+        made.location = lastCoordinate
+        compass = made
+      }
+    }
+    feed.isEnabled = wanted
   }
 
   /**
@@ -220,7 +259,7 @@ internal object ProximiioHub {
     if (runJobs.isNotEmpty() && runJobs.all { it.isActive }) return
     cancelRunStreams()
     runJobs = listOf(
-      forward(sdk.positions().map(Mappers::position)) { it.positions.box },
+      forward(sdk.positions().map(Mappers::position).onEach(::notePosition)) { it.positions.box },
       forward(sdk.floorChanges().map(Mappers::floorChange)) { it.floorChanges.box },
       forward(sdk.geofenceEvents().map(Mappers::geofenceEvent)) { it.geofenceEvents.box },
       forward(sdk.privacyZoneStateChanges().map(Mappers::privacyZoneState)) { it.privacyZoneStateChanges.box },
@@ -242,6 +281,12 @@ internal object ProximiioHub {
     if (!wasRunning) return
     withTimeoutOrNull(STREAM_DRAIN_MS) { runJobs.joinAll() }
     cancelRunStreams()
+  }
+
+  /** Keeps the position for the compass's true north. */
+  private fun notePosition(position: MsgPositionUpdate) {
+    lastCoordinate = position.coordinate
+    compass?.location = position.coordinate
   }
 
   fun cancelRunStreams() {

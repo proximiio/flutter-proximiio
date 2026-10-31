@@ -68,6 +68,7 @@ class FakeHostApi extends ProximiioHostApi {
 class FakeEvents extends BridgeEvents {
   final positionsController = StreamController<MsgPositionUpdate>.broadcast();
   final geofenceController = StreamController<MsgGeofenceEvent>.broadcast();
+  final compassController = StreamController<MsgCompassHeading>.broadcast();
   int positionsCalls = 0;
 
   @override
@@ -79,9 +80,13 @@ class FakeEvents extends BridgeEvents {
   @override
   Stream<MsgGeofenceEvent> geofenceEvents() => geofenceController.stream;
 
+  @override
+  Stream<MsgCompassHeading> compassHeadings() => compassController.stream;
+
   Future<void> close() async {
     await positionsController.close();
     await geofenceController.close();
+    await compassController.close();
   }
 }
 
@@ -266,6 +271,22 @@ void main() {
     await pumpEventQueue();
 
     expect(errors.single, isA<ProximiioException>().having((e) => e.code, 'code', ProximiioErrorCode.notAuthenticated));
+    await subscription.cancel();
+  });
+
+  test('compass headings arrive without start and are converted', () async {
+    final sdk = BridgedProximiio(api, events);
+    final headings = <CompassHeading>[];
+    final subscription = sdk.compassHeadings.listen(headings.add);
+
+    events.compassController.add(
+      MsgCompassHeading(degrees: 90, accuracyDegrees: 5, isTrueNorth: false, timestampMs: 0),
+    );
+    await pumpEventQueue();
+
+    expect(api.calls, isEmpty);
+    expect(headings.single.degrees, 90);
+    expect(headings.single.isTrueNorth, isFalse);
     await subscription.cancel();
   });
 
